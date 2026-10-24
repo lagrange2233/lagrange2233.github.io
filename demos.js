@@ -22,7 +22,7 @@ window.DEMOS = {
     {
       slug: "circle-3points",
       path: "demos/circle-3points/",
-      title: "圆上到直线距离为 1 的点，个数可能是 0、1、2、3、4",
+      title: "圆上到直线距离等于定长的点的个数问题",
       subtitle: "拖动直线 $y=x+b$，看两条平行线与圆的公共点个数如何跳变",
       topic: "解析几何",
       grade: "高二",
