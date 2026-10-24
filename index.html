@@ -52,20 +52,44 @@
   .stats b{color:var(--ink);font-size:15px;font-weight:700;margin-right:3px}
   .stats span{display:inline-flex;align-items:baseline;gap:2px}
 
-  /* ---------- 工具条 ---------- */
-  .toolbar{
-    display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;
-    margin:34px 0 18px;padding-bottom:16px;border-bottom:1px solid var(--line);
+  /* ---------- 筛选面板 ---------- */
+  .filter-panel{
+    margin:32px 0 14px;padding:4px 18px 6px;
+    background:rgba(255,255,255,.72);border:1px solid var(--line);border-radius:14px;
+    box-shadow:0 1px 2px rgba(22,32,47,.03);
   }
-  .chips{display:flex;flex-wrap:wrap;gap:7px}
+  .filter-row{
+    display:flex;gap:10px;align-items:flex-start;
+    padding:9px 0;border-bottom:1px dashed var(--line);
+  }
+  .filter-row:last-child{border-bottom:none}
+  .filter-label{
+    flex:none;width:48px;padding-top:5px;
+    font-size:12px;font-weight:600;letter-spacing:.06em;color:var(--ink3);
+  }
+  .chips{display:flex;flex-wrap:wrap;gap:7px;min-height:28px}
   .chip{
     font:inherit;font-size:12.5px;font-weight:600;color:var(--ink2);cursor:pointer;
-    background:#fff;border:1px solid var(--line);border-radius:999px;padding:5px 13px;
+    background:#fff;border:1px solid var(--line);border-radius:999px;padding:4px 13px;
     transition:.16s ease;white-space:nowrap;
   }
   .chip:hover{border-color:#a8c2e8;color:var(--blue);background:#f8fbff}
   .chip[aria-pressed="true"]{background:var(--blue);border-color:var(--blue);color:#fff;box-shadow:0 6px 14px -8px rgba(37,99,235,.9)}
-  .chip .n{opacity:.6;margin-left:3px;font-weight:400}
+  .chip .n{opacity:.55;margin-left:4px;font-weight:400}
+  .chip[aria-pressed="true"] .n{opacity:.8}
+  .chip.dim{opacity:.34;cursor:not-allowed;background:#fbfcfe}
+  .chip.dim:hover{border-color:var(--line);color:var(--ink2);background:#fbfcfe}
+
+  /* ---------- 工具条 ---------- */
+  .toolbar{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;margin:14px 0 18px}
+  .result{font-size:13px;color:var(--ink3)}
+  .result b{color:var(--ink);font-weight:700}
+  .reset{
+    font:inherit;font-size:12.5px;font-weight:600;color:var(--blue);cursor:pointer;
+    background:none;border:none;padding:2px 4px;margin-left:8px;display:none;
+  }
+  .reset.on{display:inline}
+  .reset:hover{text-decoration:underline}
   .search{
     font:inherit;font-size:13px;color:var(--ink);
     background:#fff;border:1px solid var(--line);border-radius:10px;
@@ -89,16 +113,20 @@
   }
   .card-top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:9px}
   .topic{font-size:11.5px;font-weight:600;letter-spacing:.04em;color:var(--blue);background:var(--blue-soft);border-radius:6px;padding:2px 8px}
-  .level{display:inline-flex;gap:3px;align-items:center}
-  .level i{width:5px;height:5px;border-radius:50%;background:#d7e0ec;display:block}
+  .level{display:inline-flex;gap:4px;align-items:center;margin-left:auto}
+  .level i{width:6px;height:6px;border-radius:50%;background:#d7e0ec;display:block}
   .level i.on{background:var(--amber)}
   .card-title{font-size:15.5px;line-height:1.55;margin:0 0 7px;font-weight:650;letter-spacing:.1px}
-  .card-sub{font-size:13px;color:var(--ink2);margin:0 0 12px}
-  .card-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:auto}
-  .card-tags span{font-size:11.5px;color:var(--ink3);background:#f6f9fd;border:1px solid var(--line);border-radius:5px;padding:1px 7px}
+  .card-sub{font-size:13px;color:var(--ink2);margin:0 0 11px}
+  .card-meta{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:auto}
+  .meta-i{
+    font-size:11.5px;color:var(--ink2);background:#f6f9fd;
+    border:1px solid var(--line);border-radius:5px;padding:1px 7px;
+  }
+  .meta-i.book{color:var(--ink3)}
   .card-foot{
     display:flex;align-items:center;justify-content:space-between;
-    margin-top:13px;padding-top:11px;border-top:1px dashed var(--line);
+    margin-top:12px;padding-top:10px;border-top:1px dashed var(--line);
     font-size:12px;color:var(--ink3);
   }
   .go{display:inline-flex;align-items:center;gap:4px;color:var(--blue);font-weight:600}
@@ -121,6 +149,9 @@
     .toolbar{flex-direction:column;align-items:stretch;gap:10px}
     .search{width:100%}
     .stats{gap:14px}
+    .filter-panel{padding:4px 13px 6px}
+    .filter-row{flex-direction:column;gap:5px}
+    .filter-label{width:auto;padding-top:0}
   }
 </style>
 </head>
@@ -133,21 +164,37 @@
     <p class="sub">每个演示对应一道值得推敲的题目。拖动参数、改变图形，看答案跟着一起变化——比盯着静态图想，快得多。</p>
     <div class="stats">
       <span><b id="sCount">—</b>个演示</span>
-      <span><b id="sTopic">—</b>个专题</span>
-      <span><b id="sTag">—</b>个知识点标签</span>
+      <span><b id="sTopic">—</b>个知识点</span>
+      <span><b id="sGrade">—</b>个年级</span>
+      <span><b id="sBook">—</b>本教材</span>
     </div>
   </header>
 
+  <div class="filter-panel" id="filters">
+    <div class="filter-row">
+      <span class="filter-label">知识点</span>
+      <div class="chips" id="chips-topic" role="group" aria-label="按知识点筛选"></div>
+    </div>
+    <div class="filter-row">
+      <span class="filter-label">年级</span>
+      <div class="chips" id="chips-grade" role="group" aria-label="按年级筛选"></div>
+    </div>
+    <div class="filter-row">
+      <span class="filter-label">课本</span>
+      <div class="chips" id="chips-book" role="group" aria-label="按课本筛选"></div>
+    </div>
+  </div>
+
   <div class="toolbar">
-    <div class="chips" id="chips" role="group" aria-label="按专题筛选"></div>
-    <input id="q" class="search" type="search" placeholder="搜索题目 / 知识点…" aria-label="搜索" />
+    <span class="result">共 <b id="shown">0</b> 个演示<button class="reset" id="reset">清空筛选</button></span>
+    <input id="q" class="search" type="search" placeholder="搜索题目 / 关键词…" aria-label="搜索" />
   </div>
 
   <main class="grid" id="grid"></main>
-  <div class="empty" id="empty">没有找到匹配的演示，换个关键词试试。</div>
+  <div class="empty" id="empty">没有找到匹配的演示，换个条件或关键词试试。</div>
 
   <footer>
-    <span>题目与讲解用于教学;演示为原创实现,可自由用于课堂。</span>
+    <span>题目与讲解用于教学；演示为原创实现，可自由用于课堂。</span>
     <span id="repoSlot"></span>
   </footer>
 </div>
@@ -158,7 +205,14 @@
   "use strict";
   var DEMOS = (window.DEMOS && window.DEMOS.demos) || [];
   var SITE  = (window.DEMOS && window.DEMOS.site) || {};
-  var state = { topic: "*", q: "" };
+
+  /* 三个筛选维度，字段名与 demos.js 中的一致 */
+  var GROUPS = [
+    { key: "topic", label: "知识点", order: null },
+    { key: "grade", label: "年级",   order: ["高一", "高二", "高三"] },
+    { key: "book",  label: "课本",   order: null }
+  ];
+  var state = { topic: "*", grade: "*", book: "*", q: "" };
 
   if (SITE.title) document.title = SITE.title;
   var repoSlot = document.getElementById("repoSlot");
@@ -177,31 +231,81 @@
   });
 
   /* ---------- 统计 ---------- */
-  var topics = {}, tags = {};
-  list.forEach(function(d){
-    if (d.topic) topics[d.topic] = (topics[d.topic] || 0) + 1;
-    (d.tags || []).forEach(function(t){ tags[t] = (tags[t] || 0) + 1; });
-  });
+  function uniq(key){
+    var o = {};
+    list.forEach(function(d){ if (d[key]) o[d[key]] = 1; });
+    return Object.keys(o);
+  }
   document.getElementById("sCount").textContent = list.length;
-  document.getElementById("sTopic").textContent = Object.keys(topics).length;
-  document.getElementById("sTag").textContent = Object.keys(tags).length;
+  document.getElementById("sTopic").textContent = uniq("topic").length;
+  document.getElementById("sGrade").textContent = uniq("grade").length;
+  document.getElementById("sBook").textContent  = uniq("book").length;
 
-  /* ---------- 专题筛选 ---------- */
-  var chips = document.getElementById("chips");
-  var names = Object.keys(topics).sort(function(a, b){ return topics[b] - topics[a]; });
-  var all = ['<button class="chip" data-topic="*" aria-pressed="true">全部<span class="n">' + list.length + "</span></button>"];
-  names.forEach(function(t){
-    all.push('<button class="chip" data-topic="' + esc(t) + '" aria-pressed="false">' + esc(t) +
-             '<span class="n">' + topics[t] + "</span></button>");
-  });
-  chips.innerHTML = all.join("");
-  chips.addEventListener("click", function(e){
-    var btn = e.target.closest(".chip");
-    if (!btn) return;
-    state.topic = btn.dataset.topic;
-    [].forEach.call(chips.children, function(c){
-      c.setAttribute("aria-pressed", String(c === btn));
+  /* ---------- 匹配 ---------- */
+  function hitKeyword(d){
+    if (!state.q) return true;
+    var hay = [d.title, d.subtitle, d.topic, d.grade, d.book, (d.tags || []).join(" ")]
+      .join(" ").toLowerCase();
+    return hay.indexOf(state.q) !== -1;
+  }
+  /* exceptKey：计算某一维度的候选值时，忽略该维度自身的已选条件 */
+  function hit(d, exceptKey){
+    if (!hitKeyword(d)) return false;
+    for (var i = 0; i < GROUPS.length; i++){
+      var k = GROUPS[i].key;
+      if (k === exceptKey) continue;
+      if (state[k] !== "*" && d[k] !== state[k]) return false;
+    }
+    return true;
+  }
+
+  /* ---------- 筛选项 ---------- */
+  function optionsOf(group){
+    var seen = {}, rows = [];
+    list.forEach(function(d){
+      var v = d[group.key];
+      if (!v) return;
+      if (!seen[v]) { seen[v] = { value: v, total: 0, first: rows.length }; rows.push(seen[v]); }
+      seen[v].total++;
     });
+    if (group.order){
+      rows.sort(function(a, b){
+        var ia = group.order.indexOf(a.value), ib = group.order.indexOf(b.value);
+        if (ia === -1) ia = 99;
+        if (ib === -1) ib = 99;
+        return ia - ib || a.first - b.first;
+      });
+    } else {
+      rows.sort(function(a, b){ return b.total - a.total || a.first - b.first; });
+    }
+    return rows;
+  }
+
+  function renderFilters(){
+    GROUPS.forEach(function(group){
+      var box = document.getElementById("chips-" + group.key);
+      var rows = optionsOf(group);
+      var allCount = list.filter(function(d){ return hit(d, group.key); }).length;
+      var allSel = state[group.key] === "*";
+      var html = '<button class="chip' + (!allSel && allCount === 0 ? " dim" : "") + '" data-key="' + group.key +
+                 '" data-val="*" aria-pressed="' + allSel + '">全部' +
+                 '<span class="n">' + allCount + "</span></button>";
+      rows.forEach(function(r){
+        var n = list.filter(function(d){ return d[group.key] === r.value && hit(d, group.key); }).length;
+        var sel = state[group.key] === r.value;
+        html += '<button class="chip' + (!sel && n === 0 ? " dim" : "") + '" data-key="' + group.key +
+                '" data-val="' + esc(r.value) + '" aria-pressed="' + sel +
+                '">' + esc(r.value) + '<span class="n">' + n + "</span></button>";
+      });
+      box.innerHTML = html;
+    });
+  }
+
+  document.getElementById("filters").addEventListener("click", function(e){
+    var btn = e.target.closest(".chip");
+    if (!btn || btn.classList.contains("dim")) return;
+    var k = btn.dataset.key, v = btn.dataset.val;
+    state[k] = (state[k] === v) ? "*" : v;   /* 再点一次已选项 = 取消 */
     render();
   });
 
@@ -213,33 +317,44 @@
     if (e.key === "Escape" && document.activeElement === q){ q.value = ""; state.q = ""; render(); q.blur(); }
   });
 
-  /* ---------- 渲染 ---------- */
+  document.getElementById("reset").addEventListener("click", function(){
+    state.topic = state.grade = state.book = "*";
+    state.q = ""; q.value = "";
+    render();
+  });
+
+  /* ---------- 卡片 ---------- */
   function level(n){
     var k = Math.max(1, Math.min(3, Number(n) || 1)), out = "";
     for (var i = 1; i <= 3; i++) out += '<i class="' + (i <= k ? "on" : "") + '"></i>';
     return '<span class="level" title="难度 ' + k + '/3">' + out + "</span>";
   }
-  function hit(d){
-    if (state.topic !== "*" && d.topic !== state.topic) return false;
-    if (!state.q) return true;
-    var hay = [d.title, d.subtitle, d.topic, d.grade, (d.tags || []).join(" ")].join(" ").toLowerCase();
-    return hay.indexOf(state.q) !== -1;
-  }
   function card(d){
+    var meta = [];
+    if (d.grade) meta.push('<span class="meta-i">' + esc(d.grade) + "</span>");
+    if (d.book)  meta.push('<span class="meta-i book">' + esc(d.book) + "</span>");
     return '<a class="card" href="' + esc(d.path) + '">' +
       '<div class="card-top"><span class="topic">' + esc(d.topic || "未分类") + "</span>" + level(d.level) + "</div>" +
       '<h2 class="card-title">' + esc(d.title) + "</h2>" +
       '<p class="card-sub">' + esc(d.subtitle || "") + "</p>" +
-      '<div class="card-tags">' + (d.tags || []).map(function(t){ return "<span>" + esc(t) + "</span>"; }).join("") + "</div>" +
-      '<div class="card-foot"><span>' + esc(d.date || "") + (d.grade ? " · " + esc(d.grade) : "") + "</span>" +
+      '<div class="card-meta">' + meta.join("") + "</div>" +
+      '<div class="card-foot"><span>' + esc(d.date || "") + "</span>" +
       '<span class="go">打开<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13M13 6l6 6-6 6"/></svg></span></div>' +
       "</a>";
   }
+
   function render(){
-    var shown = list.filter(hit);
+    var shown = list.filter(function(d){ return hit(d, null); });
     var grid = document.getElementById("grid");
     grid.innerHTML = shown.map(card).join("");
     document.getElementById("empty").classList.toggle("show", shown.length === 0);
+    document.getElementById("shown").textContent = shown.length;
+
+    var filtered = state.q || GROUPS.some(function(g){ return state[g.key] !== "*"; });
+    document.getElementById("reset").classList.toggle("on", !!filtered);
+
+    renderFilters();
+
     if (window.renderMathInElement) {
       window.renderMathInElement(grid, {
         delimiters: [
