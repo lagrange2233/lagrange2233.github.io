@@ -35,42 +35,82 @@
     line-height:1.65;
     min-height:100vh;
   }
-  .page{max-width:1120px;margin:0 auto;padding:44px 20px 64px}
+  .page{max-width:1120px;margin:0 auto;padding:28px 20px 56px}
 
-  /* ---------- 头部 ---------- */
-  .eyebrow{
-    display:inline-flex;align-items:center;gap:7px;
-    font-size:12px;letter-spacing:.14em;color:var(--blue);
-    background:var(--blue-soft);border:1px solid #cfe0fb;border-radius:999px;
-    padding:3px 11px;margin-bottom:14px;font-weight:600;
+  /* ---------- 头部（紧凑版） ---------- */
+  h1.brand{
+    font-size:28px;line-height:1.3;letter-spacing:.02em;
+    color:var(--ink);margin:2px 0 8px;font-weight:400;
   }
-  .eyebrow::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--blue)}
-  h1{font-size:30px;line-height:1.3;margin:0 0 12px;letter-spacing:.2px;font-weight:700}
-  h1 em{font-style:normal;color:var(--blue)}
-  .sub{margin:0;color:var(--ink2);font-size:15px;max-width:640px}
-  .stats{display:flex;flex-wrap:wrap;gap:18px;margin-top:20px;font-size:13px;color:var(--ink3)}
-  .stats b{color:var(--ink);font-size:15px;font-weight:700;margin-right:3px}
+  h1.brand b{font-weight:700;letter-spacing:.04em}
+  h1.brand i{font-style:normal;color:var(--blue);margin:0 10px;font-weight:400;font-size:1.15em;line-height:1}
+  h1.brand s{text-decoration:none;font-weight:400;color:#41506a;letter-spacing:.06em}
+  .sub{margin:0;color:var(--ink2);font-size:13px;max-width:620px}
+  .stats{display:flex;flex-wrap:wrap;margin-top:10px;font-size:11.5px;color:var(--ink3)}
   .stats span{display:inline-flex;align-items:baseline;gap:2px}
+  .stats span:not(:last-child)::after{content:"·";margin:0 9px;color:#c8d3e2}
+  .stats b{color:var(--ink2);font-size:12.5px;font-weight:700}
 
-  /* ---------- 筛选面板 ---------- */
+  /* ---------- 工具条 ---------- */
+  .toolbar{
+    display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;
+    margin:16px 0 14px;padding-bottom:12px;border-bottom:1px solid var(--line);
+  }
+  .tool-left{display:flex;flex-wrap:wrap;gap:10px;align-items:center;min-height:34px}
+  .btn-filter{
+    display:inline-flex;align-items:center;gap:6px;
+    font:inherit;font-size:12.5px;font-weight:600;color:var(--ink2);cursor:pointer;
+    background:#fff;border:1px solid var(--line);border-radius:9px;padding:6px 11px;
+    transition:.16s ease;
+  }
+  .btn-filter:hover{border-color:#a8c2e8;color:var(--blue);background:#f8fbff}
+  .btn-filter[aria-expanded="true"]{border-color:#a8c2e8;color:var(--blue);background:#f4f9ff}
+  .btn-filter svg.funnel{width:13px;height:13px;flex:none}
+  .btn-filter svg.caret{width:10px;height:10px;flex:none;transition:transform .2s ease;opacity:.55}
+  .btn-filter[aria-expanded="true"] svg.caret{transform:rotate(180deg)}
+  .badge{
+    min-width:16px;height:16px;padding:0 4px;border-radius:999px;
+    background:var(--blue);color:#fff;font-size:10.5px;font-weight:700;line-height:16px;text-align:center;
+  }
+  .badge[hidden]{display:none}
+  .result{font-size:12.5px;color:var(--ink3)}
+  .result b{color:var(--ink);font-weight:700}
+  .summary{font-size:12px;color:var(--ink3);display:none}
+  .summary.on{display:inline}
+  .summary i{font-style:normal;color:var(--ink2);font-weight:600}
+  .reset{
+    font:inherit;font-size:12px;font-weight:600;color:var(--blue);cursor:pointer;
+    background:none;border:none;padding:2px 2px;display:none;
+  }
+  .reset.on{display:inline}
+  .reset:hover{text-decoration:underline}
+  .search{
+    font:inherit;font-size:12.5px;color:var(--ink);
+    background:#fff;border:1px solid var(--line);border-radius:9px;
+    padding:7px 12px;width:220px;outline:none;transition:.16s ease;
+  }
+  .search::placeholder{color:var(--ink3)}
+  .search:focus{border-color:#a8c2e8;box-shadow:0 0 0 3px rgba(37,99,235,.1)}
+
+  /* ---------- 筛选面板（可折叠，默认收起） ---------- */
+  .collapse{display:grid;grid-template-rows:0fr;transition:grid-template-rows .24s ease}
+  .collapse.open{grid-template-rows:1fr;margin-bottom:16px}
+  .collapse > .collapse-inner{overflow:hidden;min-height:0;visibility:hidden;transition:visibility 0s .24s}
+  .collapse.open > .collapse-inner{visibility:visible;transition:visibility 0s}
   .filter-panel{
-    margin:32px 0 14px;padding:4px 18px 6px;
-    background:rgba(255,255,255,.72);border:1px solid var(--line);border-radius:14px;
-    box-shadow:0 1px 2px rgba(22,32,47,.03);
+    padding:2px 16px 4px;
+    background:rgba(255,255,255,.78);border:1px solid var(--line);border-radius:13px;
   }
-  .filter-row{
-    display:flex;gap:10px;align-items:flex-start;
-    padding:9px 0;border-bottom:1px dashed var(--line);
-  }
+  .filter-row{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px dashed var(--line)}
   .filter-row:last-child{border-bottom:none}
   .filter-label{
-    flex:none;width:48px;padding-top:5px;
-    font-size:12px;font-weight:600;letter-spacing:.06em;color:var(--ink3);
+    flex:none;width:46px;padding-top:5px;
+    font-size:11.5px;font-weight:600;letter-spacing:.06em;color:var(--ink3);
   }
-  .chips{display:flex;flex-wrap:wrap;gap:7px;min-height:28px}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;min-height:27px}
   .chip{
-    font:inherit;font-size:12.5px;font-weight:600;color:var(--ink2);cursor:pointer;
-    background:#fff;border:1px solid var(--line);border-radius:999px;padding:4px 13px;
+    font:inherit;font-size:12px;font-weight:600;color:var(--ink2);cursor:pointer;
+    background:#fff;border:1px solid var(--line);border-radius:999px;padding:3px 12px;
     transition:.16s ease;white-space:nowrap;
   }
   .chip:hover{border-color:#a8c2e8;color:var(--blue);background:#f8fbff}
@@ -80,30 +120,12 @@
   .chip.dim{opacity:.34;cursor:not-allowed;background:#fbfcfe}
   .chip.dim:hover{border-color:var(--line);color:var(--ink2);background:#fbfcfe}
 
-  /* ---------- 工具条 ---------- */
-  .toolbar{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;margin:14px 0 18px}
-  .result{font-size:13px;color:var(--ink3)}
-  .result b{color:var(--ink);font-weight:700}
-  .reset{
-    font:inherit;font-size:12.5px;font-weight:600;color:var(--blue);cursor:pointer;
-    background:none;border:none;padding:2px 4px;margin-left:8px;display:none;
-  }
-  .reset.on{display:inline}
-  .reset:hover{text-decoration:underline}
-  .search{
-    font:inherit;font-size:13px;color:var(--ink);
-    background:#fff;border:1px solid var(--line);border-radius:10px;
-    padding:8px 12px;width:230px;outline:none;transition:.16s ease;
-  }
-  .search::placeholder{color:var(--ink3)}
-  .search:focus{border-color:#a8c2e8;box-shadow:0 0 0 3px rgba(37,99,235,.1)}
-
   /* ---------- 卡片 ---------- */
   .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(316px,1fr));gap:16px}
   .card{
     display:flex;flex-direction:column;text-decoration:none;color:inherit;
     background:var(--card);border:1px solid var(--line);border-radius:16px;
-    padding:18px 19px 15px;
+    padding:17px 18px 14px;
     box-shadow:0 1px 2px rgba(22,32,47,.04), 0 12px 28px -22px rgba(22,32,47,.3);
     transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease;
   }
@@ -111,45 +133,46 @@
     transform:translateY(-3px);border-color:#bcd3f2;
     box-shadow:0 1px 2px rgba(22,32,47,.05), 0 18px 34px -20px rgba(37,99,235,.35);
   }
-  .card-top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:9px}
-  .topic{font-size:11.5px;font-weight:600;letter-spacing:.04em;color:var(--blue);background:var(--blue-soft);border-radius:6px;padding:2px 8px}
+  .card-top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
+  .topic{font-size:11px;font-weight:600;letter-spacing:.04em;color:var(--blue);background:var(--blue-soft);border-radius:6px;padding:2px 8px}
   .level{display:inline-flex;gap:4px;align-items:center;margin-left:auto}
   .level i{width:6px;height:6px;border-radius:50%;background:#d7e0ec;display:block}
   .level i.on{background:var(--amber)}
-  .card-title{font-size:15.5px;line-height:1.55;margin:0 0 7px;font-weight:650;letter-spacing:.1px}
-  .card-sub{font-size:13px;color:var(--ink2);margin:0 0 11px}
+  .card-title{font-size:15px;line-height:1.55;margin:0 0 6px;font-weight:650;letter-spacing:.1px}
+  .card-sub{font-size:12.5px;color:var(--ink2);margin:0 0 10px}
   .card-meta{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:auto}
   .meta-i{
-    font-size:11.5px;color:var(--ink2);background:#f6f9fd;
+    font-size:11px;color:var(--ink2);background:#f6f9fd;
     border:1px solid var(--line);border-radius:5px;padding:1px 7px;
   }
   .meta-i.book{color:var(--ink3)}
   .card-foot{
     display:flex;align-items:center;justify-content:space-between;
-    margin-top:12px;padding-top:10px;border-top:1px dashed var(--line);
-    font-size:12px;color:var(--ink3);
+    margin-top:11px;padding-top:9px;border-top:1px dashed var(--line);
+    font-size:11.5px;color:var(--ink3);
   }
   .go{display:inline-flex;align-items:center;gap:4px;color:var(--blue);font-weight:600}
-  .go svg{width:13px;height:13px;transition:transform .18s ease}
+  .go svg{width:12px;height:12px;transition:transform .18s ease}
   .card:hover .go svg{transform:translateX(3px)}
 
-  .empty{display:none;padding:60px 0;text-align:center;color:var(--ink3);font-size:14px}
+  .empty{display:none;padding:56px 0;text-align:center;color:var(--ink3);font-size:13.5px}
   .empty.show{display:block}
 
   footer{
-    margin-top:52px;padding-top:20px;border-top:1px solid var(--line);
-    font-size:12.5px;color:var(--ink3);display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;
+    margin-top:44px;padding-top:18px;border-top:1px solid var(--line);
+    font-size:12px;color:var(--ink3);display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;
   }
   footer a{color:var(--ink2);text-decoration:none;border-bottom:1px dotted #c3cfdd}
   footer a:hover{color:var(--blue)}
 
   @media (max-width:640px){
-    .page{padding:30px 15px 48px}
-    h1{font-size:23px}
-    .toolbar{flex-direction:column;align-items:stretch;gap:10px}
+    .page{padding:22px 15px 44px}
+    h1.brand{font-size:21px}
+    h1.brand i{margin:0 7px}
+    .sub{font-size:12.5px}
+    .toolbar{flex-direction:column;align-items:stretch;gap:9px}
     .search{width:100%}
-    .stats{gap:14px}
-    .filter-panel{padding:4px 13px 6px}
+    .filter-panel{padding:2px 12px 4px}
     .filter-row{flex-direction:column;gap:5px}
     .filter-label{width:auto;padding-top:0}
   }
@@ -159,9 +182,8 @@
 <div class="page">
 
   <header>
-    <div class="eyebrow">高中数学 · 动态演示</div>
-    <h1>把课本上<em>看不出来</em>的那一步，拖出来看</h1>
-    <p class="sub">每个演示对应一道值得推敲的题目。拖动参数、改变图形，看答案跟着一起变化——比盯着静态图想，快得多。</p>
+    <h1 class="brand"><b>高中数学</b><i>·</i><s>动态演示</s></h1>
+    <p class="sub">每个演示对应一道值得推敲的题目。拖动参数、改变图形，看答案跟着一起变化。</p>
     <div class="stats">
       <span><b id="sCount">—</b>个演示</span>
       <span><b id="sTopic">—</b>个知识点</span>
@@ -170,24 +192,38 @@
     </div>
   </header>
 
-  <div class="filter-panel" id="filters">
-    <div class="filter-row">
-      <span class="filter-label">知识点</span>
-      <div class="chips" id="chips-topic" role="group" aria-label="按知识点筛选"></div>
+  <div class="toolbar">
+    <div class="tool-left">
+      <button class="btn-filter" id="btnFilter" aria-expanded="false" aria-controls="filters">
+        <svg class="funnel" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5h18l-7 8v6l-4 2v-8z"/></svg>
+        筛选
+        <span class="badge" id="fbadge" hidden>0</span>
+        <svg class="caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+      </button>
+      <span class="result">共 <b id="shown">0</b> 个演示</span>
+      <span class="summary" id="summary"></span>
+      <button class="reset" id="reset">清空</button>
     </div>
-    <div class="filter-row">
-      <span class="filter-label">年级</span>
-      <div class="chips" id="chips-grade" role="group" aria-label="按年级筛选"></div>
-    </div>
-    <div class="filter-row">
-      <span class="filter-label">课本</span>
-      <div class="chips" id="chips-book" role="group" aria-label="按课本筛选"></div>
-    </div>
+    <input id="q" class="search" type="search" placeholder="搜索题目 / 关键词…" aria-label="搜索" />
   </div>
 
-  <div class="toolbar">
-    <span class="result">共 <b id="shown">0</b> 个演示<button class="reset" id="reset">清空筛选</button></span>
-    <input id="q" class="search" type="search" placeholder="搜索题目 / 关键词…" aria-label="搜索" />
+  <div class="collapse" id="filterWrap">
+    <div class="collapse-inner" inert>
+      <div class="filter-panel" id="filters">
+        <div class="filter-row">
+          <span class="filter-label">知识点</span>
+          <div class="chips" id="chips-topic" role="group" aria-label="按知识点筛选"></div>
+        </div>
+        <div class="filter-row">
+          <span class="filter-label">年级</span>
+          <div class="chips" id="chips-grade" role="group" aria-label="按年级筛选"></div>
+        </div>
+        <div class="filter-row">
+          <span class="filter-label">课本</span>
+          <div class="chips" id="chips-book" role="group" aria-label="按课本筛选"></div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <main class="grid" id="grid"></main>
@@ -213,6 +249,7 @@
     { key: "book",  label: "课本",   order: null }
   ];
   var state = { topic: "*", grade: "*", book: "*", q: "" };
+  var panelOpen = false;
 
   if (SITE.title) document.title = SITE.title;
   var repoSlot = document.getElementById("repoSlot");
@@ -248,7 +285,6 @@
       .join(" ").toLowerCase();
     return hay.indexOf(state.q) !== -1;
   }
-  /* exceptKey：计算某一维度的候选值时，忽略该维度自身的已选条件 */
   function hit(d, exceptKey){
     if (!hitKeyword(d)) return false;
     for (var i = 0; i < GROUPS.length; i++){
@@ -309,12 +345,30 @@
     render();
   });
 
+  /* ---------- 筛选面板开合 ---------- */
+  var btnFilter = document.getElementById("btnFilter");
+  var filterWrap = document.getElementById("filterWrap");
+  function setPanel(open){
+    panelOpen = open;
+    filterWrap.classList.toggle("open", open);
+    btnFilter.setAttribute("aria-expanded", open ? "true" : "false");
+    /* 收起时让里面的按钮退出 Tab 顺序，避免键盘用户 Tab 进看不见的筛选项 */
+    var inner = filterWrap.querySelector(".collapse-inner");
+    if (open) inner.removeAttribute("inert"); else inner.setAttribute("inert", "");
+    renderToolbar();
+  }
+  btnFilter.addEventListener("click", function(){ setPanel(!panelOpen); });
+
   /* ---------- 搜索 ---------- */
   var q = document.getElementById("q");
   q.addEventListener("input", function(){ state.q = q.value.trim().toLowerCase(); render(); });
   document.addEventListener("keydown", function(e){
-    if (e.key === "/" && document.activeElement !== q){ e.preventDefault(); q.focus(); }
-    if (e.key === "Escape" && document.activeElement === q){ q.value = ""; state.q = ""; render(); q.blur(); }
+    if (document.activeElement === q){
+      if (e.key === "Escape"){ q.value = ""; state.q = ""; render(); q.blur(); }
+      return;
+    }
+    if (e.key === "/"){ e.preventDefault(); q.focus(); }
+    if (e.key === "f" || e.key === "F"){ e.preventDefault(); setPanel(!panelOpen); }
   });
 
   document.getElementById("reset").addEventListener("click", function(){
@@ -343,6 +397,29 @@
       "</a>";
   }
 
+  /* ---------- 工具条状态 ---------- */
+  function activeOf(){
+    var out = [];
+    GROUPS.forEach(function(g){ if (state[g.key] !== "*") out.push(state[g.key]); });
+    return out;
+  }
+  function renderToolbar(){
+    var act = activeOf();
+    var badge = document.getElementById("fbadge");
+    badge.textContent = act.length;
+    badge.hidden = act.length === 0;
+    document.getElementById("reset").classList.toggle("on", act.length > 0 || !!state.q);
+
+    /* 面板收起时，把已选条件写在工具条上，免得「筛完看不见自己选了什么」 */
+    var sum = document.getElementById("summary");
+    if (act.length && !panelOpen){
+      sum.innerHTML = "· 已选 <i>" + act.map(esc).join(" / ") + "</i>";
+      sum.classList.add("on");
+    } else {
+      sum.classList.remove("on");
+    }
+  }
+
   function render(){
     var shown = list.filter(function(d){ return hit(d, null); });
     var grid = document.getElementById("grid");
@@ -350,10 +427,8 @@
     document.getElementById("empty").classList.toggle("show", shown.length === 0);
     document.getElementById("shown").textContent = shown.length;
 
-    var filtered = state.q || GROUPS.some(function(g){ return state[g.key] !== "*"; });
-    document.getElementById("reset").classList.toggle("on", !!filtered);
-
     renderFilters();
+    renderToolbar();
 
     if (window.renderMathInElement) {
       window.renderMathInElement(grid, {
