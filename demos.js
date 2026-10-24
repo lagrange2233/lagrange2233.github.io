@@ -16,7 +16,7 @@
 window.DEMOS = {
   site: {
     title: "高中数学 · 动态演示",
-    repo: ""            // 填上仓库地址，首页页脚会出现链接，例如 "https://github.com/你的用户名/math-demos"
+    repo: "https://github.com/lagrange2233/lagrange2233.github.io"   // 首页页脚的「源码 / 更新记录」链接
   },
   demos: [
     {

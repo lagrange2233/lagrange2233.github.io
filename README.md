@@ -1,6 +1,12 @@
 # 高中数学 · 动态演示
 
-用纯静态页面托管的高中数学可交互演示站，部署在 GitHub Pages，长期使用 `https://<用户名>.github.io/<仓库名>/` 地址。
+用纯静态页面托管的高中数学可交互演示站。
+
+- 线上地址：**https://lagrange2233.github.io/**
+- 仓库：https://github.com/lagrange2233/lagrange2233.github.io
+
+> 仓库名用的是 `<用户名>.github.io` 这种「用户主页仓库」，所以站点在域名**根路径**下（不是 `/子路径/`）。
+> 站内全部使用相对路径，从根路径换成自定义域名不需要改代码。
 
 ## 目录结构
 
@@ -27,33 +33,23 @@ python -m http.server 8080
 
 然后访问 http://localhost:8080 。
 
-## 首次部署到 GitHub Pages
+## 部署状态（已完成）
 
-1. 在 GitHub 新建一个**公开**仓库（免费账号只有 public 仓库能开 Pages），名字例如 `math-demos`。
-2. 在 `site` 目录初始化并推送：
+已经推到 `lagrange2233/lagrange2233.github.io`，Pages 从 `main` 分支根目录自动构建，访问 https://lagrange2233.github.io/ 即可。
+
+`<用户名>.github.io` 这类仓库的 Pages 是自动开启的，不需要去 Settings 里点。
+
+以后每次更新只有三行：
 
 ```bash
 cd site
-git init
-git add .
-git commit -m "init: 演示站骨架"
-git branch -M main
-git remote add origin https://github.com/<用户名>/math-demos.git
-git push -u origin main
+git add -A && git commit -m "add: 新演示 xxx"
+git push
 ```
 
-3. 仓库 → **Settings → Pages** → Source 选 `Deploy from a branch` → Branch 选 `main`，目录选 `/(root)` → Save。
-4. 等 1 分钟左右，访问 `https://<用户名>.github.io/math-demos/`。
-   若仓库名正好是 `<用户名>.github.io`，则站点在根路径 `https://<用户名>.github.io/`。
-   两种情况下相对路径都有效，不用改代码。
+约 1 分钟内自动生效；如果没变化，先 `Ctrl+F5` 强制刷新（Pages 边缘缓存有几十秒延迟）。
 
-以后更新：
-
-```bash
-git add . && git commit -m "add: 新演示 xxx" && git push
-```
-
-约 1 分钟内自动生效；如果没变化，先 `Ctrl+F5` 强制刷新。
+> 若在新机器上推送，需要先登录一次 GitHub（`git push` 会弹出浏览器授权，凭据会存进 Windows 凭据管理器）。
 
 ## 新增一个演示
 
@@ -75,7 +71,7 @@ git add . && git commit -m "add: 新演示 xxx" && git push
 
 现在用的是 `github.io` 默认域名，国内（尤其学校网络）可能偏慢。等确定要换，按这个顺序做，改动很小：
 
-1. 申请国内域名 → 在域名商解析里加一条 CNAME 指向 `<用户名>.github.io`（`github.io` 本身不需要备案）。
+1. 申请国内域名 → 在域名商解析里加一条 CNAME 指向 `lagrange2233.github.io`（`github.io` 本身不需要备案）。
 2. 仓库 Settings → Pages → Custom domain 填上域名，勾选 Enforce HTTPS（证书由 GitHub 自动签发，等几分钟）。
 3. 如果大陆访问仍然吃力：把域名接到 Cloudflare（免费），开代理（小云朵），源站仍指向 GitHub Pages；国内访问会有明显改善。
 4. 追求国内秒开才需要考虑备案 + 国内节点（EdgeOne Pages / 腾讯云 COS），那是另一条路，前面三步不用返工。
