@@ -22,6 +22,8 @@ window.DEMOS = {
     title: "高中数学 · 动态演示",
     repo: "https://github.com/lagrange2233/lagrange2233.github.io"   // 首页页脚的「源码 / 更新记录」链接
   },
+  /* ⚠️ 每条记录必须填 topic / grade / book 三类标签，缺一不可：
+     索引页的三行筛选就是按这三个字段做的，漏了这条演示在筛选里会失踪。 */
   demos: [
     {
       slug: "circle-3points",
