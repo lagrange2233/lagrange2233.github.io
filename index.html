@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>高中数学 · 动态演示</title>
+<meta name="description" content="高中数学题的可交互演示：拖动参数，看图形与答案如何一起变化。" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%232563eb'/%3E%3Ctext x='16' y='23' font-size='19' font-family='Georgia,serif' font-style='italic' fill='%23fff' text-anchor='middle'%3Ef%3C/text%3E%3C/svg%3E" />
+<!-- KaTeX：本地共享副本，与各演示页共用同一份缓存 -->
+<link rel="stylesheet" href="assets/katex/katex.min.css" />
+<script src="assets/katex/katex.min.js"></script>
+<script src="assets/katex/auto-render.min.js"></script>
+<style>
+  :root{
+    --bg:#f1f5fa;
+    --card:#ffffff;
+    --ink:#16202f;
+    --ink2:#5c6a7e;
+    --ink3:#8c99ab;
+    --line:#e1e9f3;
+    --blue:#2563eb;
+    --blue-soft:#e8f1ff;
+    --amber:#d98a00;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:
+      radial-gradient(1100px 480px at 12% -10%, #e4efff 0%, rgba(228,239,255,0) 62%),
+      radial-gradient(900px 460px at 95% 0%, #fdf1e2 0%, rgba(253,241,226,0) 55%),
+      var(--bg);
+    color:var(--ink);
+    font-family:"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,-apple-system,sans-serif;
+    -webkit-font-smoothing:antialiased;
+    line-height:1.65;
+    min-height:100vh;
+  }
+  .page{max-width:1120px;margin:0 auto;padding:44px 20px 64px}
+
+  /* ---------- 头部 ---------- */
+  .eyebrow{
+    display:inline-flex;align-items:center;gap:7px;
+    font-size:12px;letter-spacing:.14em;color:var(--blue);
+    background:var(--blue-soft);border:1px solid #cfe0fb;border-radius:999px;
+    padding:3px 11px;margin-bottom:14px;font-weight:600;
+  }
+  .eyebrow::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--blue)}
+  h1{font-size:30px;line-height:1.3;margin:0 0 12px;letter-spacing:.2px;font-weight:700}
+  h1 em{font-style:normal;color:var(--blue)}
+  .sub{margin:0;color:var(--ink2);font-size:15px;max-width:640px}
+  .stats{display:flex;flex-wrap:wrap;gap:18px;margin-top:20px;font-size:13px;color:var(--ink3)}
+  .stats b{color:var(--ink);font-size:15px;font-weight:700;margin-right:3px}
+  .stats span{display:inline-flex;align-items:baseline;gap:2px}
+
+  /* ---------- 工具条 ---------- */
+  .toolbar{
+    display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;
+    margin:34px 0 18px;padding-bottom:16px;border-bottom:1px solid var(--line);
+  }
+  .chips{display:flex;flex-wrap:wrap;gap:7px}
+  .chip{
+    font:inherit;font-size:12.5px;font-weight:600;color:var(--ink2);cursor:pointer;
+    background:#fff;border:1px solid var(--line);border-radius:999px;padding:5px 13px;
+    transition:.16s ease;white-space:nowrap;
+  }
+  .chip:hover{border-color:#a8c2e8;color:var(--blue);background:#f8fbff}
+  .chip[aria-pressed="true"]{background:var(--blue);border-color:var(--blue);color:#fff;box-shadow:0 6px 14px -8px rgba(37,99,235,.9)}
+  .chip .n{opacity:.6;margin-left:3px;font-weight:400}
+  .search{
+    font:inherit;font-size:13px;color:var(--ink);
+    background:#fff;border:1px solid var(--line);border-radius:10px;
+    padding:8px 12px;width:230px;outline:none;transition:.16s ease;
+  }
+  .search::placeholder{color:var(--ink3)}
+  .search:focus{border-color:#a8c2e8;box-shadow:0 0 0 3px rgba(37,99,235,.1)}
+
+  /* ---------- 卡片 ---------- */
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(316px,1fr));gap:16px}
+  .card{
+    display:flex;flex-direction:column;text-decoration:none;color:inherit;
+    background:var(--card);border:1px solid var(--line);border-radius:16px;
+    padding:18px 19px 15px;
+    box-shadow:0 1px 2px rgba(22,32,47,.04), 0 12px 28px -22px rgba(22,32,47,.3);
+    transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+  }
+  .card:hover{
+    transform:translateY(-3px);border-color:#bcd3f2;
+    box-shadow:0 1px 2px rgba(22,32,47,.05), 0 18px 34px -20px rgba(37,99,235,.35);
+  }
+  .card-top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:9px}
+  .topic{font-size:11.5px;font-weight:600;letter-spacing:.04em;color:var(--blue);background:var(--blue-soft);border-radius:6px;padding:2px 8px}
+  .level{display:inline-flex;gap:3px;align-items:center}
+  .level i{width:5px;height:5px;border-radius:50%;background:#d7e0ec;display:block}
+  .level i.on{background:var(--amber)}
+  .card-title{font-size:15.5px;line-height:1.55;margin:0 0 7px;font-weight:650;letter-spacing:.1px}
+  .card-sub{font-size:13px;color:var(--ink2);margin:0 0 12px}
+  .card-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:auto}
+  .card-tags span{font-size:11.5px;color:var(--ink3);background:#f6f9fd;border:1px solid var(--line);border-radius:5px;padding:1px 7px}
+  .card-foot{
+    display:flex;align-items:center;justify-content:space-between;
+    margin-top:13px;padding-top:11px;border-top:1px dashed var(--line);
+    font-size:12px;color:var(--ink3);
+  }
+  .go{display:inline-flex;align-items:center;gap:4px;color:var(--blue);font-weight:600}
+  .go svg{width:13px;height:13px;transition:transform .18s ease}
+  .card:hover .go svg{transform:translateX(3px)}
+
+  .empty{display:none;padding:60px 0;text-align:center;color:var(--ink3);font-size:14px}
+  .empty.show{display:block}
+
+  footer{
+    margin-top:52px;padding-top:20px;border-top:1px solid var(--line);
+    font-size:12.5px;color:var(--ink3);display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;
+  }
+  footer a{color:var(--ink2);text-decoration:none;border-bottom:1px dotted #c3cfdd}
+  footer a:hover{color:var(--blue)}
+
+  @media (max-width:640px){
+    .page{padding:30px 15px 48px}
+    h1{font-size:23px}
+    .toolbar{flex-direction:column;align-items:stretch;gap:10px}
+    .search{width:100%}
+    .stats{gap:14px}
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header>
+    <div class="eyebrow">高中数学 · 动态演示</div>
+    <h1>把课本上<em>看不出来</em>的那一步，拖出来看</h1>
+    <p class="sub">每个演示对应一道值得推敲的题目。拖动参数、改变图形，看答案跟着一起变化——比盯着静态图想，快得多。</p>
+    <div class="stats">
+      <span><b id="sCount">—</b>个演示</span>
+      <span><b id="sTopic">—</b>个专题</span>
+      <span><b id="sTag">—</b>个知识点标签</span>
+    </div>
+  </header>
+
+  <div class="toolbar">
+    <div class="chips" id="chips" role="group" aria-label="按专题筛选"></div>
+    <input id="q" class="search" type="search" placeholder="搜索题目 / 知识点…" aria-label="搜索" />
+  </div>
+
+  <main class="grid" id="grid"></main>
+  <div class="empty" id="empty">没有找到匹配的演示，换个关键词试试。</div>
+
+  <footer>
+    <span>题目与讲解用于教学;演示为原创实现,可自由用于课堂。</span>
+    <span id="repoSlot"></span>
+  </footer>
+</div>
+
+<script src="demos.js"></script>
+<script>
+(function(){
+  "use strict";
+  var DEMOS = (window.DEMOS && window.DEMOS.demos) || [];
+  var SITE  = (window.DEMOS && window.DEMOS.site) || {};
+  var state = { topic: "*", q: "" };
+
+  if (SITE.title) document.title = SITE.title;
+  var repoSlot = document.getElementById("repoSlot");
+  if (SITE.repo) {
+    repoSlot.innerHTML = '<a href="' + SITE.repo + '" target="_blank" rel="noopener">源码 / 更新记录</a>';
+  }
+
+  function esc(s){
+    return String(s == null ? "" : s).replace(/[&<>"']/g, function(c){
+      return { "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c];
+    });
+  }
+
+  var list = DEMOS.slice().sort(function(a, b){
+    return String(b.date || "").localeCompare(String(a.date || ""));
+  });
+
+  /* ---------- 统计 ---------- */
+  var topics = {}, tags = {};
+  list.forEach(function(d){
+    if (d.topic) topics[d.topic] = (topics[d.topic] || 0) + 1;
+    (d.tags || []).forEach(function(t){ tags[t] = (tags[t] || 0) + 1; });
+  });
+  document.getElementById("sCount").textContent = list.length;
+  document.getElementById("sTopic").textContent = Object.keys(topics).length;
+  document.getElementById("sTag").textContent = Object.keys(tags).length;
+
+  /* ---------- 专题筛选 ---------- */
+  var chips = document.getElementById("chips");
+  var names = Object.keys(topics).sort(function(a, b){ return topics[b] - topics[a]; });
+  var all = ['<button class="chip" data-topic="*" aria-pressed="true">全部<span class="n">' + list.length + "</span></button>"];
+  names.forEach(function(t){
+    all.push('<button class="chip" data-topic="' + esc(t) + '" aria-pressed="false">' + esc(t) +
+             '<span class="n">' + topics[t] + "</span></button>");
+  });
+  chips.innerHTML = all.join("");
+  chips.addEventListener("click", function(e){
+    var btn = e.target.closest(".chip");
+    if (!btn) return;
+    state.topic = btn.dataset.topic;
+    [].forEach.call(chips.children, function(c){
+      c.setAttribute("aria-pressed", String(c === btn));
+    });
+    render();
+  });
+
+  /* ---------- 搜索 ---------- */
+  var q = document.getElementById("q");
+  q.addEventListener("input", function(){ state.q = q.value.trim().toLowerCase(); render(); });
+  document.addEventListener("keydown", function(e){
+    if (e.key === "/" && document.activeElement !== q){ e.preventDefault(); q.focus(); }
+    if (e.key === "Escape" && document.activeElement === q){ q.value = ""; state.q = ""; render(); q.blur(); }
+  });
+
+  /* ---------- 渲染 ---------- */
+  function level(n){
+    var k = Math.max(1, Math.min(3, Number(n) || 1)), out = "";
+    for (var i = 1; i <= 3; i++) out += '<i class="' + (i <= k ? "on" : "") + '"></i>';
+    return '<span class="level" title="难度 ' + k + '/3">' + out + "</span>";
+  }
+  function hit(d){
+    if (state.topic !== "*" && d.topic !== state.topic) return false;
+    if (!state.q) return true;
+    var hay = [d.title, d.subtitle, d.topic, d.grade, (d.tags || []).join(" ")].join(" ").toLowerCase();
+    return hay.indexOf(state.q) !== -1;
+  }
+  function card(d){
+    return '<a class="card" href="' + esc(d.path) + '">' +
+      '<div class="card-top"><span class="topic">' + esc(d.topic || "未分类") + "</span>" + level(d.level) + "</div>" +
+      '<h2 class="card-title">' + esc(d.title) + "</h2>" +
+      '<p class="card-sub">' + esc(d.subtitle || "") + "</p>" +
+      '<div class="card-tags">' + (d.tags || []).map(function(t){ return "<span>" + esc(t) + "</span>"; }).join("") + "</div>" +
+      '<div class="card-foot"><span>' + esc(d.date || "") + (d.grade ? " · " + esc(d.grade) : "") + "</span>" +
+      '<span class="go">打开<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13M13 6l6 6-6 6"/></svg></span></div>' +
+      "</a>";
+  }
+  function render(){
+    var shown = list.filter(hit);
+    var grid = document.getElementById("grid");
+    grid.innerHTML = shown.map(card).join("");
+    document.getElementById("empty").classList.toggle("show", shown.length === 0);
+    if (window.renderMathInElement) {
+      window.renderMathInElement(grid, {
+        delimiters: [
+          { left: "$$", right: "$$", display: true },
+          { left: "$", right: "$", display: false }
+        ],
+        throwOnError: false
+      });
+    }
+  }
+  render();
+})();
+</script>
+</body>
+</html>

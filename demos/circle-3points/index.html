@@ -1,0 +1,1151 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>到直线距离为 1 的点：0 / 1 / 2 / 3 / 4 个 · 动态演示</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%232563eb'/%3E%3Ctext x='16' y='23' font-size='19' font-family='Georgia,serif' font-style='italic' fill='%23fff' text-anchor='middle'%3Ef%3C/text%3E%3C/svg%3E" />
+<meta name="description" content="圆上到直线距离为 1 的点为什么可能是 3 个？拖动直线，看两条平行线与圆的公共点个数如何跳变。" />
+<!-- KaTeX：本地共享副本，全站只下载并缓存一次（相对站点根） -->
+<link rel="stylesheet" href="../../assets/katex/katex.min.css" />
+<script src="../../assets/katex/katex.min.js"></script>
+<script src="../../assets/katex/auto-render.min.js"></script>
+<style>
+  :root{
+    --bg:#f1f5fa;
+    --card:#ffffff;
+    --ink:#16202f;
+    --ink2:#5c6a7e;
+    --ink3:#8c99ab;
+    --line:#e1e9f3;
+    --blue:#2563eb;
+    --amber:#d98a00;
+    --red:#dc2626;
+    --green:#0f8a5f;
+    --serif:"Cambria Math","Times New Roman",Georgia,serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:
+      radial-gradient(1100px 480px at 12% -10%, #e4efff 0%, rgba(228,239,255,0) 62%),
+      radial-gradient(900px 460px at 95% 0%, #fdf1e2 0%, rgba(253,241,226,0) 55%),
+      var(--bg);
+    color:var(--ink);
+    font-family:"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,-apple-system,sans-serif;
+    -webkit-font-smoothing:antialiased;
+    line-height:1.65;
+  }
+  .page{max-width:1200px;margin:0 auto;padding:26px 20px 64px}
+
+  header{margin-bottom:18px}
+  .back{
+    display:inline-flex;align-items:center;gap:5px;margin-bottom:11px;
+    font-size:12.5px;font-weight:600;color:var(--ink2);text-decoration:none;
+    background:#fff;border:1px solid var(--line);border-radius:999px;padding:4px 12px;
+    transition:.16s ease;
+  }
+  .back:hover{color:var(--blue);border-color:#a8c2e8;background:#f4f9ff;transform:translateY(-1px)}
+  .eyebrow{
+    display:inline-flex;align-items:center;gap:7px;
+    font-size:12px;letter-spacing:.14em;color:var(--blue);
+    background:#e8f1ff;border:1px solid #cfe0fb;border-radius:999px;
+    padding:3px 11px;margin-bottom:10px;font-weight:600;
+  }
+  h1{font-size:23px;line-height:1.35;margin:0 0 8px;letter-spacing:.2px}
+  .sub{margin:0;color:var(--ink2);font-size:14px}
+  .m{font-family:var(--serif);font-style:italic;letter-spacing:.02em}
+
+  /* KaTeX 微调 */
+  .katex{font-size:1.02em}
+  p .katex, li .katex, td .katex, th .katex{font-size:1.04em}
+  /* 画布上的 LaTeX 标签（HTML 覆盖层，代替 canvas 文字） */
+  .math-layer{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+  .mlabel{
+    position:absolute;left:0;top:0;
+    padding:2px 7px 1px;border-radius:7px;
+    background:rgba(255,255,255,.95);
+    border:1px solid currentColor;
+    font-size:12.4px;line-height:1.15;white-space:nowrap;
+    box-shadow:0 1px 2px rgba(22,32,47,.06);
+  }
+  .mlabel .katex{font-size:1em}
+
+  .main{display:grid;grid-template-columns:minmax(0,1fr) 336px;gap:18px;margin-top:18px;align-items:start}
+
+  .card{
+    background:var(--card);border:1px solid var(--line);border-radius:16px;
+    box-shadow:0 1px 2px rgba(22,32,47,.04), 0 12px 28px -18px rgba(22,32,47,.28);
+  }
+
+  .stage{position:relative;overflow:hidden}
+  .canvas-wrap{position:relative}
+  #cv{display:block;width:100%;height:530px;touch-action:none}
+  .banner{
+    position:absolute;left:14px;bottom:12px;
+    transform:translateY(10px);
+    padding:8px 16px;border-radius:999px;
+    background:linear-gradient(180deg,#fff5f5,#ffe8e8);
+    border:1px solid #f6b9b9;color:#b91c1c;
+    font-size:13.5px;font-weight:700;letter-spacing:.3px;
+    box-shadow:0 10px 22px -12px rgba(185,28,28,.6);
+    opacity:0;pointer-events:none;transition:opacity .22s ease, transform .22s ease;
+    display:flex;align-items:center;gap:8px;white-space:nowrap;
+  }
+  .banner.show{opacity:1;transform:translateY(0)}
+  .banner .spark{width:8px;height:8px;border-radius:50%;background:#dc2626;box-shadow:0 0 0 4px rgba(220,38,38,.16)}
+  .banner.single{background:linear-gradient(180deg,#fffaf0,#fff0d6);border-color:#f0cf95;color:#a26200;box-shadow:0 10px 22px -12px rgba(162,98,0,.5)}
+  .banner.single .spark{background:#d98a00;box-shadow:0 0 0 4px rgba(217,138,0,.16)}
+
+  .controls{
+    display:flex;flex-direction:column;gap:9px;
+    padding:12px 15px 13px;border-top:1px solid var(--line);
+    background:linear-gradient(180deg,#fafcff,#f5f9ff);
+  }
+  .ctrl-row{display:flex;flex-wrap:wrap;align-items:center;gap:9px}
+  .btn{
+    font-family:inherit;font-size:13px;font-weight:600;color:var(--ink);
+    background:#fff;border:1px solid #d5e0ee;border-radius:10px;
+    padding:7px 13px;cursor:pointer;transition:.16s ease;white-space:nowrap;
+  }
+  .btn:hover{border-color:#a8c2e8;background:#f4f9ff;transform:translateY(-1px)}
+  .btn:active{transform:translateY(0)}
+  .btn.primary{background:var(--blue);border-color:var(--blue);color:#fff;box-shadow:0 6px 14px -8px rgba(37,99,235,.9)}
+  .btn.primary:hover{background:#1d4ed8;border-color:#1d4ed8}
+  /* d 数值开关 */
+  .btn.switch{display:inline-flex;align-items:center;gap:8px;padding:6px 12px 6px 9px}
+  .btn.switch .sw{
+    position:relative;flex:none;width:27px;height:16px;border-radius:999px;
+    background:#d3dded;transition:background .18s ease;
+  }
+  .btn.switch .sw::after{
+    content:"";position:absolute;left:2px;top:2px;width:12px;height:12px;border-radius:50%;
+    background:#fff;box-shadow:0 1px 2px rgba(15,30,60,.3);transition:transform .18s ease;
+  }
+  .btn.switch .sw-txt{font-variant-numeric:tabular-nums;letter-spacing:.01em}
+  .btn.switch.on{border-color:#9dbbe6;background:#f3f8ff;color:var(--blue)}
+  .btn.switch.on .sw{background:var(--blue)}
+  .btn.switch.on .sw::after{transform:translateX(11px)}
+  .slider-wrap{display:flex;align-items:center;gap:9px;flex:1 1 220px;min-width:180px}
+  .slider-wrap .lab{font-size:12px;color:var(--ink3);font-weight:600}
+  .slider-wrap .val{font-family:var(--serif);font-size:14px;font-weight:700;color:var(--blue);min-width:62px;text-align:right}
+  input[type=range]{
+    -webkit-appearance:none;appearance:none;flex:1;height:4px;border-radius:3px;
+    background:linear-gradient(90deg,#dbe6f5,#dbe6f5);outline:none;cursor:pointer;
+  }
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none;width:16px;height:16px;border-radius:50%;
+    background:var(--blue);border:3px solid #fff;
+    box-shadow:0 1px 6px rgba(37,99,235,.55);cursor:grab;
+  }
+  input[type=range]::-moz-range-thumb{
+    width:14px;height:14px;border-radius:50%;background:var(--blue);
+    border:3px solid #fff;box-shadow:0 1px 6px rgba(37,99,235,.55);cursor:grab;
+  }
+
+  .quick{display:flex;flex-direction:column;gap:6px;padding-top:7px;border-top:1px dashed #e6eefa;margin-top:1px}
+  .quick-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px}
+  .quick-head .lab{font-size:12px;color:var(--ink3);font-weight:700;letter-spacing:.04em}
+  .quick-head .hint{font-size:11.5px;color:#a9b4c4}
+  .quick-row{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+  .side{
+    flex:none;width:56px;font-family:var(--serif);font-size:12.5px;font-weight:700;
+    color:#42506a;letter-spacing:.02em;white-space:nowrap;
+  }
+  .qbtn{
+    font-family:inherit;font-size:12.5px;font-weight:700;color:var(--ink2);
+    background:#fff;border:1px solid #dde6f2;border-radius:8px;
+    padding:4px 11px;cursor:pointer;transition:.15s ease;white-space:nowrap;min-width:72px;text-align:center;
+  }
+  .qbtn:hover{border-color:#a8c2e8;background:#f4f9ff;color:var(--blue)}
+  .qbtn.on{background:#14306b;border-color:#14306b;color:#fff;box-shadow:0 6px 14px -9px rgba(20,48,107,.9)}
+
+  .panel{padding:16px 18px 18px}
+  .panel h3{margin:0 0 12px;font-size:13px;letter-spacing:.12em;color:var(--ink3);font-weight:700}
+  .metric{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:7px 0;border-bottom:1px dashed #edf2f9}
+  .metric:last-of-type{border-bottom:none}
+  .m-label{font-size:13px;color:var(--ink2)}
+  .m-val{font-family:var(--serif);font-size:16px;font-weight:700;color:var(--ink)}
+  .m-val.side-val{font-family:inherit;font-size:13.5px;color:#3b62a8}
+
+  .divider{height:12px}
+  .row{padding:10px 12px;border:1px solid #eef2f8;border-radius:11px;background:#fbfcfe;margin-bottom:9px}
+  .row-head{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--ink2);margin-bottom:3px}
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--amber);flex:none;box-shadow:0 0 0 3px rgba(217,138,0,.14)}
+  .row-body{display:flex;justify-content:space-between;align-items:center;gap:8px}
+  .row-body .hv{font-family:var(--serif);font-size:15px;font-weight:700}
+  .chip{font-size:12px;font-weight:700;padding:2px 9px;border-radius:999px;white-space:nowrap}
+  .chip.n0{background:#f1f4f8;color:#8c99ab}
+  .chip.n1{background:#fff3dd;color:#a26200}
+  .chip.n2{background:#e8f1ff;color:#1d4ed8}
+  .chip.n3{background:#ffe8e8;color:#b91c1c}
+
+  .total{
+    margin-top:12px;padding:12px 14px;border-radius:12px;
+    background:#f3f7fd;border:1px solid #e2ebf7;
+    font-size:14px;font-weight:700;color:#1d3a6b;
+    display:flex;justify-content:space-between;align-items:center;gap:8px;
+    transition:.22s ease;
+  }
+  .total .num{font-family:var(--serif);font-size:19px}
+  .total.hot{
+    background:linear-gradient(135deg,#fff1f1,#ffe4e4);
+    border-color:#f8bebc;color:#b91c1c;
+    box-shadow:0 8px 20px -14px rgba(185,28,28,.9);
+  }
+  .total.warn{
+    background:linear-gradient(135deg,#fffaf1,#fff2d9);
+    border-color:#f2d8a8;color:#a26200;
+  }
+
+  .cases{margin-top:6px;display:grid;gap:4px}
+  .cases-title{font-size:12px;font-weight:700;letter-spacing:.1em;color:var(--ink3);margin:14px 0 6px}
+  .case-row{
+    display:flex;align-items:center;justify-content:space-between;gap:8px;
+    padding:6px 10px;border-radius:9px;font-size:12.5px;color:var(--ink2);
+    cursor:pointer;border:1px solid transparent;transition:.15s ease;
+  }
+  .case-row:hover{background:#f4f8ff;border-color:#e2ebf8}
+  .case-row.active{background:#eef5ff;border-color:#c9ddfa;color:#14306b;font-weight:700}
+  .case-row .cn{display:flex;align-items:center;gap:7px;white-space:nowrap}
+  .case-row .cr{font-family:var(--serif);font-size:12.5px;color:var(--ink3);white-space:nowrap}
+  .case-row.active .cr{color:#3b62a8}
+  .dotn{width:7px;height:7px;border-radius:50%;flex:none}
+  .d4{background:#2563eb}
+  .d3{background:#dc2626}
+  .d2{background:#5b8def}
+  .d1{background:#d98a00}
+  .d0{background:#b6c1d0}
+
+  .tip{margin:13px 0 0;font-size:12.5px;line-height:1.7;color:var(--ink3)}
+  .tip .m{color:var(--ink2)}
+
+  .solution{margin-top:18px;padding:22px 24px 24px}
+  .solution h2{font-size:16px;margin:0 0 4px;display:flex;align-items:center;gap:9px}
+  .solution h2 .bar{width:3px;height:16px;border-radius:2px;background:var(--blue)}
+  .solution .lead{margin:6px 0 16px;font-size:13.5px;color:var(--ink2)}
+
+  /* 一般结论：表格与说明块 */
+  .gtable{
+    width:100%;border-collapse:separate;border-spacing:0;
+    font-size:13.2px;color:#28374d;margin:4px 0 16px;
+    border:1px solid #e7eef8;border-radius:12px;overflow:hidden;
+  }
+  .gtable th,.gtable td{padding:9px 12px;text-align:left;border-bottom:1px solid #f0f5fc;vertical-align:middle}
+  .gtable th{background:#f7fafd;font-size:12.2px;font-weight:700;color:#5b6b82;letter-spacing:.02em;white-space:nowrap}
+  .gtable tbody tr:last-child td{border-bottom:none}
+  .gtable tbody tr:hover td{background:#fbfdff}
+  .gtable td.m{font-family:var(--serif);font-size:13.6px;white-space:nowrap}
+  .gtable .ncell{
+    text-align:center;font-family:var(--serif);font-size:16px;font-weight:700;
+    width:76px;letter-spacing:.02em;
+  }
+  .ncell.n4{color:#1d4ed8}.ncell.n3{color:#dc2626}.ncell.n2{color:#2563eb}
+  .ncell.n1{color:#b45309}.ncell.n0{color:#94a3b8}
+
+  .genbox{
+    display:block;padding:12px 14px;border-radius:12px;
+    background:#fafcff;border:1px solid #edf2f9;margin:0 0 12px;
+  }
+  .genbox p{margin:0;font-size:13.5px;line-height:1.85;color:#28374d}
+  .genbox .glab{
+    display:inline-block;margin-bottom:6px;padding:2px 9px;border-radius:999px;
+    background:#eef4ff;color:#2f5fc4;font-size:11.5px;font-weight:700;letter-spacing:.04em;
+  }
+  .genkey{
+    padding:14px 16px;border-radius:12px;margin:0 0 12px;
+    background:linear-gradient(180deg,#fffdf7,#fff8ec);border:1px solid #f3e2c3;
+  }
+  .genkey p{margin:0;font-size:13.5px;line-height:1.85;color:#4a3a20}
+  .genkey p + p{margin-top:6px}
+  .genkey .gform{
+    font-family:var(--serif);font-size:16px;font-weight:700;color:#a26200;
+    text-align:center;padding:4px 0 6px;letter-spacing:.02em;
+  }
+
+  .steps{display:grid;gap:11px}
+  .step{display:flex;gap:12px;padding:12px 14px;border-radius:12px;background:#fafcff;border:1px solid #edf2f9}
+  .step .num{
+    flex:none;width:22px;height:22px;border-radius:50%;background:#e8f1ff;color:#1d4ed8;
+    font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;margin-top:2px;
+  }
+  .step .body{font-size:13.8px;line-height:1.85;color:#28374d}
+  .step .body p{margin:0}
+  .step .body p + p{margin-top:5px}
+  .step .body p.eqline,.eqline{text-align:center;margin:4px 0 2px}
+  .katex-display{margin:.2em 0}
+  .katex-display>.katex{font-size:1.12em}
+  .hl{background:linear-gradient(180deg,transparent 62%,#ffe9a8 62%);font-weight:600;padding:0 1px}
+  .hl-red{background:linear-gradient(180deg,transparent 62%,#ffd3d3 62%);font-weight:700;padding:0 1px;color:#b91c1c}
+
+  .case-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-top:14px}
+  .case-item{
+    border:1px solid #e8eff9;border-radius:13px;padding:12px 12px 13px;background:#fbfdff;
+    display:flex;flex-direction:column;gap:6px;position:relative;overflow:hidden;
+  }
+  .case-item::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:#c9d8ec}
+  .case-item.k4::before{background:#2563eb}
+  .case-item.k3::before{background:#dc2626}
+  .case-item.k2::before{background:#5b8def}
+  .case-item.k1::before{background:#d98a00}
+  .case-item.k0::before{background:#b6c1d0}
+  .case-item .ch{display:flex;align-items:baseline;gap:6px}
+  .case-item .cn{font-family:var(--serif);font-size:22px;font-weight:700;line-height:1}
+  .case-item.k4 .cn{color:#1d4ed8}
+  .case-item.k3 .cn{color:#b91c1c}
+  .case-item.k2 .cn{color:#3b62a8}
+  .case-item.k1 .cn{color:#a26200}
+  .case-item.k0 .cn{color:#7d8b9f}
+  .case-item .cu{font-size:12px;color:var(--ink3)}
+  .case-item .cr{font-family:var(--serif);font-size:13px;font-weight:700;color:#2b3f61;background:#eef4fd;border-radius:7px;padding:2px 8px;align-self:flex-start}
+  .case-item p{margin:0;font-size:12.2px;line-height:1.6;color:var(--ink2)}
+
+  .answer{
+    margin-top:16px;padding:16px 20px;border-radius:14px;
+    background:linear-gradient(120deg,#eef5ff,#f7fbff 45%,#fff6ea);
+    border:1px solid #dbe8fb;
+    display:flex;flex-wrap:wrap;align-items:center;gap:12px;
+  }
+  .answer .tagline{font-size:12px;font-weight:800;letter-spacing:.14em;color:#5c6a7e}
+  .answer .eq{font-family:var(--serif);font-size:22px;font-weight:700;color:#14306b;letter-spacing:.02em}
+  .answer .eq b{color:#b91c1c}
+
+  .legend{display:flex;flex-wrap:wrap;gap:14px;padding:10px 15px 0;font-size:12px;color:var(--ink3)}
+  .legend i{display:inline-block;width:16px;height:0;border-top-width:3px;border-top-style:solid;vertical-align:middle;margin-right:6px;border-radius:2px}
+  .legend .lgdot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#ea580c;vertical-align:middle;margin-right:6px}
+
+  @media (max-width: 940px){
+    .main{grid-template-columns:1fr}
+    #cv{height:420px}
+    h1{font-size:20px}
+    .page{padding:20px 14px 48px}
+    .case-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .qbtn{min-width:0;padding:4px 7px;font-size:12px}
+    .side{width:46px;font-size:11.5px}
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header>
+    <a class="back" href="../../index.html">&larr; 全部演示</a>
+    <div class="eyebrow">高中解析几何 · 直线与圆的位置关系</div>
+    <h1>圆 $x^{2}+y^{2}=4$ 上到直线 $l:\;y=x+b$ 距离为 1 的点，可能是 0 / 1 / 2 / 3 / 4 个</h1>
+    <p class="sub">关键转化：到 $l$ 距离为 1 的点，全部落在与 $l$ 平行、且距离为 1 的两条直线上。于是「圆上这样的点有几个」$=$「这两条平行线与圆共有几个公共点」。拖动下方滑块，可以看到点数随 $b$ 在 $0\to1\to2\to3\to4$ 之间跳变。</p>
+  </header>
+
+  <div class="main">
+    <section class="card stage">
+      <div class="canvas-wrap">
+        <canvas id="cv"></canvas>
+        <div class="math-layer" id="mlayer"></div>
+        <div class="banner" id="banner"><span class="spark"></span><span id="bannerText">恰有 3 个点</span></div>
+      </div>
+      <div class="legend">
+        <span><i style="border-color:#1e3a8a"></i>圆 $C$</span>
+        <span><i style="border-color:#2563eb"></i>直线 $l$</span>
+        <span><i style="border-color:#e5a12a;border-top-style:dashed"></i>距 $l$ 为 1 的两条平行线</span>
+        <span><span class="lgdot"></span>满足条件的点</span>
+      </div>
+      <div class="controls">
+        <div class="ctrl-row">
+          <button class="btn primary" id="play">暂停</button>
+          <button class="btn" id="reset">从头播放</button>
+          <button class="btn switch on" id="toggleD" aria-pressed="true" title="显示 / 隐藏画布上 d 的具体数值（快捷键 D）">
+            <span class="sw"></span>
+            <span class="sw-txt"><span>$d$ 的数值：</span><span id="toggleDText">显示</span></span>
+          </button>
+          <div class="slider-wrap">
+            <span class="lab">$b$</span>
+            <input type="range" id="slider" min="-5" max="5" step="0.001" value="-5" />
+            <span class="val" id="bRead">−5.000</span>
+          </div>
+        </div>
+        <div class="quick">
+          <div class="quick-head">
+            <span class="lab">情形直达</span>
+            <span class="hint">上下两行对应圆心两侧，同一列是同一情形</span>
+          </div>
+          <div class="quick-row">
+            <span class="side">$b&gt;0$</span>
+            <button class="qbtn" data-n="0" data-s="1">0 个点</button>
+            <button class="qbtn" data-n="1" data-s="1">1 个点</button>
+            <button class="qbtn" data-n="2" data-s="1">2 个点</button>
+            <button class="qbtn" data-n="3" data-s="1">3 个点</button>
+            <button class="qbtn" data-n="4" data-s="1">4 个点</button>
+          </div>
+          <div class="quick-row">
+            <span class="side">$b&lt;0$</span>
+            <button class="qbtn" data-n="0" data-s="-1">0 个点</button>
+            <button class="qbtn" data-n="1" data-s="-1">1 个点</button>
+            <button class="qbtn" data-n="2" data-s="-1">2 个点</button>
+            <button class="qbtn" data-n="3" data-s="-1">3 个点</button>
+            <button class="qbtn" data-n="4" data-s="-1">4 个点</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <aside class="card panel">
+      <h3>实时数据</h3>
+      <div class="metric"><span class="m-label">圆心到 $l$ 的距离 $d=|b|/\sqrt2$</span><span class="m-val" id="vd">3.536</span></div>
+      <div class="metric"><span class="m-label">$l$ 位于圆心</span><span class="m-val side-val" id="vside">左上侧</span></div>
+      <div class="metric"><span class="m-label">圆半径 $r$</span><span class="m-val">2</span></div>
+
+      <div class="divider"></div>
+
+      <div class="row">
+        <div class="row-head"><span class="dot"></span>近侧平行线 · 到 $O$ 距离 $|d-1|$</div>
+        <div class="row-body"><span class="hv" id="vh1">2.536</span><span class="chip n0" id="vs1">0 个点</span></div>
+      </div>
+      <div class="row">
+        <div class="row-head"><span class="dot"></span>远侧平行线 · 到 $O$ 距离 $d+1$</div>
+        <div class="row-body"><span class="hv" id="vh2">4.536</span><span class="chip n0" id="vs2">0 个点</span></div>
+      </div>
+
+      <div class="total" id="vtot">
+        <span>圆上满足条件的点</span><span class="num" id="vnum">0</span>
+      </div>
+
+      <div class="cases-title">五种情形（点击可直达）</div>
+      <div class="cases" id="cases">
+        <div class="case-row" data-n="4"><span class="cn"><i class="dotn d4"></i>4 个点</span><span class="cr">$0\le|b|&lt;\sqrt2$</span></div>
+        <div class="case-row" data-n="3"><span class="cn"><i class="dotn d3"></i>3 个点</span><span class="cr">$|b|=\sqrt2$</span></div>
+        <div class="case-row" data-n="2"><span class="cn"><i class="dotn d2"></i>2 个点</span><span class="cr">$\sqrt2&lt;|b|&lt;3\sqrt2$</span></div>
+        <div class="case-row" data-n="1"><span class="cn"><i class="dotn d1"></i>1 个点</span><span class="cr">$|b|=3\sqrt2$</span></div>
+        <div class="case-row" data-n="0"><span class="cn"><i class="dotn d0"></i>0 个点</span><span class="cr">$|b|&gt;3\sqrt2$</span></div>
+      </div>
+
+      <p class="tip">每条平行线与圆最多贡献 2 个点，所以「恰好 3 个」只可能是 $1+2$：一条与圆<b>相切</b>、另一条与圆<b>相交</b>。而当两条线都跑到圆外时，一个点也没有。</p>
+    </aside>
+  </div>
+
+  <section class="card solution">
+    <h2><span class="bar"></span>解题过程</h2>
+    <p class="lead">设圆心 $O(0,\,0)$，半径 $r=2$；把 $l$ 写成一般式 $x-y+b=0$。</p>
+
+    <div class="steps">
+      <div class="step">
+        <div class="num">1</div>
+        <div class="body">
+          <p>点 $P(x,\,y)$ 到 $l$ 的距离为 1：</p>
+          <p class="eqline">$$\frac{|x-y+b|}{\sqrt2}=1\quad\Longrightarrow\quad x-y+b=\pm\sqrt2$$</p>
+          <p>即两条平行线 <span class="hl">$l_1:\;y=x+b-\sqrt2$</span> 与 <span class="hl">$l_2:\;y=x+b+\sqrt2$</span>。</p>
+          <p>二者到 $l$ 的距离都是 $\frac{\sqrt2}{\sqrt2}=1$（斜率都是 1，沿 $y$ 轴平移 $\sqrt2$）。</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="num">2</div>
+        <div class="body">
+          <p>原命题 $\iff$ 这两条直线与圆 $C$ 的公共点总数恰为 3。</p>
+          <p>两条平行线各自与圆最多交 2 点，故总数 3 只能是 <span class="hl-red">一条相切（1 点）$+$ 一条相交（2 点）</span>。</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="num">3</div>
+        <div class="body">
+          <p>设圆心 $O$ 到 $l$ 的距离 $d=\frac{|b|}{\sqrt2}$。两条平行线分别位于 $l$ 的两侧，它们到 $O$ 的距离是 $|d-1|$ 和 $d+1$。</p>
+          <p>① 若「远侧」相切：$d+1=2\Rightarrow d=1$。此时近侧距离 $|1-1|=0&lt;2$，恰与圆交于 2 点，<span class="hl-red">合计 3 点，符合</span>。</p>
+          <p>② 若「近侧」相切：$|d-1|=2\Rightarrow d=3$。此时远侧距离 $4&gt;2$ 无交点，合计只有 1 点，<span class="hl">舍去</span>。</p>
+          <p>判断依据：直线到圆心的距离 $h$ 与 $r=2$ 比较，$h&lt;2$ 交 2 点，$h=2$ 相切 1 点，$h&gt;2$ 无交点。</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="num">4</div>
+        <div class="body">
+          <p>由 $d=\frac{|b|}{\sqrt2}=1$，得 $|b|=\sqrt2$，即 <span class="hl-red">$b=\pm\sqrt2$</span>。</p>
+          <p>验证 $b=\sqrt2$：$l_1:\;y=x$ 过圆心，与圆交于 $\left(\sqrt2,\,\sqrt2\right)$、$\left(-\sqrt2,\,-\sqrt2\right)$；$l_2:\;y=x+2\sqrt2$ 与圆相切于 $\left(-\sqrt2,\,\sqrt2\right)$。三点到 $l$ 的距离均为 1 ✓</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="answer">
+      <span class="tagline">答案</span>
+      <span class="eq">$b=\textcolor{#b91c1c}{\sqrt2}\quad\text{或}\quad b=\textcolor{#b91c1c}{-\sqrt2}$</span>
+    </div>
+  </section>
+
+  <section class="card solution">
+    <h2><span class="bar"></span>五种情形的完整分类</h2>
+    <p class="lead">记 $d=\frac{|b|}{\sqrt2}$，两条平行线到圆心的距离为 $|d-1|$（近侧）与 $d+1$（远侧）。每条线与圆：距离 $&lt;2$ 交 <b>2</b> 点，$=2$ 相切 <b>1</b> 点，$&gt;2$ 无交点。把两边的点数相加即可。</p>
+
+    <div class="case-grid">
+      <div class="case-item k4">
+        <div class="ch"><span class="cn">4</span><span class="cu">个点</span></div>
+        <div class="cr">$0\le|b|&lt;\sqrt2$</div>
+        <p>此时 $d&lt;1$，两条平行线到圆心都不到 2，<b>都与圆相交</b>，各 2 点。<br>$b=0$ 时两条线到圆心距离都是 1，最对称。</p>
+      </div>
+      <div class="case-item k3">
+        <div class="ch"><span class="cn">3</span><span class="cu">个点</span></div>
+        <div class="cr">$|b|=\sqrt2$</div>
+        <p>此时 $d=1$：近侧线恰好<b>过圆心</b>（直径，2 点），远侧线恰好<b>相切</b>（1 点）。<br>这就是本题所求。</p>
+      </div>
+      <div class="case-item k2">
+        <div class="ch"><span class="cn">2</span><span class="cu">个点</span></div>
+        <div class="cr">$\sqrt2&lt;|b|&lt;3\sqrt2$</div>
+        <p>此时 $1&lt;d&lt;3$：近侧线仍与圆<b>相交</b>（2 点），远侧线已完全<b>移到圆外</b>（0 点）。</p>
+      </div>
+      <div class="case-item k1">
+        <div class="ch"><span class="cn">1</span><span class="cu">个点</span></div>
+        <div class="cr">$|b|=3\sqrt2$</div>
+        <p>此时 $d=3$：近侧线恰好与圆<b>相切</b>（1 点），远侧线距离 4 已在圆外（0 点）。$|b|=3\sqrt2\approx4.243$。</p>
+      </div>
+      <div class="case-item k0">
+        <div class="ch"><span class="cn">0</span><span class="cu">个点</span></div>
+        <div class="cr">$|b|&gt;3\sqrt2$</div>
+        <p>此时 $d&gt;3$：连近侧线到圆心的距离都已超过 2，<b>两条线都在圆外</b>，圆上没有任何点满足条件。</p>
+      </div>
+    </div>
+
+    <div class="answer">
+      <span class="tagline">要点</span>
+      <span class="eq" style="font-size:16px;font-weight:600;color:#28374d">点数只会在 $0\to1\to2\to3\to4$ 之间切换，且 1 个点和 3 个点都只出现在 $|b|$ 的两个临界值上</span>
+    </div>
+  </section>
+
+  <section class="card solution">
+    <h2><span class="bar"></span>推广：半径 $r$ 为任意值时的通用结论</h2>
+    <p class="lead">把 $r=2$ 换成一般的 $r$，推理方式与结论形式完全不变，变的只是两个临界值。记圆心 $O$ 到 $l$ 的距离为 $d$，则两条「到 $l$ 距离为 1」的平行线到 $O$ 的距离分别是 $|d-1|$（近侧）与 $d+1$（远侧）。</p>
+
+    <div class="genbox">
+      <span class="glab">第一步 · 单条直线</span>
+      <p>一条直线到圆心的距离为 $h$ 时：$h&lt;r$ 交 <b>2</b> 点，$h=r$ 相切 <b>1</b> 点，$h&gt;r$ 交 <b>0</b> 点。所以只需判断 $d+1$ 与 $|d-1|$ 各自落在 $r$ 的哪一侧，再把点数相加。</p>
+    </div>
+
+    <table class="gtable">
+      <thead>
+        <tr>
+          <th>$d$ 的范围</th>
+          <th>远侧线（距 $d+1$）</th>
+          <th>近侧线（距 $|d-1|$）</th>
+          <th style="text-align:center">圆上点数</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>$0\le d&lt;r-1$</td>
+          <td>$d+1&lt;r$ → 2 点</td>
+          <td>$&lt;r$ → 2 点</td>
+          <td class="ncell n4">4</td>
+        </tr>
+        <tr>
+          <td>$d=r-1$</td>
+          <td>恰好与圆<b>相切</b> → 1 点</td>
+          <td>$|r-2|&lt;r$ → 2 点</td>
+          <td class="ncell n3">3</td>
+        </tr>
+        <tr>
+          <td>$r-1&lt;d&lt;r+1$</td>
+          <td>$&gt;r$ → 0 点</td>
+          <td>$&lt;r$ → 2 点</td>
+          <td class="ncell n2">2</td>
+        </tr>
+        <tr>
+          <td>$d=r+1$</td>
+          <td>$&gt;r$ → 0 点</td>
+          <td>恰好与圆<b>相切</b> → 1 点</td>
+          <td class="ncell n1">1</td>
+        </tr>
+        <tr>
+          <td>$d&gt;r+1$</td>
+          <td>$&gt;r$ → 0 点</td>
+          <td>$&gt;r$ → 0 点</td>
+          <td class="ncell n0">0</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="genkey">
+      <p><b>统一判据：</b>点数只在「两条平行线中恰有一条与圆相切」的瞬间跳变，也就是</p>
+      <p class="gform">$d\pm1=r\;\iff\;d=r-1\ \text{或}\ d=r+1\;\iff\;|d-r|=1$</p>
+      <p>两个临界值之间恒为 <b>2</b> 个点；再往圆心收（$d&lt;r-1$）为 <b>4</b> 个点；再往外推（$d&gt;r+1$）为 <b>0</b> 个点。点数随 $d$ 单向递减：$4\to3\to2\to1\to0$，绝不会跳着来。</p>
+    </div>
+
+    <div class="genbox">
+      <span class="glab">第二步 · 带回本题</span>
+      <p>$r=2\;\Rightarrow$ 两个临界值 $d=1$ 与 $d=3$；又 $d=\frac{|b|}{\sqrt2}$，故 $|b|=\sqrt2$（3 点）与 $|b|=3\sqrt2\approx4.243$（1 点）。本题要求的正是前者。</p>
+      <p>若把「距离为 1」换成一般的 $a$，只需把上表里的 1 全部换成 $a$：临界值变成 $d=r\pm a$，于是「恰有 3 个点」$\iff d=r-a$（要求 $r&gt;a$，否则近侧线不可能与圆交出 2 点）。</p>
+    </div>
+
+    <div class="answer">
+      <span class="tagline">一句话结论</span>
+      <span class="eq" style="font-size:14.8px;font-weight:600;color:#28374d">
+        $d&lt;r-1$ → <b>4</b> 点　│　$d=r-1$ → <b>3</b> 点　│　$r-1&lt;d&lt;r+1$ → <b>2</b> 点　│　$d=r+1$ → <b>1</b> 点　│　$d&gt;r+1$ → <b>0</b> 点
+      </span>
+    </div>
+  </section>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var SQ2 = Math.SQRT2;
+  var B_MAX = 5;                 // 滑块与动画的边界
+  var R_MIN = 3.5, R_MAX = 7.4;  // 世界坐标中的纵向半视野
+
+  var cv  = document.getElementById('cv');
+  var ctx = cv.getContext('2d');
+
+  /* ---------- 全站公式：一次性用 KaTeX 渲染 $...$ ---------- */
+  if (window.renderMathInElement){
+    renderMathInElement(document.body, {
+      delimiters: [
+        { left: '$$', right: '$$', display: true },
+        { left: '$',  right: '$',  display: false },
+        { left: '\\(', right: '\\)', display: false }
+      ],
+      ignoredTags: ['script','noscript','style','textarea','pre','code','option'],
+      throwOnError: false,
+      strict: false
+    });
+  }
+
+  var els = {
+    banner: document.getElementById('banner'),
+    bannerText: document.getElementById('bannerText'),
+    play: document.getElementById('play'),
+    reset: document.getElementById('reset'),
+    toggleD: document.getElementById('toggleD'),
+    toggleDText: document.getElementById('toggleDText'),
+    slider: document.getElementById('slider'),
+    bRead: document.getElementById('bRead'),
+    vd: document.getElementById('vd'),
+    vside: document.getElementById('vside'),
+    vh1: document.getElementById('vh1'),
+    vh2: document.getElementById('vh2'),
+    vs1: document.getElementById('vs1'),
+    vs2: document.getElementById('vs2'),
+    vtot: document.getElementById('vtot'),
+    vnum: document.getElementById('vnum'),
+    cases: document.getElementById('cases')
+  };
+  var caseRows = Array.prototype.slice.call(els.cases.querySelectorAll('.case-row'));
+  var qbtns    = Array.prototype.slice.call(document.querySelectorAll('.qbtn'));
+
+  /* 各情形的代表值（正侧；负侧取相反数） */
+  var CASE_B = { 4: 1, 3: SQ2, 2: 2.4, 1: 3 * SQ2, 0: 5 };
+
+  /* ---------- 状态 ---------- */
+  var state = { b: -B_MAX, playing: true, dir: 1, dwell: 0, speed: 1.05, showD: true };
+  var view  = { R: R_MAX };
+
+  /* ---------- 画布 ---------- */
+  var W = 0, H = 0, s = 60, ox = 0, oy = 0;
+  function X(x){ return ox + x * s; }
+  function Y(y){ return oy - y * s; }
+
+  function resize(){
+    var r = cv.getBoundingClientRect();
+    if (r.width < 10 || r.height < 10) return;
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    cv.width  = Math.round(r.width  * dpr);
+    cv.height = Math.round(r.height * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    W = r.width; H = r.height;
+  }
+
+  function applyView(){
+    var R = view.R;
+    s  = Math.min(H / (2 * R), W / (2 * R * 1.42));
+    ox = W * 0.5;
+    oy = H * 0.5;
+  }
+
+  /* ---------- 数学 ---------- */
+  function chordPts(k){
+    var h    = Math.abs(k) / SQ2;
+    var foot = [-k / 2, k / 2];
+    if (h > 2 + 1e-7) return { pts: [], tangent: false };
+    var half = Math.sqrt(Math.max(0, 4 - h * h));
+    if (half < 1e-6) return { pts: [foot], tangent: true };
+    var u = 1 / SQ2;
+    return {
+      pts: [
+        [foot[0] - half * u, foot[1] - half * u],
+        [foot[0] + half * u, foot[1] + half * u]
+      ],
+      tangent: false
+    };
+  }
+
+  function analyze(b){
+    var d  = Math.abs(b) / SQ2;
+    var kA = b - SQ2, kB = b + SQ2;
+    var rA = chordPts(kA), rB = chordPts(kB);
+    // b ≥ 0 时 kA 那条离圆心更近；b < 0 时反而是 kB 更近
+    var aIsNear = Math.abs(kA) <= Math.abs(kB);
+    return {
+      d: d,
+      h1: Math.abs(d - 1),   // 近侧到圆心距离
+      h2: d + 1,             // 远侧到圆心距离
+      r1: aIsNear ? rA : rB,
+      r2: aIsNear ? rB : rA,
+      total: rA.pts.length + rB.pts.length
+    };
+  }
+
+  /* ---------- 绘图工具 ---------- */
+  function rr(x, y, w, h, r){
+    ctx.beginPath();
+    if (ctx.roundRect){ ctx.roundRect(x, y, w, h, r); return; }
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+  }
+
+  /* ---------- 画布标签：交给 KaTeX 排成 HTML 浮层（canvas 无法直接排 LaTeX） ---------- */
+  var mlayer   = document.getElementById('mlayer');
+  var tagPool  = [], tagUsed = 0, texCache = {}, sizeCache = {};
+
+  function texHTML(tex){
+    var c = texCache[tex];
+    if (c) return c;
+    var html;
+    try {
+      html = katex.renderToString(tex, { output:'html', throwOnError:false, displayMode:false, strict:false });
+    } catch (e){
+      html = '<span>' + tex + '</span>';
+    }
+    texCache[tex] = html;
+    return html;
+  }
+
+  function tag(px, py, tex, color, place){
+    var el = tagPool[tagUsed];
+    if (!el){
+      el = document.createElement('div');
+      el.className = 'mlabel';
+      mlayer.appendChild(el);
+      tagPool[tagUsed] = el;
+    }
+    tagUsed++;
+    if (el.__tex !== tex){ el.innerHTML = texHTML(tex); el.__tex = tex; }
+    el.style.color   = color;
+    el.style.display = '';
+
+    var sz = sizeCache[tex];
+    if (!sz){ sz = { w: el.offsetWidth, h: el.offsetHeight }; sizeCache[tex] = sz; }
+
+    var x = px, y = py - sz.h / 2;
+    if (place === 'left') x = px - sz.w;
+    else if (place === 'center') x = px - sz.w / 2;
+    x = Math.max(6, Math.min(W - sz.w - 6, x));
+    y = Math.max(6, Math.min(H - sz.h - 6, y));
+    el.style.left = x + 'px';
+    el.style.top  = y + 'px';
+  }
+
+  function tagEnd(){
+    for (var i = tagUsed; i < tagPool.length; i++) tagPool[i].style.display = 'none';
+    tagUsed = 0;
+  }
+
+  function fmtNum(v, dg){
+    var t = Math.abs(v) < 5e-4 ? (0).toFixed(dg) : v.toFixed(dg);
+    return t.replace('-', '−');
+  }
+  function fmtB(b){
+    if (Math.abs(Math.abs(b) - SQ2) < 1e-9)   return b > 0 ? '√2' : '−√2';
+    if (Math.abs(Math.abs(b) - 3 * SQ2) < 1e-9) return b > 0 ? '3√2' : '−3√2';
+    return fmtNum(b, 3);
+  }
+
+  /* ---------- 绘制 ---------- */
+  function draw(now){
+    var b = state.b;
+    var A = analyze(b);
+    var t = now || performance.now();
+
+    var targetR = Math.max(R_MIN, Math.min(R_MAX, Math.abs(b) + 2.3));
+    view.R += (targetR - view.R) * 0.15;
+    applyView();
+
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, W, H);
+
+    var R   = view.R;
+    var LM  = Math.max(30, R * 8);              // 直线延伸范围
+    var N   = Math.ceil(Math.max(W, H) / s) + 2;
+    var step = s > 42 ? 1 : (s > 24 ? 2 : 5);
+
+    // 网格
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = '#eaf0fa';
+    ctx.beginPath();
+    for (var i = -N; i <= N; i += step){
+      ctx.moveTo(X(i), 0); ctx.lineTo(X(i), H);
+      ctx.moveTo(0, Y(i)); ctx.lineTo(W, Y(i));
+    }
+    ctx.stroke();
+
+    // 坐标轴
+    ctx.strokeStyle = '#cbd6e6';
+    ctx.lineWidth = 1.4;
+    ctx.beginPath();
+    ctx.moveTo(0, Y(0)); ctx.lineTo(W, Y(0));
+    ctx.moveTo(X(0), 0); ctx.lineTo(X(0), H);
+    ctx.stroke();
+
+    // 刻度
+    var fs = Math.max(9, Math.min(11.5, s * 0.19));
+    ctx.fillStyle = '#a3aebf';
+    ctx.font = fs.toFixed(1) + 'px "Segoe UI","Microsoft YaHei",sans-serif';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+    var K = Math.ceil(R) + 1;
+    for (var k = -K; k <= K; k += step){
+      if (k === 0) continue;
+      var pxk = X(k);
+      if (pxk > 14 && pxk < W - 14) ctx.fillText(k, pxk, Y(0) + 5);
+    }
+
+    // 距离带
+    var c1 = b - SQ2, c2 = b + SQ2;
+    ctx.beginPath();
+    ctx.moveTo(X(-LM), Y(-LM + c1));
+    ctx.lineTo(X(LM),  Y(LM  + c1));
+    ctx.lineTo(X(LM),  Y(LM  + c2));
+    ctx.lineTo(X(-LM), Y(-LM + c2));
+    ctx.closePath();
+    ctx.fillStyle = 'rgba(245,158,11,0.075)';
+    ctx.fill();
+
+    // 圆
+    ctx.beginPath();
+    ctx.arc(X(0), Y(0), 2 * s, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(37,99,235,0.045)';
+    ctx.fill();
+    ctx.strokeStyle = '#1e3a8a';
+    ctx.lineWidth = Math.max(1.8, Math.min(2.4, s * 0.045));
+    ctx.stroke();
+
+    // 两条平行线
+    ctx.save();
+    ctx.setLineDash([7, 6]);
+    ctx.lineWidth = Math.max(1.5, Math.min(2, s * 0.04));
+    ctx.strokeStyle = '#e5a12a';
+    [c1, c2].forEach(function(c){
+      ctx.beginPath();
+      ctx.moveTo(X(-LM), Y(-LM + c));
+      ctx.lineTo(X(LM),  Y(LM  + c));
+      ctx.stroke();
+    });
+    ctx.restore();
+
+    // 直线 l
+    ctx.beginPath();
+    ctx.moveTo(X(-LM), Y(-LM + b));
+    ctx.lineTo(X(LM),  Y(LM  + b));
+    ctx.strokeStyle = '#2563eb';
+    ctx.lineWidth = Math.max(2, Math.min(2.8, s * 0.05));
+    ctx.stroke();
+
+    // 圆心到 l 的垂线段
+    if (Math.abs(b) > 0.6){
+      var fx = -b / 2, fy = b / 2;
+      ctx.save();
+      ctx.setLineDash([4, 5]);
+      ctx.strokeStyle = '#94a3b8';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(X(0), Y(0));
+      ctx.lineTo(X(fx), Y(fy));
+      ctx.stroke();
+      ctx.restore();
+      // 相切情形：垂足就是切点，标签沿垂线往圆心一侧收一点，避免贴住切点标注
+      var tt = (A.total === 1) ? 0.46 : 0.58;
+      var dTxt = state.showD
+        ? 'd=' + A.d.toFixed(3)
+        : 'd=|b|/\\sqrt2';
+      tag(X(fx * tt) + 16, Y(fy * tt) + 12, dTxt, state.showD ? '#54657e' : '#7d8b9f', 'left');
+    }
+
+    // 垂直距离 "1" 标记
+    var ux = 1 / SQ2, uy = -1 / SQ2;
+    var pick = null;
+    var xLim = Math.min(6, R);
+    for (var x0 = -xLim; x0 <= xLim; x0 += 0.1){
+      var p  = [x0, x0 + b];
+      var q1 = [p[0] + ux, p[1] + uy];
+      var q2 = [p[0] - ux, p[1] - uy];
+      var sy = [Y(p[1]), Y(q1[1]), Y(q2[1])];
+      var sx = X(x0);
+      var ok = sy[0] > 52 && sy[0] < H - 52 && sy[1] > 40 && sy[1] < H - 60 && sy[2] > 40 && sy[2] < H - 60
+               && sx > W * 0.06 && sx < W * 0.40;
+      if (ok){ pick = [p, q1, q2]; break; }
+    }
+    if (pick){
+      ctx.strokeStyle = '#c68a16';
+      ctx.lineWidth = 1.6;
+      ctx.beginPath();
+      ctx.moveTo(X(pick[0][0]), Y(pick[0][1]));
+      ctx.lineTo(X(pick[1][0]), Y(pick[1][1]));
+      ctx.moveTo(X(pick[0][0]), Y(pick[0][1]));
+      ctx.lineTo(X(pick[2][0]), Y(pick[2][1]));
+      ctx.stroke();
+      [pick[1], pick[2]].forEach(function(q){
+        var kk = 0.8;
+        var tx = X(pick[0][0] + (q[0] - pick[0][0]) * kk);
+        var ty = Y(pick[0][1] + (q[1] - pick[0][1]) * kk);
+        tag(tx - 15, ty, '1', '#c68a16', 'center');
+      });
+    }
+
+    // 满足条件的点
+    var hot    = (A.total === 3);
+    var lonely = (A.total === 1);
+    var pulse  = 0.5 + 0.5 * Math.sin(t / 260);
+    var allPts = A.r1.pts.concat(A.r2.pts);
+    var mainColor = hot ? '#dc2626' : (lonely ? '#d98a00' : '#ea580c');
+
+    allPts.forEach(function(p){
+      var ppx = X(p[0]), ppy = Y(p[1]);
+      if (hot || lonely){
+        ctx.beginPath();
+        ctx.arc(ppx, ppy, 12 + 7 * pulse, 0, Math.PI * 2);
+        ctx.fillStyle = hot
+          ? 'rgba(220,38,38,' + (0.10 + 0.13 * (1 - pulse)).toFixed(3) + ')'
+          : 'rgba(217,138,0,' + (0.10 + 0.13 * (1 - pulse)).toFixed(3) + ')';
+        ctx.fill();
+      }
+      ctx.beginPath();
+      ctx.arc(ppx, ppy, 6.5, 0, Math.PI * 2);
+      ctx.fillStyle = mainColor;
+      ctx.fill();
+      ctx.lineWidth = 2.5;
+      ctx.strokeStyle = '#ffffff';
+      ctx.stroke();
+    });
+
+    // 切点标注：沿半径方向移到圆外，避免与圆内其它标注相撞
+    if (hot || lonely){
+      var tp = A.r1.tangent ? A.r1.pts[0] : (A.r2.tangent ? A.r2.pts[0] : null);
+      if (tp){
+        var nx = tp[0] / 2, ny = tp[1] / 2;
+        tag(X(tp[0] + nx * 0.76), Y(tp[1] + ny * 0.76), '\\text{切点}', mainColor, 'center');
+      }
+    }
+
+    // 圆心
+    ctx.beginPath();
+    ctx.arc(X(0), Y(0), 3.6, 0, Math.PI * 2);
+    ctx.fillStyle = '#1e3a8a';
+    ctx.fill();
+    tag(X(0) - 16, Y(0) + 16, 'O', '#1e3a8a', 'center');
+
+    // 直线 l 标签
+    (function(){
+      for (var wx = N; wx > -N; wx -= 0.2){
+        var px2 = X(wx), py2 = Y(wx + b);
+        if (px2 > W * 0.42 && px2 < W - 34 && py2 > 44 && py2 < H - 44){
+          tag(px2 - 4, py2 - 24, 'l:\\ y=x+b', '#2563eb', 'left');
+          return;
+        }
+      }
+    })();
+
+    // 圆标签（放在圆下方，避开上方切点标注）
+    tag(X(0), Y(-2) + 26, 'C:\\ x^{2}+y^{2}=4', '#1e3a8a', 'center');
+    tagEnd();
+  }
+
+  /* ---------- 面板 ---------- */
+  var bannerKey = '';
+  function setBanner(prefix, tex){
+    var key = prefix + tex;
+    if (key === bannerKey) return;
+    bannerKey = key;
+    els.bannerText.innerHTML = prefix + texHTML(tex);
+  }
+
+  function updateUI(){
+    var A = analyze(state.b);
+    var total = A.total;
+    var sgNow = state.b >= 0 ? 1 : -1;
+
+    els.bRead.textContent = fmtB(state.b);
+    els.vd.textContent    = fmtNum(A.d, 3);
+    els.vh1.textContent   = fmtNum(A.h1, 3);
+    els.vh2.textContent   = fmtNum(A.h2, 3);
+    els.vside.textContent = Math.abs(state.b) < 0.02
+      ? '中央（过圆心）'
+      : (state.b > 0 ? '左上侧' : '右下侧');
+
+    var n1 = A.r1.pts.length, n2 = A.r2.pts.length;
+    els.vs1.textContent = n1 + ' 个点';
+    els.vs1.className = 'chip n' + n1;
+    els.vs2.textContent = n2 + ' 个点';
+    els.vs2.className = 'chip n' + n2;
+
+    els.vnum.textContent = total;
+    els.vtot.classList.toggle('hot', total === 3);
+    els.vtot.classList.toggle('warn', total === 1);
+
+    caseRows.forEach(function(row){
+      row.classList.toggle('active', +row.getAttribute('data-n') === total);
+    });
+    qbtns.forEach(function(btn){
+      btn.classList.toggle('on',
+        +btn.getAttribute('data-n') === total && +btn.getAttribute('data-s') === sgNow);
+    });
+
+    var show = (total === 3 || total === 1);
+    els.banner.classList.toggle('show', show);
+    els.banner.classList.toggle('single', total === 1);
+    if (total === 3){
+      setBanner('恰有 3 个点 · ', state.b > 0 ? 'b=\\sqrt2' : 'b=-\\sqrt2');
+    } else if (total === 1){
+      setBanner('恰有 1 个点 · ', state.b > 0 ? 'b=3\\sqrt2' : 'b=-3\\sqrt2');
+    }
+
+    if (document.activeElement !== els.slider){
+      els.slider.value = state.b;
+    }
+  }
+
+  /* ---------- 动画 ---------- */
+  var last = performance.now();
+  var TARGETS = [-3 * SQ2, -SQ2, SQ2, 3 * SQ2];
+
+  function loop(now){
+    var dt = Math.min(0.05, (now - last) / 1000);
+    if (!isFinite(dt) || dt < 0) dt = 0.016;
+    last = now;
+
+    if (state.playing){
+      if (state.dwell > 0){
+        state.dwell -= dt;
+        if (state.dwell < 0) state.dwell = 0;
+      } else {
+        var prev = state.b;
+        var nb = prev + state.dir * state.speed * dt;
+        if (nb > B_MAX){ nb = B_MAX; state.dir = -1; }
+        if (nb < -B_MAX){ nb = -B_MAX; state.dir = 1; }
+        for (var i = 0; i < TARGETS.length; i++){
+          var tv = TARGETS[i];
+          if ((prev < tv && nb >= tv) || (prev > tv && nb <= tv)){
+            nb = tv;
+            state.dwell = 1.5;
+            break;
+          }
+        }
+        state.b = nb;
+      }
+    }
+
+    draw(now);
+    updateUI();
+    requestAnimationFrame(loop);
+  }
+
+  /* ---------- 交互 ---------- */
+  function setPlaying(v){
+    state.playing = v;
+    els.play.textContent = v ? '暂停' : '播放';
+  }
+
+  function jumpTo(b){
+    state.b = Math.max(-B_MAX, Math.min(B_MAX, b));
+    state.dir = state.b > 0 ? -1 : 1;   // 定位后按播放会朝圆心方向回扫
+    state.dwell = 0;
+    setPlaying(false);
+    updateUI();
+  }
+
+  els.play.addEventListener('click', function(){
+    if (state.playing){ setPlaying(false); }
+    else {
+      if (state.b >= B_MAX - 1e-9) state.dir = -1;
+      if (state.b <= -B_MAX + 1e-9) state.dir = 1;
+      setPlaying(true);
+    }
+  });
+
+  els.reset.addEventListener('click', function(){
+    state.b = -B_MAX; state.dir = 1; state.dwell = 0;
+    view.R = R_MAX;
+    setPlaying(true);
+  });
+
+  els.slider.addEventListener('input', function(){
+    state.b = parseFloat(els.slider.value);
+    state.dwell = 0;
+    setPlaying(false);
+  });
+
+  els.slider.addEventListener('change', function(){
+    var v = parseFloat(els.slider.value);
+    TARGETS.forEach(function(t){ if (Math.abs(v - t) < 0.03) v = t; });
+    state.b = v;
+    els.slider.value = v;
+    updateUI();
+  });
+
+  caseRows.forEach(function(row){
+    row.addEventListener('click', function(){
+      // 保持当前所处的这一侧，只切换情形
+      var sg = state.b >= 0 ? 1 : -1;
+      jumpTo(sg * CASE_B[+row.getAttribute('data-n')]);
+    });
+  });
+
+  qbtns.forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var n  = +btn.getAttribute('data-n');
+      var sg = +btn.getAttribute('data-s');
+      jumpTo(sg * CASE_B[n]);
+    });
+  });
+
+  /* d 的具体数值：显示 / 隐藏 */
+  function setShowD(v){
+    state.showD = !!v;
+    els.toggleD.classList.toggle('on', state.showD);
+    els.toggleD.setAttribute('aria-pressed', state.showD ? 'true' : 'false');
+    els.toggleDText.textContent = state.showD ? '显示' : '隐藏';
+  }
+  setShowD(state.showD);
+  els.toggleD.addEventListener('click', function(){ setShowD(!state.showD); });
+
+  window.addEventListener('keydown', function(e){
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    var t = e.target;
+    if (t && /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)) return;
+    if (e.key === 'd' || e.key === 'D'){
+      e.preventDefault();
+      setShowD(!state.showD);
+    }
+  });
+
+  window.addEventListener('resize', function(){ resize(); });
+  if (window.ResizeObserver){
+    new ResizeObserver(function(){ resize(); }).observe(cv);
+  }
+
+  resize();
+  requestAnimationFrame(loop);
+})();
+</script>
+<script>
+  /* KaTeX 加载失败时给出提示（不至于让页面满屏 $ 与反斜杠） */
+  window.addEventListener('load', function(){
+    if (window.katex && window.renderMathInElement) return;
+    var w = document.createElement('div');
+    w.textContent = '公式渲染库未能加载：请确认 assets/katex/ 目录下的文件完整（尤其是 fonts 文件夹）。';
+    w.style.cssText = 'position:fixed;left:50%;top:12px;transform:translateX(-50%);z-index:99;' +
+      'background:#fff5f5;border:1px solid #f6b9b9;color:#b91c1c;padding:8px 16px;border-radius:999px;' +
+      'font:600 13px/1.4 "Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;' +
+      'box-shadow:0 8px 20px -10px rgba(185,28,28,.5)';
+    document.body.appendChild(w);
+  });
+</script>
+</body>
+</html>

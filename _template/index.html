@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<!-- ① 改成这道题的标题 -->
+<title>演示标题 · 高中数学动态演示</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%232563eb'/%3E%3Ctext x='16' y='23' font-size='19' font-family='Georgia,serif' font-style='italic' fill='%23fff' text-anchor='middle'%3Ef%3C/text%3E%3C/svg%3E" />
+<meta name="description" content="一句话说明这道题和这个演示能看到什么。" />
+<!-- KaTeX：本地共享副本，路径按本文件深度调整（模板在站点根下一层，用 ../） -->
+<link rel="stylesheet" href="../assets/katex/katex.min.css" />
+<script src="../assets/katex/katex.min.js"></script>
+<script src="../assets/katex/auto-render.min.js"></script>
+<style>
+  :root{
+    --bg:#f1f5fa; --card:#fff; --ink:#16202f; --ink2:#5c6a7e; --ink3:#8c99ab;
+    --line:#e1e9f3; --blue:#2563eb; --amber:#d98a00; --green:#0f8a5f;
+    --serif:"Cambria Math","Times New Roman",Georgia,serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:radial-gradient(1100px 480px at 12% -10%,#e4efff 0%,rgba(228,239,255,0) 62%),var(--bg);
+    color:var(--ink);line-height:1.65;
+    font-family:"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,-apple-system,sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .page{max-width:1120px;margin:0 auto;padding:26px 20px 64px}
+  .back{
+    display:inline-flex;align-items:center;gap:5px;margin-bottom:11px;
+    font-size:12.5px;font-weight:600;color:var(--ink2);text-decoration:none;
+    background:#fff;border:1px solid var(--line);border-radius:999px;padding:4px 12px;transition:.16s;
+  }
+  .back:hover{color:var(--blue);border-color:#a8c2e8;background:#f4f9ff}
+  .eyebrow{
+    display:inline-flex;align-items:center;gap:7px;font-size:12px;letter-spacing:.14em;
+    color:var(--blue);background:#e8f1ff;border:1px solid #cfe0fb;border-radius:999px;
+    padding:3px 11px;margin-bottom:10px;font-weight:600;
+  }
+  h1{font-size:22px;line-height:1.45;margin:0 0 8px}
+  .sub{margin:0;color:var(--ink2);font-size:14px}
+  .card{
+    background:var(--card);border:1px solid var(--line);border-radius:16px;margin-top:18px;
+    box-shadow:0 1px 2px rgba(22,32,47,.04),0 12px 28px -18px rgba(22,32,47,.28);overflow:hidden;
+  }
+  #cv{display:block;width:100%;height:520px;touch-action:none}
+  .controls{
+    display:flex;flex-wrap:wrap;align-items:center;gap:14px;
+    padding:13px 16px;border-top:1px solid var(--line);background:linear-gradient(180deg,#fafcff,#f5f9ff);
+  }
+  .controls label{display:inline-flex;align-items:center;gap:9px;font-size:13px;font-weight:600;color:var(--ink2)}
+  input[type=range]{width:220px;accent-color:var(--blue)}
+  .readout{
+    font-size:13px;color:var(--ink2);background:#fff;border:1px solid var(--line);
+    border-radius:9px;padding:5px 11px;
+  }
+  .readout b{color:var(--blue);font-weight:700}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <a class="back" href="../index.html">&larr; 全部演示</a>
+  <!-- ② 专题 + 标题 + 一句话导语 -->
+  <div class="eyebrow">专题 · 知识点</div>
+  <h1>在这里写题目：$y=ax^{2}$ 的开口如何随 $a$ 变化</h1>
+  <p class="sub">拖动下面的滑块，观察抛物线的形状与顶点——先让学生猜，再动手验证。</p>
+
+  <section class="card">
+    <canvas id="cv"></canvas>
+    <div class="controls">
+      <label>参数 $a$
+        <input id="a" type="range" min="-2" max="2" step="0.1" value="1" />
+      </label>
+      <span class="readout"><i style="font-family:var(--serif);font-style:italic">a</i> = <b id="aOut">1</b></span>
+    </div>
+  </section>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var cv = document.getElementById("cv");
+  var ctx = cv.getContext("2d");
+  var state = { a: 1 };
+
+  /* 世界坐标 → 屏幕坐标：原点在画布中心，1 个单位 = unit 像素 */
+  var unit = 52, W = 0, H = 0, dpr = 1;
+  function toX(x){ return W / 2 + x * unit; }
+  function toY(y){ return H / 2 - y * unit; }
+
+  function resize(){
+    dpr = window.devicePixelRatio || 1;
+    var r = cv.getBoundingClientRect();
+    W = r.width; H = r.height;
+    cv.width = Math.round(W * dpr);
+    cv.height = Math.round(H * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    draw();
+  }
+
+  function drawGrid(){
+    var x, y, nx = Math.ceil(W / 2 / unit), ny = Math.ceil(H / 2 / unit);
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = "#eaf0f8";
+    for (x = -nx; x <= nx; x++){
+      ctx.beginPath(); ctx.moveTo(toX(x), 0); ctx.lineTo(toX(x), H); ctx.stroke();
+    }
+    for (y = -ny; y <= ny; y++){
+      ctx.beginPath(); ctx.moveTo(0, toY(y)); ctx.lineTo(W, toY(y)); ctx.stroke();
+    }
+    ctx.strokeStyle = "#c9d6e6";
+    ctx.beginPath(); ctx.moveTo(0, toY(0)); ctx.lineTo(W, toY(0)); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(toX(0), 0); ctx.lineTo(toX(0), H); ctx.stroke();
+  }
+
+  function draw(){
+    ctx.clearRect(0, 0, W, H);
+    drawGrid();
+
+    /* 曲线部分：换成你的函数 */
+    ctx.beginPath();
+    ctx.lineWidth = 2.4;
+    ctx.strokeStyle = "#2563eb";
+    for (var px = 0; px <= W; px += 1){
+      var x = (px - W / 2) / unit;
+      var y = state.a * x * x;
+      var py = toY(y);
+      if (px === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+    }
+    ctx.stroke();
+
+    /* 顶点 */
+    ctx.beginPath();
+    ctx.arc(toX(0), toY(0), 4.5, 0, Math.PI * 2);
+    ctx.fillStyle = "#d98a00";
+    ctx.fill();
+    ctx.strokeStyle = "#fff"; ctx.lineWidth = 1.6; ctx.stroke();
+  }
+
+  var input = document.getElementById("a");
+  var out = document.getElementById("aOut");
+  input.addEventListener("input", function(){
+    state.a = parseFloat(input.value);
+    out.textContent = input.value;
+    draw();
+  });
+
+  if (window.ResizeObserver) new ResizeObserver(resize).observe(cv);
+  resize();
+
+  /* 页面内 $...$ 统一交给 KaTeX 排版（含标题、说明文字） */
+  if (window.renderMathInElement) {
+    window.renderMathInElement(document.body, {
+      delimiters: [
+        { left: "$$", right: "$$", display: true },
+        { left: "$", right: "$", display: false }
+      ],
+      throwOnError: false
+    });
+  }
+})();
+</script>
+</body>
+</html>
