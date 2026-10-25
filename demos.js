@@ -36,6 +36,18 @@ window.DEMOS = {
       level: 3,
       tags: ["直线与圆", "点到直线距离", "分类讨论"],
       date: "2026-10-21"
+    },
+    {
+      slug: "chord-min",
+      path: "demos/chord-min/",
+      title: "过圆内一定点的直线被圆截得弦长的最小值",
+      subtitle: "拖动倾斜角 $\\alpha$ 转动过 $P_0$ 的弦，看弦长如何被「圆心到弦的距离」$d$ 控制",
+      topic: "解析几何",
+      grade: "高二",
+      book: "选择性必修一",
+      level: 2,
+      tags: ["直线与圆", "弦长", "垂径定理", "最值"],
+      date: "2026-10-25"
     }
   ]
 };

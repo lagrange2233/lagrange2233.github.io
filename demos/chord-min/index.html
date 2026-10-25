@@ -1,0 +1,1062 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>过圆内一定点的弦长的最小值 · 动态演示</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%232563eb'/%3E%3Ctext x='16' y='23' font-size='19' font-family='Georgia,serif' font-style='italic' fill='%23fff' text-anchor='middle'%3Ef%3C/text%3E%3C/svg%3E" />
+<meta name="description" content="圆 x²+y²=8 内一点 P₀(-1,2)，过 P₀ 的弦 AB 随倾斜角变化。拖动滑块，看弦长如何在 AB⊥OP₀ 时取到最小值 2√3。" />
+<!-- KaTeX：本地共享副本（相对站点根） -->
+<link rel="stylesheet" href="../../assets/katex/katex.min.css" />
+<script src="../../assets/katex/katex.min.js"></script>
+<script src="../../assets/katex/auto-render.min.js"></script>
+<style>
+  :root{
+    --bg:#f1f5fa;
+    --card:#ffffff;
+    --ink:#16202f;
+    --ink2:#5c6a7e;
+    --ink3:#8c99ab;
+    --line:#e1e9f3;
+    --blue:#2563eb;
+    --amber:#d98a00;
+    --red:#dc2626;
+    --green:#0f8a5f;
+    --violet:#7c3aed;
+    --serif:"Cambria Math","Times New Roman",Georgia,serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:
+      radial-gradient(1100px 480px at 12% -10%, #e4efff 0%, rgba(228,239,255,0) 62%),
+      radial-gradient(900px 460px at 95% 0%, #fdf1e2 0%, rgba(253,241,226,0) 55%),
+      var(--bg);
+    color:var(--ink);
+    font-family:"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,-apple-system,sans-serif;
+    -webkit-font-smoothing:antialiased;
+    line-height:1.65;
+  }
+  .page{max-width:1200px;margin:0 auto;padding:26px 20px 64px}
+
+  header{margin-bottom:18px}
+  .back{
+    display:inline-flex;align-items:center;gap:5px;margin-bottom:11px;
+    font-size:12.5px;font-weight:600;color:var(--ink2);text-decoration:none;
+    background:#fff;border:1px solid var(--line);border-radius:999px;padding:4px 12px;
+    transition:.16s ease;
+  }
+  .back:hover{color:var(--blue);border-color:#a8c2e8;background:#f4f9ff;transform:translateY(-1px)}
+  .eyebrow{
+    display:inline-flex;align-items:center;gap:7px;
+    font-size:12px;letter-spacing:.14em;color:var(--blue);
+    background:#e8f1ff;border:1px solid #cfe0fb;border-radius:999px;
+    padding:3px 11px;margin-bottom:10px;font-weight:600;
+  }
+  h1{font-size:23px;line-height:1.4;margin:0 0 8px;letter-spacing:.2px}
+  .sub{margin:0;color:var(--ink2);font-size:14px}
+  .m{font-family:var(--serif);font-style:italic;letter-spacing:.02em}
+
+  .katex{font-size:1.02em}
+  p .katex, li .katex, td .katex, th .katex{font-size:1.04em}
+  .math-layer{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+  .mlabel{
+    position:absolute;left:0;top:0;
+    padding:2px 7px 1px;border-radius:7px;
+    background:rgba(255,255,255,.95);
+    border:1px solid currentColor;
+    font-size:12.4px;line-height:1.15;white-space:nowrap;
+    box-shadow:0 1px 2px rgba(22,32,47,.06);
+  }
+  .mlabel .katex{font-size:1em}
+
+  .main{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:18px;margin-top:18px;align-items:start}
+
+  .card{
+    background:var(--card);border:1px solid var(--line);border-radius:16px;
+    box-shadow:0 1px 2px rgba(22,32,47,.04), 0 12px 28px -18px rgba(22,32,47,.28);
+  }
+
+  .stage{position:relative;overflow:hidden}
+  .canvas-wrap{position:relative}
+  #cv{display:block;width:100%;height:530px;touch-action:none}
+  .banner{
+    position:absolute;left:14px;bottom:12px;
+    transform:translateY(10px);
+    padding:8px 16px;border-radius:999px;
+    background:linear-gradient(180deg,#fff5f5,#ffe8e8);
+    border:1px solid #f6b9b9;color:#b91c1c;
+    font-size:13.5px;font-weight:700;letter-spacing:.3px;
+    box-shadow:0 10px 22px -12px rgba(185,28,28,.6);
+    opacity:0;pointer-events:none;transition:opacity .22s ease, transform .22s ease;
+    display:flex;align-items:center;gap:8px;white-space:nowrap;
+  }
+  .banner.show{opacity:1;transform:translateY(0)}
+  .banner .spark{width:8px;height:8px;border-radius:50%;background:#dc2626;box-shadow:0 0 0 4px rgba(220,38,38,.16)}
+  .banner.cool{background:linear-gradient(180deg,#f2f7ff,#e7f0ff);border-color:#bcd3f6;color:#1d4ed8;box-shadow:0 10px 22px -12px rgba(29,78,216,.5)}
+  .banner.cool .spark{background:#2563eb;box-shadow:0 0 0 4px rgba(37,99,235,.16)}
+
+  .controls{
+    display:flex;flex-direction:column;gap:9px;
+    padding:12px 15px 13px;border-top:1px solid var(--line);
+    background:linear-gradient(180deg,#fafcff,#f5f9ff);
+  }
+  .ctrl-row{display:flex;flex-wrap:wrap;align-items:center;gap:9px}
+  .btn{
+    font-family:inherit;font-size:13px;font-weight:600;color:var(--ink);
+    background:#fff;border:1px solid #d5e0ee;border-radius:10px;
+    padding:7px 13px;cursor:pointer;transition:.16s ease;white-space:nowrap;
+  }
+  .btn:hover{border-color:#a8c2e8;background:#f4f9ff;transform:translateY(-1px)}
+  .btn:active{transform:translateY(0)}
+  .btn.primary{background:var(--blue);border-color:var(--blue);color:#fff;box-shadow:0 6px 14px -8px rgba(37,99,235,.9)}
+  .btn.primary:hover{background:#1d4ed8;border-color:#1d4ed8}
+  .btn:disabled{opacity:.45;cursor:default;transform:none}
+  .btn.switch{display:inline-flex;align-items:center;gap:8px;padding:6px 12px 6px 9px}
+  .btn.switch .sw{
+    position:relative;flex:none;width:27px;height:16px;border-radius:999px;
+    background:#d3dded;transition:background .18s ease;
+  }
+  .btn.switch .sw::after{
+    content:"";position:absolute;left:2px;top:2px;width:12px;height:12px;border-radius:50%;
+    background:#fff;box-shadow:0 1px 2px rgba(15,30,60,.3);transition:transform .18s ease;
+  }
+  .btn.switch.on{border-color:#9dbbe6;background:#f3f8ff;color:var(--blue)}
+  .btn.switch.on .sw{background:var(--blue)}
+  .btn.switch.on .sw::after{transform:translateX(11px)}
+  .slider-wrap{display:flex;align-items:center;gap:9px;flex:1 1 240px;min-width:200px}
+  .slider-wrap .lab{font-size:12.5px;color:var(--ink3);font-weight:600;white-space:nowrap}
+  .slider-wrap .val{font-family:var(--serif);font-size:14.5px;font-weight:700;color:var(--blue);min-width:66px;text-align:right}
+  input[type=range]{
+    -webkit-appearance:none;appearance:none;flex:1;height:4px;border-radius:3px;
+    background:linear-gradient(90deg,#dbe6f5,#dbe6f5);outline:none;cursor:pointer;
+  }
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none;width:16px;height:16px;border-radius:50%;
+    background:var(--blue);border:3px solid #fff;
+    box-shadow:0 1px 6px rgba(37,99,235,.55);cursor:grab;
+  }
+  input[type=range]::-moz-range-thumb{
+    width:14px;height:14px;border-radius:50%;background:var(--blue);
+    border:3px solid #fff;box-shadow:0 1px 6px rgba(37,99,235,.55);cursor:grab;
+  }
+
+  .legend{display:flex;flex-wrap:wrap;gap:13px;padding:10px 15px 0;font-size:12px;color:var(--ink3)}
+  .legend i{display:inline-block;width:16px;height:0;border-top-width:3px;border-top-style:solid;vertical-align:middle;margin-right:6px;border-radius:2px}
+  .legend .lgdot{display:inline-block;width:8px;height:8px;border-radius:50%;vertical-align:middle;margin-right:6px}
+
+  .panel{padding:16px 18px 18px}
+  .panel h3{margin:0 0 12px;font-size:13px;letter-spacing:.12em;color:var(--ink3);font-weight:700}
+  .metric{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:7px 0;border-bottom:1px dashed #edf2f9}
+  .metric:last-of-type{border-bottom:none}
+  .m-label{font-size:13px;color:var(--ink2)}
+  .m-val{font-family:var(--serif);font-size:16px;font-weight:700;color:var(--ink);white-space:nowrap}
+  .m-val.side-val{font-family:"Consolas","SFMono-Regular",monospace;font-size:12.6px;color:#3b62a8}
+
+  .total{
+    margin-top:12px;padding:12px 14px;border-radius:12px;
+    background:#f3f7fd;border:1px solid #e2ebf7;
+    font-size:13.5px;font-weight:700;color:#1d3a6b;
+    display:flex;justify-content:space-between;align-items:center;gap:8px;
+    transition:.22s ease;
+  }
+  .total .num{font-family:var(--serif);font-size:19px}
+  .total.hot{
+    background:linear-gradient(135deg,#fff1f1,#ffe4e4);
+    border-color:#f8bebc;color:#b91c1c;
+    box-shadow:0 8px 20px -14px rgba(185,28,28,.9);
+  }
+
+  .chart{margin-top:14px;padding-top:12px;border-top:1px dashed #e8eff9}
+  .chart-head{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:6px}
+  .chart-head .t{font-size:12px;font-weight:700;letter-spacing:.06em;color:#5b6b82}
+  .chart-head .h{font-size:11px;color:#a9b4c4}
+  #cv2{display:block;width:100%;height:142px}
+
+  .tip{margin:12px 0 0;font-size:12.5px;line-height:1.7;color:var(--ink3)}
+  .tip b{color:var(--ink2)}
+
+  .solution{margin-top:18px;padding:22px 24px 24px}
+  .solution h2{font-size:16px;margin:0 0 4px;display:flex;align-items:center;gap:9px}
+  .solution h2 .bar{width:3px;height:16px;border-radius:2px;background:var(--blue)}
+  .solution .lead{margin:6px 0 16px;font-size:13.5px;color:var(--ink2)}
+
+  .steps{display:grid;gap:11px}
+  .step{display:flex;gap:12px;padding:12px 14px;border-radius:12px;background:#fafcff;border:1px solid #edf2f9}
+  .step .num{
+    flex:none;width:22px;height:22px;border-radius:50%;background:#e8f1ff;color:#1d4ed8;
+    font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;margin-top:2px;
+  }
+  .step .body{font-size:13.8px;line-height:1.85;color:#28374d;min-width:0}
+  .step .body p{margin:0}
+  .step .body p + p{margin-top:5px}
+  .step .body p.eqline,.eqline{text-align:center;margin:4px 0 2px}
+  .katex-display{margin:.2em 0}
+  .katex-display>.katex{font-size:1.12em}
+  .hl{background:linear-gradient(180deg,transparent 62%,#ffe9a8 62%);font-weight:600;padding:0 1px}
+  .hl-red{background:linear-gradient(180deg,transparent 62%,#ffd3d3 62%);font-weight:700;padding:0 1px;color:#b91c1c}
+
+  .gtable{
+    width:100%;border-collapse:separate;border-spacing:0;
+    font-size:13.2px;color:#28374d;margin:4px 0 14px;
+    border:1px solid #e7eef8;border-radius:12px;overflow:hidden;
+  }
+  .gtable th,.gtable td{padding:9px 12px;text-align:left;border-bottom:1px solid #f0f5fc;vertical-align:middle}
+  .gtable th{background:#f7fafd;font-size:12.2px;font-weight:700;color:#5b6b82;letter-spacing:.02em;white-space:nowrap}
+  .gtable tbody tr:last-child td{border-bottom:none}
+  .gtable tbody tr:hover td{background:#fbfdff}
+  .gtable td.m{font-family:var(--serif);font-size:13.6px;white-space:nowrap}
+  .gtable tr.best td{background:#fff8f8}
+  .gtable tr.best:hover td{background:#fff3f3}
+  .badge{display:inline-block;font-size:11px;font-weight:800;letter-spacing:.04em;padding:1px 7px;border-radius:999px;margin-left:6px;vertical-align:1px}
+  .badge.min{background:#ffe4e4;color:#b91c1c}
+  .badge.max{background:#e6efff;color:#1d4ed8}
+
+  .genbox{
+    display:block;padding:12px 14px;border-radius:12px;
+    background:#fafcff;border:1px solid #edf2f9;margin:0 0 12px;
+  }
+  .genbox p{margin:0;font-size:13.5px;line-height:1.85;color:#28374d}
+  .genkey{
+    padding:14px 16px;border-radius:12px;margin:0 0 12px;
+    background:linear-gradient(180deg,#fffdf7,#fff8ec);border:1px solid #f3e2c3;
+  }
+  .genkey p{margin:0;font-size:13.5px;line-height:1.85;color:#4a3a20}
+  .genkey p + p{margin-top:6px}
+  .genkey .gform{
+    font-family:var(--serif);font-size:16.5px;font-weight:700;color:#a26200;
+    text-align:center;padding:4px 0 6px;letter-spacing:.02em;
+  }
+
+  .answer{
+    margin-top:16px;padding:16px 20px;border-radius:14px;
+    background:linear-gradient(120deg,#eef5ff,#f7fbff 45%,#fff6ea);
+    border:1px solid #dbe8fb;
+    display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;
+  }
+  .answer .tagline{font-size:12px;font-weight:800;letter-spacing:.14em;color:#5c6a7e}
+  .answer .eq{font-family:var(--serif);font-size:21px;font-weight:700;color:#14306b;letter-spacing:.02em}
+  .answer .eq b{color:#b91c1c}
+
+  @media (max-width: 940px){
+    .main{grid-template-columns:1fr}
+    #cv{height:430px}
+    h1{font-size:19.5px}
+    .page{padding:20px 14px 48px}
+    .answer .eq{font-size:17px}
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header>
+    <a class="back" href="../../index.html">&larr; 全部演示</a>
+    <div class="eyebrow">高中解析几何 · 直线与圆的位置关系</div>
+    <h1>过圆内一定点的直线被圆截得弦长的最小值</h1>
+    <p class="sub">圆 $O:x^{2}+y^{2}=8$ 内有一点 $P_0(-1,\,2)$,$AB$ 是过 $P_0$ 且倾斜角为 $\alpha$ 的弦。拖动滑块转动这条弦,看看它的长度被什么控制。关键只有一条:由垂径定理,$|AB|=2\sqrt{r^{2}-d^{2}}$,其中 $d$ 是圆心到弦的距离——半径 $r=2\sqrt2$ 是定值,所以<span class="hl-red">弦最短 $\iff d$ 最大</span>,而 $d=|OH|\le|OP_0|$,等号成立就是 $AB\perp OP_0$。</p>
+  </header>
+
+  <div class="main">
+    <section class="card stage">
+      <div class="canvas-wrap">
+        <canvas id="cv"></canvas>
+        <div class="math-layer" id="mlayer"></div>
+        <div class="banner" id="banner"><span class="spark"></span><span id="bannerText"></span></div>
+      </div>
+      <div class="legend">
+        <span><i style="border-color:#1e3a8a"></i>圆 $O$</span>
+        <span><i style="border-color:#2563eb"></i>弦 $AB$</span>
+        <span><i style="border-color:#7c3aed"></i>定线段 $OP_0$</span>
+        <span><i style="border-color:#d98a00;border-top-style:dashed"></i>圆心到弦的距离 $d$</span>
+        <span><i style="border-color:#0f8a5f;border-top-style:dashed"></i>中点 $H$ 的轨迹</span>
+      </div>
+      <div class="controls">
+        <div class="ctrl-row">
+          <button class="btn primary" id="play">暂停</button>
+          <button class="btn" id="minBtn">最短弦</button>
+          <button class="btn" id="maxBtn">直径(最长弦)</button>
+          <button class="btn switch on" id="togTrail" aria-pressed="true" title="显示 / 隐藏所有弦中点的轨迹">
+            <span class="sw"></span>
+            <span class="sw-txt">中点轨迹</span>
+          </button>
+        </div>
+        <div class="ctrl-row">
+          <div class="slider-wrap">
+            <span class="lab">倾斜角 $\alpha$</span>
+            <input type="range" id="slider" min="0" max="180" step="0.1" value="0" />
+            <span class="val" id="aRead">0.0&deg;</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <aside class="card panel">
+      <h3>实时数据</h3>
+      <div class="metric"><span class="m-label">圆心到弦的距离 $d=|OH|$</span><span class="m-val" id="vd">2.000</span></div>
+      <div class="metric"><span class="m-label">弦长 $|AB|=2\sqrt{8-d^{2}}$</span><span class="m-val" id="vL">4.000</span></div>
+      <div class="metric"><span class="m-label">半径 $r$</span><span class="m-val">$2\sqrt2\approx2.828$</span></div>
+      <div class="metric"><span class="m-label">$|OP_0|$ 的上限</span><span class="m-val">$\sqrt5\approx2.236$</span></div>
+      <div class="metric"><span class="m-label">当前直线</span><span class="m-val side-val" id="veq">y = 2.000</span></div>
+
+      <div class="total" id="vtot"><span>当前弦长</span><span class="num" id="vnum">4.000</span></div>
+
+      <div class="chart">
+        <div class="chart-head">
+          <span class="t">弦长随 $\alpha$ 的变化</span>
+          <span class="h">最低点 = 最短弦</span>
+        </div>
+        <canvas id="cv2"></canvas>
+      </div>
+
+      <p class="tip">$d$ 越大弦越短,而 $d$ 在 $\triangle OHP_0$ 中只是一条直角边,斜边 $|OP_0|$ 才是它能到的极限。所以最短弦一定出现在 <b>$H$ 与 $P_0$ 重合</b>的时候——也就是弦垂直于 $OP_0$。</p>
+    </aside>
+  </div>
+
+  <section class="card solution">
+    <h2><span class="bar"></span>解题过程</h2>
+    <p class="lead">记圆心为 $O(0,\,0)$,半径 $r=\sqrt8=2\sqrt2$;设 $H$ 为弦 $AB$ 的中点(即 $O$ 到 $AB$ 的垂足),$d=|OH|$。</p>
+
+    <div class="steps">
+      <div class="step">
+        <div class="num">1</div>
+        <div class="body">
+          <p>由垂径定理,$OH\perp AB$ 且 $H$ 是 $AB$ 中点,在 $\mathrm{Rt}\triangle OHA$ 中</p>
+          <p class="eqline">$$|AB|=2|AH|=2\sqrt{r^{2}-d^{2}}=2\sqrt{8-d^{2}}$$</p>
+          <p>半径 $r$ 是定值,$8-d^{2}$ 随 $d$ 增大而减小,所以 <span class="hl-red">弦长最短 $\iff d$ 最大</span>。把「求弦长最小值」变成了「求 $d$ 的最大值」。</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="num">2</div>
+        <div class="body">
+          <p>弦过定点 $P_0$,于是 $\triangle OHP_0$ 是直角三角形($\angle OHP_0=90^{\circ}$),$OP_0$ 是斜边,$OH$ 是直角边:</p>
+          <p class="eqline">$$d=|OH|\le|OP_0|=\sqrt{(-1)^{2}+2^{2}}=\sqrt5$$</p>
+          <p>等号成立 $\iff$ 直角边与斜边重合 $\iff H$ 与 $P_0$ 重合 $\iff$ <span class="hl">$AB\perp OP_0$</span>。几何意义:圆心到弦的最大距离,就是圆心到定点的距离。</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="num">3</div>
+        <div class="body">
+          <p>由 $k_{OP_0}=\dfrac{2-0}{-1-0}=-2$,得弦 $AB$ 的斜率</p>
+          <p class="eqline">$$k_{AB}=-\frac{1}{k_{OP_0}}=\frac12,\qquad \tan\alpha=\frac12$$</p>
+          <p>直线过 $P_0(-1,\,2)$:</p>
+          <p class="eqline">$$y-2=\frac12(x+1)\iff x-2y+5=0$$</p>
+          <p>注意这里斜率一定存在($k_{OP_0}=-2\ne0$),不必再讨论 $\alpha=90^{\circ}$ 的情形。</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="num">4</div>
+        <div class="body">
+          <p>把 $d=\sqrt5$ 代回弦长公式:</p>
+          <p class="eqline">$$|AB|_{\min}=2\sqrt{8-5}=2\sqrt3$$</p>
+          <p>也可以直接用直角三角形:此时 $|P_0A|=|P_0B|=\sqrt{r^{2}-|OP_0|^{2}}=\sqrt3$,故 $|AB|=2\sqrt3$。</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="answer">
+      <span class="tagline">答案</span>
+      <span class="eq">$AB:\ \textcolor{#b91c1c}{x-2y+5=0}$</span>
+      <span class="eq">$|AB|_{\min}=\textcolor{#b91c1c}{2\sqrt3}$</span>
+    </div>
+  </section>
+
+  <section class="card solution">
+    <h2><span class="bar"></span>几个特殊位置对照</h2>
+    <p class="lead">下表把滑块转到几个好算的角度,可以直接和图形对照。$d$ 与弦长互为反调:一个到顶,另一个就到底。</p>
+
+    <table class="gtable">
+      <thead>
+        <tr>
+          <th>倾斜角 $\alpha$</th>
+          <th>直线 $AB$</th>
+          <th>$d=|OH|$</th>
+          <th>$|AB|=2\sqrt{8-d^{2}}$</th>
+          <th>说明</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="m">$0^{\circ}$</td>
+          <td class="m">$y=2$</td>
+          <td class="m">$2$</td>
+          <td class="m">$4$</td>
+          <td>水平弦</td>
+        </tr>
+        <tr class="best">
+          <td class="m">$\arctan\frac12\approx26.57^{\circ}$</td>
+          <td class="m">$x-2y+5=0$</td>
+          <td class="m">$\sqrt5$</td>
+          <td class="m">$2\sqrt3$<span class="badge min">最短</span></td>
+          <td>$AB\perp OP_0$,$H$ 与 $P_0$ 重合</td>
+        </tr>
+        <tr>
+          <td class="m">$90^{\circ}$</td>
+          <td class="m">$x=-1$</td>
+          <td class="m">$1$</td>
+          <td class="m">$2\sqrt7\approx5.29$</td>
+          <td>竖弦</td>
+        </tr>
+        <tr>
+          <td class="m">$116.57^{\circ}$</td>
+          <td class="m">$2x+y=0$</td>
+          <td class="m">$0$</td>
+          <td class="m">$4\sqrt2$<span class="badge max">最长</span></td>
+          <td>过圆心,是直径</td>
+        </tr>
+        <tr>
+          <td class="m">$180^{\circ}$</td>
+          <td class="m">$y=2$</td>
+          <td class="m">$2$</td>
+          <td class="m">$4$</td>
+          <td>与 $0^{\circ}$ 是同一条直线</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="genkey">
+      <p><b>一般结论</b>(过圆内一点 $P_0$ 的弦,且 $P_0$ 不是圆心):</p>
+      <p class="gform">$|AB|_{\min}=2\sqrt{r^{2}-|OP_0|^{2}}\ \ (\text{当 }AB\perp OP_0)$　·　$|AB|_{\max}=2r\ \ (\text{当 }AB\text{ 过圆心})$</p>
+      <p>所有弦的中点 $H$ 都满足 $\angle OHP_0=90^{\circ}$,所以中点的轨迹是以 $OP_0$ 为直径的圆(页面里那条绿色虚线圆)——$d$ 的最大值,正是这个圆上点到 $O$ 的最大距离。</p>
+    </div>
+
+    <div class="genbox">
+      <p><b>为什么不能直接设 $y=kx+b$ 求最值?</b> 那样要解二次方程、用韦达定理表示弦长,再对 $k$ 求最值,计算量大且容易漏掉斜率不存在的情况。而「$d\le|OP_0|$」用的是直角三角形的斜边大于直角边,一步到位——<span class="hl">几何洞察优于代数硬算</span>,这是直线与圆问题的通用思路。</p>
+    </div>
+  </section>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var DEG = Math.PI / 180;
+  var R  = 2 * Math.SQRT2;              // 圆半径 2√2
+  var P0 = { x: -1, y: 2 };             // 圆内定点
+  var OP0 = Math.sqrt(P0.x * P0.x + P0.y * P0.y);   // √5
+  var L_MIN = 2 * Math.sqrt(R * R - OP0 * OP0);     // 2√3
+  var L_MAX = 2 * R;                                // 4√2
+
+  var A_OP  = ((Math.atan2(P0.y, P0.x) / DEG) + 360) % 360;   // 116.565°
+  var A_MIN = (A_OP - 90 + 360) % 180;                        // 26.565°  弦 ⊥ OP0
+  var A_DIA = A_OP % 180;                                     // 116.565° 弦过圆心
+
+  /* 角度判据：极值附近 d 与弦长都极平坦，用数值差判断会过宽，这里比角度 */
+  function near(a, b){
+    var t = Math.abs(a - b) % 180;
+    return Math.min(t, 180 - t) < 0.09;
+  }
+
+  var cv  = document.getElementById('cv');
+  var ctx = cv.getContext('2d');
+  var cv2 = document.getElementById('cv2');
+
+  if (window.renderMathInElement){
+    renderMathInElement(document.body, {
+      delimiters: [
+        { left: '$$', right: '$$', display: true },
+        { left: '$',  right: '$',  display: false }
+      ],
+      ignoredTags: ['script','noscript','style','textarea','pre','code','option'],
+      throwOnError: false,
+      strict: false
+    });
+  }
+
+  var els = {
+    banner: document.getElementById('banner'),
+    bannerText: document.getElementById('bannerText'),
+    play: document.getElementById('play'),
+    minBtn: document.getElementById('minBtn'),
+    maxBtn: document.getElementById('maxBtn'),
+    togTrail: document.getElementById('togTrail'),
+    slider: document.getElementById('slider'),
+    aRead: document.getElementById('aRead'),
+    vd: document.getElementById('vd'),
+    vL: document.getElementById('vL'),
+    veq: document.getElementById('veq'),
+    vtot: document.getElementById('vtot'),
+    vnum: document.getElementById('vnum')
+  };
+
+  var state = { a: 0, playing: true, dir: 1, dwell: 0, speed: 15, trail: true };
+
+  /* ---------- 画布 ---------- */
+  var W = 0, H = 0, s = 60, ox = 0, oy = 0;
+  var VIEW_R = 3.75;
+
+  function X(x){ return ox + x * s; }
+  function Y(y){ return oy - y * s; }
+
+  function resize(){
+    var r = cv.getBoundingClientRect();
+    if (r.width < 10 || r.height < 10) return;
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    cv.width  = Math.round(r.width  * dpr);
+    cv.height = Math.round(r.height * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    W = r.width; H = r.height;
+    s  = Math.min(H / (2 * VIEW_R), W / (2 * VIEW_R * 1.32));
+    ox = W * 0.5;
+    oy = H * 0.5;
+  }
+
+  /* ---------- 数学 ---------- */
+  /* 过 P0、方向 (cosα, sinα) 的直线：n=(-sinα, cosα) 为单位法向，
+     圆心 O 到该直线的有向距离 ds = P0·n，垂足（弦中点）V = ds·n */
+  function geom(aDeg){
+    var a  = aDeg * DEG;
+    var ux = Math.cos(a), uy = Math.sin(a);
+    var ds = -P0.x * uy + P0.y * ux;     // = sinα + 2cosα
+    var d  = Math.abs(ds);
+    var vx = -ds * uy, vy = ds * ux;     // V = ds * n
+    var half = Math.sqrt(Math.max(0, R * R - d * d));
+    return {
+      a: aDeg, ux: ux, uy: uy, ds: ds, d: d,
+      V: [vx, vy], half: half,
+      A: [vx + half * ux, vy + half * uy],
+      B: [vx - half * ux, vy - half * uy],
+      len: 2 * half
+    };
+  }
+
+  /* ---------- 画布标签（HTML 浮层 + KaTeX） ---------- */
+  var mlayer  = document.getElementById('mlayer');
+  var tagPool = [], tagUsed = 0, texCache = {}, sizeCache = {};
+
+  function texHTML(tex){
+    var c = texCache[tex];
+    if (c) return c;
+    var html;
+    try {
+      html = katex.renderToString(tex, { output:'html', throwOnError:false, displayMode:false, strict:false });
+    } catch (e){
+      html = '<span>' + tex + '</span>';
+    }
+    texCache[tex] = html;
+    return html;
+  }
+
+  function tag(px, py, tex, color, place){
+    var el = tagPool[tagUsed];
+    if (!el){
+      el = document.createElement('div');
+      el.className = 'mlabel';
+      mlayer.appendChild(el);
+      tagPool[tagUsed] = el;
+    }
+    tagUsed++;
+    if (el.__tex !== tex){ el.innerHTML = texHTML(tex); el.__tex = tex; }
+    el.style.color   = color;
+    el.style.display = '';
+
+    var sz = sizeCache[tex];
+    if (!sz || !sz.w){ sz = { w: el.offsetWidth, h: el.offsetHeight }; if (sz.w) sizeCache[tex] = sz; }
+
+    var x = px, y = py - sz.h / 2;
+    if (place === 'right')      x = px;
+    else if (place === 'left')  x = px - sz.w;
+    else                        x = px - sz.w / 2;
+    x = Math.max(6, Math.min(W - sz.w - 6, x));
+    y = Math.max(6, Math.min(H - sz.h - 6, y));
+    el.style.left = x + 'px';
+    el.style.top  = y + 'px';
+  }
+
+  function tagEnd(){
+    for (var i = tagUsed; i < tagPool.length; i++) tagPool[i].style.display = 'none';
+    tagUsed = 0;
+  }
+
+  function fmt(v, dg){
+    var t = (Math.abs(v) < 5e-4 ? 0 : v).toFixed(dg);
+    return t.replace('-', '−');
+  }
+
+  /* ---------- 主图 ---------- */
+  function rrect(x, y, w, h, r){
+    ctx.beginPath();
+    if (ctx.roundRect){ ctx.roundRect(x, y, w, h, r); return; }
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+  }
+
+  function draw(now){
+    var t = now || performance.now();
+    var g = geom(state.a);
+    var isMin = near(state.a, A_MIN);
+
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, W, H);
+
+    /* 网格 */
+    var N = Math.ceil(Math.max(W, H) / s) + 2;
+    var step = s > 42 ? 1 : (s > 24 ? 2 : 5);
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = '#eaf0fa';
+    ctx.beginPath();
+    for (var i = -N; i <= N; i += step){
+      ctx.moveTo(X(i), 0); ctx.lineTo(X(i), H);
+      ctx.moveTo(0, Y(i)); ctx.lineTo(W, Y(i));
+    }
+    ctx.stroke();
+
+    /* 坐标轴与刻度 */
+    ctx.strokeStyle = '#cbd6e6';
+    ctx.lineWidth = 1.4;
+    ctx.beginPath();
+    ctx.moveTo(0, Y(0)); ctx.lineTo(W, Y(0));
+    ctx.moveTo(X(0), 0); ctx.lineTo(X(0), H);
+    ctx.stroke();
+
+    var fs = Math.max(9, Math.min(11.5, s * 0.19));
+    ctx.fillStyle = '#a3aebf';
+    ctx.font = fs.toFixed(1) + 'px "Segoe UI","Microsoft YaHei",sans-serif';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+    var K = Math.ceil(VIEW_R) + 1;
+    for (var k = -K; k <= K; k += step){
+      if (k === 0) continue;
+      var pk = X(k);
+      if (pk > 14 && pk < W - 14) ctx.fillText(k, pk, Y(0) + 5);
+    }
+
+    /* 圆 */
+    ctx.beginPath();
+    ctx.arc(X(0), Y(0), R * s, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(37,99,235,0.045)';
+    ctx.fill();
+    ctx.strokeStyle = '#1e3a8a';
+    ctx.lineWidth = Math.max(1.8, Math.min(2.4, s * 0.045));
+    ctx.stroke();
+
+    /* 中点轨迹：以 OP0 为直径的圆 */
+    if (state.trail){
+      var ccx = P0.x / 2, ccy = P0.y / 2, rr2 = OP0 / 2;
+      ctx.save();
+      ctx.setLineDash([6, 6]);
+      ctx.beginPath();
+      ctx.arc(X(ccx), Y(ccy), rr2 * s, 0, Math.PI * 2);
+      ctx.strokeStyle = 'rgba(15,138,95,0.55)';
+      ctx.lineWidth = 1.6;
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    /* 定线段 OP0 */
+    ctx.beginPath();
+    ctx.moveTo(X(0), Y(0));
+    ctx.lineTo(X(P0.x), Y(P0.y));
+    ctx.strokeStyle = '#7c3aed';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    /* 完整的直线（延伸到视野外），淡一些 */
+    var LM = 6.6;
+    ctx.beginPath();
+    ctx.moveTo(X(g.V[0] - LM * g.ux), Y(g.V[1] - LM * g.uy));
+    ctx.lineTo(X(g.V[0] + LM * g.ux), Y(g.V[1] + LM * g.uy));
+    ctx.strokeStyle = isMin ? 'rgba(220,38,38,0.28)' : 'rgba(37,99,235,0.26)';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    /* 弦 AB */
+    ctx.save();
+    if (isMin){ ctx.shadowColor = 'rgba(220,38,38,0.55)'; ctx.shadowBlur = 14; }
+    ctx.beginPath();
+    ctx.moveTo(X(g.A[0]), Y(g.A[1]));
+    ctx.lineTo(X(g.B[0]), Y(g.B[1]));
+    ctx.strokeStyle = isMin ? '#dc2626' : '#2563eb';
+    ctx.lineWidth = Math.max(2.6, Math.min(3.4, s * 0.055));
+    ctx.lineCap = 'round';
+    ctx.stroke();
+    ctx.restore();
+
+    /* 圆心到弦的距离 d = OH */
+    if (g.d > 0.06){
+      ctx.save();
+      ctx.setLineDash([5, 5]);
+      ctx.beginPath();
+      ctx.moveTo(X(0), Y(0));
+      ctx.lineTo(X(g.V[0]), Y(g.V[1]));
+      ctx.strokeStyle = '#d98a00';
+      ctx.lineWidth = 1.8;
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    /* 直角标记（在垂足 V 处，朝弦与朝圆心各取一小段） */
+    (function(){
+      var nsign = g.ds >= 0 ? 1 : -1;          // 指向圆心的法向
+      var nx = -g.uy * nsign, ny = g.ux * nsign;
+      var len = Math.max(10, Math.min(14, s * 0.2));
+      var ux = g.ux, uy = g.uy;
+      // 选朝向屏幕内的一侧
+      var sgn = (uy <= 0) ? 1 : -1;
+      var p0 = [g.V[0], g.V[1]];
+      var p1 = [p0[0] + sgn * ux * len / s, p0[1] + sgn * uy * len / s];
+      var p2 = [p1[0] + nx * len / s, p1[1] + ny * len / s];
+      var p3 = [p0[0] + nx * len / s, p0[1] + ny * len / s];
+      ctx.beginPath();
+      ctx.moveTo(X(p1[0]), Y(p1[1]));
+      ctx.lineTo(X(p2[0]), Y(p2[1]));
+      ctx.lineTo(X(p3[0]), Y(p3[1]));
+      ctx.strokeStyle = '#c68a16';
+      ctx.lineWidth = 1.6;
+      ctx.stroke();
+    })();
+
+    /* 点：A、B */
+    var pulse = 0.5 + 0.5 * Math.sin(t / 280);
+    [g.A, g.B].forEach(function(p){
+      if (isMin){
+        ctx.beginPath();
+        ctx.arc(X(p[0]), Y(p[1]), 11 + 6 * pulse, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(220,38,38,' + (0.10 + 0.12 * (1 - pulse)).toFixed(3) + ')';
+        ctx.fill();
+      }
+      ctx.beginPath();
+      ctx.arc(X(p[0]), Y(p[1]), 6.2, 0, Math.PI * 2);
+      ctx.fillStyle = isMin ? '#dc2626' : '#2563eb';
+      ctx.fill();
+      ctx.lineWidth = 2.4; ctx.strokeStyle = '#fff'; ctx.stroke();
+    });
+
+    /* 中点 H */
+    var hNearP0 = Math.abs(g.V[0] - P0.x) < 0.06 && Math.abs(g.V[1] - P0.y) < 0.06;
+    if (!hNearP0){
+      ctx.beginPath();
+      ctx.arc(X(g.V[0]), Y(g.V[1]), 5, 0, Math.PI * 2);
+      ctx.fillStyle = '#0f8a5f';
+      ctx.fill();
+      ctx.lineWidth = 2.2; ctx.strokeStyle = '#fff'; ctx.stroke();
+    }
+
+    /* 定点 P0 */
+    ctx.beginPath();
+    ctx.arc(X(P0.x), Y(P0.y), 6.6, 0, Math.PI * 2);
+    ctx.fillStyle = '#ea580c';
+    ctx.fill();
+    ctx.lineWidth = 2.6; ctx.strokeStyle = '#fff'; ctx.stroke();
+
+    /* 圆心 O */
+    ctx.beginPath();
+    ctx.arc(X(0), Y(0), 3.8, 0, Math.PI * 2);
+    ctx.fillStyle = '#1e3a8a';
+    ctx.fill();
+
+    /* ---- 标签 ---- */
+    tag(X(0) - 12, Y(0) + 15, 'O', '#1e3a8a', 'center');
+
+    // 圆
+    tag(X(0), Y(-R) + 20, 'x^{2}+y^{2}=8', '#1e3a8a', 'center');
+
+    // A、B：沿半径方向外推
+    (function(){
+      var la = Math.sqrt(g.A[0]*g.A[0] + g.A[1]*g.A[1]) || 1;
+      var lb = Math.sqrt(g.B[0]*g.B[0] + g.B[1]*g.B[1]) || 1;
+      tag(X(g.A[0] * (1 + 0.34 / la)), Y(g.A[1] * (1 + 0.34 / la)), 'A', isMin ? '#dc2626' : '#2563eb', 'center');
+      tag(X(g.B[0] * (1 + 0.34 / lb)), Y(g.B[1] * (1 + 0.34 / lb)), 'B', isMin ? '#dc2626' : '#2563eb', 'center');
+    })();
+
+    // P0 / H
+    if (hNearP0){
+      tag(X(P0.x) - 6, Y(P0.y) - 24, 'P_0=H', '#ea580c', 'center');
+    } else {
+      tag(X(P0.x) - 8, Y(P0.y) - 24, 'P_0', '#ea580c', 'center');
+      if (g.a < 34) tag(X(g.V[0]) + 6, Y(g.V[1]) + 22, 'H', '#0f8a5f', 'center');
+      else          tag(X(g.V[0]) + 12, Y(g.V[1]) - 18, 'H', '#0f8a5f', 'center');
+    }
+
+    // d 标注：OH 中点，沿法向偏移
+    if (g.d > 0.5){
+      var mx = g.V[0] * 0.52, my = g.V[1] * 0.52;
+      var offx = -g.uy * 0.34, offy = g.ux * 0.34;
+      tag(X(mx + offx), Y(my + offy), 'd', '#c68a16', 'center');
+    }
+
+    // 当前倾斜角：在 P0 附近画一小段角标 + 文字
+    (function(){
+      var arcR = 26;
+      if (g.a > 1.5){
+        ctx.beginPath();
+        ctx.arc(X(P0.x), Y(P0.y), arcR, -g.a * DEG, 0, true);
+        ctx.strokeStyle = 'rgba(37,99,235,0.5)';
+        ctx.lineWidth = 1.6;
+        ctx.stroke();
+      }
+      if (g.a > 4 && g.a < 176){
+        var mid = -g.a * DEG / 2;
+        var tx = X(P0.x) + Math.cos(mid) * (arcR + 15);
+        var ty = Y(P0.y) + Math.sin(mid) * (arcR + 15);
+        if (g.a < 34) ty -= 17;          // 小角度时抬高，避开右侧的 H 标签
+        tag(tx, ty, '\\alpha', '#3b62a8', 'center');
+      }
+    })();
+
+    // 最短时的强调标注
+    if (isMin){
+      tag(X(g.V[0]) + 12, Y(g.V[1]) + 30, 'OP_0\\perp AB', '#b91c1c', 'center');
+    }
+
+    tagEnd();
+  }
+
+  /* ---------- 弦长曲线 ---------- */
+  function chordLen(aDeg){
+    var a = aDeg * DEG;
+    var d = Math.abs(-P0.x * Math.sin(a) + P0.y * Math.cos(a));
+    return 2 * Math.sqrt(Math.max(0, R * R - d * d));
+  }
+
+  function drawChart(){
+    if (!cv2) return;
+    var r = cv2.getBoundingClientRect();
+    if (r.width < 10) return;
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    cv2.width  = Math.round(r.width  * dpr);
+    cv2.height = Math.round(r.height * dpr);
+    var c = cv2.getContext('2d');
+    c.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    var W2 = r.width, H2 = r.height;
+    c.clearRect(0, 0, W2, H2);
+
+    var padL = 32, padR = 10, padT = 8, padB = 22;
+    var pw = W2 - padL - padR, ph = H2 - padT - padB;
+    var yMax = L_MAX * 1.06;
+
+    function px(a){ return padL + (a / 180) * pw; }
+    function py(v){ return padT + ph - (v / yMax) * ph; }
+
+    // 基准线
+    c.strokeStyle = '#eef3fa'; c.lineWidth = 1;
+    [0, 2, 4].forEach(function(v){
+      c.beginPath(); c.moveTo(padL, py(v)); c.lineTo(padL + pw, py(v)); c.stroke();
+    });
+
+    // 曲线下的填充
+    c.beginPath();
+    c.moveTo(px(0), py(0));
+    for (var a = 0; a <= 180; a += 0.5) c.lineTo(px(a), py(chordLen(a)));
+    c.lineTo(px(180), py(0));
+    c.closePath();
+    c.fillStyle = 'rgba(37,99,235,0.07)';
+    c.fill();
+
+    // 最短 / 最长 参考线
+    c.save();
+    c.setLineDash([4, 4]);
+    c.strokeStyle = 'rgba(220,38,38,0.55)';
+    c.lineWidth = 1.2;
+    c.beginPath(); c.moveTo(padL, py(L_MIN)); c.lineTo(padL + pw, py(L_MIN)); c.stroke();
+    c.strokeStyle = 'rgba(29,78,216,0.4)';
+    c.beginPath(); c.moveTo(padL, py(L_MAX)); c.lineTo(padL + pw, py(L_MAX)); c.stroke();
+    c.restore();
+
+    // 曲线
+    c.beginPath();
+    for (var b = 0; b <= 180; b += 0.5){
+      var yy = py(chordLen(b));
+      if (b === 0) c.moveTo(px(b), yy); else c.lineTo(px(b), yy);
+    }
+    c.strokeStyle = '#2563eb';
+    c.lineWidth = 2;
+    c.stroke();
+
+    // 坐标轴文字
+    c.fillStyle = '#a3aebf';
+    c.font = '9.5px "Segoe UI","Microsoft YaHei",sans-serif';
+    c.textAlign = 'center'; c.textBaseline = 'top';
+    [0, 45, 90, 135, 180].forEach(function(v){ c.fillText(v + '°', px(v), padT + ph + 6); });
+    c.textAlign = 'right'; c.textBaseline = 'middle';
+    c.fillStyle = '#b91c1c'; c.fillText('2√3', padL - 4, py(L_MIN));
+    c.fillStyle = '#3b62a8'; c.fillText('4√2', padL - 4, py(L_MAX));
+
+    // 当前点
+    var cur = chordLen(state.a);
+    var cx = px(state.a), cy = py(cur);
+    c.save();
+    c.setLineDash([3, 3]);
+    c.strokeStyle = 'rgba(22,32,47,0.22)';
+    c.beginPath(); c.moveTo(cx, padT + ph); c.lineTo(cx, cy); c.stroke();
+    c.restore();
+    c.beginPath();
+    c.arc(cx, cy, 4.2, 0, Math.PI * 2);
+    c.fillStyle = near(state.a, A_MIN) ? '#dc2626' : '#1d3a6b';
+    c.fill();
+    c.lineWidth = 2; c.strokeStyle = '#fff'; c.stroke();
+  }
+
+  /* ---------- 面板 ---------- */
+  var bannerKey = '';
+  function setBanner(html){
+    if (html === bannerKey) return;
+    bannerKey = html;
+    els.bannerText.innerHTML = html;
+    if (window.renderMathInElement){
+      renderMathInElement(els.bannerText, {
+        delimiters: [{ left: '$', right: '$', display: false }],
+        throwOnError: false, strict: false
+      });
+    }
+  }
+
+  function eqText(g){
+    var a = g.a * DEG;
+    if (near(g.a, A_MIN)) return 'x − 2y + 5 = 0';
+    if (near(g.a, A_DIA)) return '2x + y = 0';
+    if (Math.abs(Math.cos(a)) < 1e-6) return 'x = −1';
+    var k = Math.tan(a);
+    var b = P0.y - k * P0.x;
+    return 'y = ' + fmt(k, 3) + 'x ' + (b >= 0 ? '+ ' : '− ') + fmt(Math.abs(b), 3);
+  }
+
+  function updateUI(){
+    var g = geom(state.a);
+    var isMin = near(state.a, A_MIN);
+    var isMax = near(state.a, A_DIA);
+
+    els.aRead.innerHTML = fmt(state.a, 1) + '&deg;';
+    els.vd.textContent = fmt(g.d, 3);
+    els.vL.textContent = fmt(g.len, 3);
+    els.veq.textContent = eqText(g);
+    els.vnum.textContent = fmt(g.len, 3);
+
+    els.vtot.classList.toggle('hot', isMin);
+    els.vtot.firstElementChild.textContent = isMin ? '当前弦长（最短）' : '当前弦长';
+
+    els.banner.classList.toggle('show', isMin || isMax);
+    els.banner.classList.toggle('cool', isMax);
+    if (isMin)      setBanner('弦最短 · $AB:\\ x-2y+5=0$,$\\ |AB|=2\\sqrt3$');
+    else if (isMax) setBanner('弦最长 · 过圆心，是直径 $|AB|=4\\sqrt2$');
+
+    els.togTrail.classList.toggle('on', state.trail);
+    els.togTrail.setAttribute('aria-pressed', state.trail ? 'true' : 'false');
+
+    if (document.activeElement !== els.slider){
+      els.slider.value = state.a;
+    }
+  }
+
+  /* ---------- 动画 ---------- */
+  var last = performance.now();
+  var STOPS = [A_MIN, A_DIA];
+
+  function loop(now){
+    var dt = Math.min(0.05, (now - last) / 1000);
+    if (!isFinite(dt) || dt < 0) dt = 0.016;
+    last = now;
+
+    if (state.playing){
+      if (state.dwell > 0){
+        state.dwell -= dt;
+        if (state.dwell < 0) state.dwell = 0;
+      } else {
+        var prev = state.a;
+        var na = prev + state.dir * state.speed * dt;
+        if (na >= 180){ na = 180; state.dir = -1; }
+        if (na <= 0){ na = 0; state.dir = 1; }
+        for (var i = 0; i < STOPS.length; i++){
+          var tv = STOPS[i];
+          if ((prev < tv && na >= tv) || (prev > tv && na <= tv)){
+            na = tv; state.dwell = 1.6; break;
+          }
+        }
+        state.a = na;
+      }
+    }
+
+    draw(now);
+    drawChart();
+    updateUI();
+    requestAnimationFrame(loop);
+  }
+
+  /* ---------- 交互 ---------- */
+  function setPlaying(v){
+    state.playing = v;
+    els.play.textContent = v ? '暂停' : '播放';
+  }
+
+  function jumpTo(a){
+    state.a = Math.max(0, Math.min(180, a));
+    state.dwell = 0;
+    setPlaying(false);
+    els.slider.value = state.a;
+    updateUI();
+  }
+
+  els.play.addEventListener('click', function(){
+    if (state.playing){ setPlaying(false); return; }
+    if (state.a >= 180 - 1e-9) state.dir = -1;
+    if (state.a <= 1e-9) state.dir = 1;
+    setPlaying(true);
+  });
+
+  els.minBtn.addEventListener('click', function(){ jumpTo(A_MIN); });
+  els.maxBtn.addEventListener('click', function(){ jumpTo(A_DIA); });
+
+  els.togTrail.addEventListener('click', function(){
+    state.trail = !state.trail;
+    updateUI();
+  });
+
+  els.slider.addEventListener('input', function(){
+    state.a = parseFloat(els.slider.value);
+    state.dwell = 0;
+    setPlaying(false);
+    updateUI();
+  });
+
+  els.slider.addEventListener('change', function(){
+    var v = parseFloat(els.slider.value);
+    if (Math.abs(v - A_MIN) < 0.45) v = A_MIN;
+    if (Math.abs(v - A_DIA) < 0.45) v = A_DIA;
+    state.a = v;
+    els.slider.value = v;
+    updateUI();
+  });
+
+  window.addEventListener('keydown', function(e){
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    var tg = e.target;
+    if (tg && /^(INPUT|TEXTAREA|SELECT)$/.test(tg.tagName)) return;
+    if (e.key === 'm' || e.key === 'M'){ jumpTo(A_MIN); }
+    if (e.key === 'd' || e.key === 'D'){ jumpTo(A_DIA); }
+  });
+
+  window.addEventListener('resize', function(){ resize(); });
+  if (window.ResizeObserver){
+    new ResizeObserver(function(){ resize(); }).observe(cv);
+  }
+  if (document.fonts && document.fonts.ready){
+    document.fonts.ready.then(function(){ sizeCache = {}; });
+  }
+
+  resize();
+  els.slider.value = state.a;
+  requestAnimationFrame(loop);
+})();
+</script>
+<script>
+  window.addEventListener('load', function(){
+    if (window.katex && window.renderMathInElement) return;
+    var w = document.createElement('div');
+    w.textContent = '公式渲染库未能加载：请确认 assets/katex/ 目录下的文件完整（尤其是 fonts 文件夹）。';
+    w.style.cssText = 'position:fixed;left:50%;top:12px;transform:translateX(-50%);z-index:99;' +
+      'background:#fff5f5;border:1px solid #f6b9b9;color:#b91c1c;padding:8px 16px;border-radius:999px;' +
+      'font:600 13px/1.4 "Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;' +
+      'box-shadow:0 8px 20px -10px rgba(185,28,28,.5)';
+    document.body.appendChild(w);
+  });
+</script>
+</body>
+</html>
