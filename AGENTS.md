@@ -20,6 +20,7 @@ demos.js                演示清单，全站唯一数据源
 AGENTS.md               本文件，规则
 README.md               给人看的部署与使用说明
 .nojekyll               关闭 Jekyll，否则 _template/ 会被吞掉
+.gitignore              排除 .workbuddy/ 等工具产生的本地文件
 assets/katex/           KaTeX 本地副本（css + js + 20 个 woff2），全站共享
 demos/<slug>/index.html 一个演示一个文件夹，入口统一叫 index.html
 _template/index.html    新演示模板，复制改名即可开始
@@ -48,6 +49,7 @@ tools/extract-katex.py  从离线单文件版里重抽 KaTeX（升级时用）
 
 ```bash
 cd site
+git pull                      # 开工前先同步，多设备改同一个仓库时尤其重要
 cp -r _template demos/我的演示
 # ① 改 demos/我的演示/index.html 的 <title>、<h1>、导语
 # ② 重写 draw() 里的绘制逻辑

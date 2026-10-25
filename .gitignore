@@ -1,0 +1,17 @@
+# 只放站点本身。以下都是工具或系统产生的本地文件，一律不进仓库。
+
+# 编辑器 / AI 工作目录
+.workbuddy/
+.vscode/
+.idea/
+
+# 依赖（本站零依赖，永远不会需要，防手滑）
+node_modules/
+
+# 系统垃圾
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# 本地调试输出
+*.log

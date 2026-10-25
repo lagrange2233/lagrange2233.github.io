@@ -56,6 +56,89 @@ git push
 
 > 若在新机器上推送，需要先登录一次 GitHub（`git push` 会弹出浏览器授权，凭据会存进 Windows 凭据管理器）。
 
+## 在新设备上开工
+
+只做一次性配置，之后每次就是 pull → 改 → push。
+
+### 先看这台设备有什么
+
+```bash
+git --version
+node --version      # 只跑自检才需要，18 以上即可
+python --version    # 只做本地预览才需要
+```
+
+**Git 是必须的**，Node 和 Python 可有可无。
+
+### 1. 装 Git（没有的话）
+
+- Windows：https://git-scm.com/download/win ，一路默认，**保留 Git Credential Manager**（装它才有登录弹窗）
+- macOS：`xcode-select --install`，或 `brew install git`
+
+### 2. 配一次身份
+
+```bash
+git config --global user.name  "lagrange2233"
+git config --global user.email "lagrange2233@users.noreply.github.com"
+```
+
+用 `users.noreply.github.com` 这个邮箱，能和仓库里已有的提交保持一致，也不会暴露真实邮箱。
+
+### 3. clone 成和这里一样的结构
+
+```bash
+mkdir 数学
+git clone https://github.com/lagrange2233/lagrange2233.github.io.git 数学/site
+cd 数学/site
+node tools/check.mjs
+```
+
+最后一句应该输出「全部通过」。跑通了说明目录结构、文件完整性都正常。
+
+**为什么套一层 `数学/`**：本仓库所有文档里的命令都写的是 `cd site`，结构一致就不用每次换算。
+直接 `git clone`（仓库根就是当前目录）也能用，只是下文所有 `site` 要换成那个目录名。
+
+### 4. 本地看一眼（可选）
+
+```bash
+python -m http.server 8080
+```
+
+访问 http://localhost:8080 。
+
+### 5. 第一次推送：授权一次
+
+```bash
+git add -A
+git commit -m "test: 新设备连通性"
+git push
+```
+
+会弹出浏览器，登录 **lagrange2233** 并授权。授权后凭证存进系统凭据管理器，之后 push 静默完成。
+
+**如果浏览器弹不出来**（远程桌面、无图形界面、公司网络拦截）：改用 Personal Access Token ——
+GitHub → Settings → Developer settings → Personal access tokens → **Fine-grained tokens** → Generate new token，
+Repository access 只勾 `lagrange2233.github.io`，权限给 **Contents: Read and write**。
+push 时用户名填 `lagrange2233`，密码粘 token。
+token 只贴在命令行里，**不要写进任何文件或 `.git/config`**。
+
+### 6. 每台设备每次开工
+
+```bash
+cd 数学/site
+git pull                      # 先同步，再动手
+# …… 改东西 ……
+node tools/check.mjs
+git add -A && git commit -m "add: 新演示 xxx" && git push
+```
+
+**先 pull 再改**。两台设备都改过之后直接 push 会被拒，那时 `git pull --rebase` 再 push 一次即可，不要用 `--force`。
+
+### 7. 如果这台设备也装 WorkBuddy
+
+工作区选 **`数学/`**，不要选 `数学/site`。这样 `.workbuddy/` 落在仓库外面，不会混进提交；
+就算选成了 site，仓库根目录的 `.gitignore` 也已经把它排除了。
+
 ## 规范与自检
 
 站点的硬性规则全部写在 **[`AGENTS.md`](AGENTS.md)** 里，那是唯一真相源。换设备、换人接手、让 AI 帮忙改，都以那份为准；本文件只讲「怎么做」。
