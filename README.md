@@ -12,14 +12,19 @@
 
 ```
 site/                     ← 这个目录就是网站根目录（也是 git 仓库根目录）
-├── index.html            首页：卡片索引 + 专题筛选 + 搜索
+├── index.html            首页：卡片索引 + 三行筛选 + 搜索
 ├── demos.js              演示清单（全站唯一数据源，加演示只改这里）
+├── AGENTS.md             建站规范 —— 规则的唯一真相源，改规则改这里
+├── README.md             本文件，讲"怎么做"
 ├── .nojekyll             关闭 Jekyll，否则 _template/ 这类下划线目录会被吞掉
 ├── assets/katex/         KaTeX 本地副本：css + js + 20 个 woff2 字体
 ├── demos/
-│   └── circle-3points/   一个演示一个文件夹，入口统一叫 index.html
+│   ├── circle-3points/   一个演示一个文件夹，入口统一叫 index.html
+│   └── chord-min/
 ├── _template/            新演示模板，复制改名即可开始
-└── tools/extract-katex.py  从离线单文件版里抽取 KaTeX 资源（升级/替换时用）
+└── tools/
+    ├── check.mjs         站点自检（三类标签、断链、外链、体积…）
+    └── extract-katex.py  从离线单文件版里抽取 KaTeX 资源（升级/替换时用）
 ```
 
 ## 本地预览
@@ -51,13 +56,34 @@ git push
 
 > 若在新机器上推送，需要先登录一次 GitHub（`git push` 会弹出浏览器授权，凭据会存进 Windows 凭据管理器）。
 
+## 规范与自检
+
+站点的硬性规则全部写在 **[`AGENTS.md`](AGENTS.md)** 里，那是唯一真相源。换设备、换人接手、让 AI 帮忙改，都以那份为准；本文件只讲「怎么做」。
+
+改完东西跑一次自检：
+
+```bash
+cd site
+node tools/check.mjs
+```
+
+它检查：三类标签（知识点 / 年级 / 课本）是否齐全、`demos.js` 与 `demos/` 目录是否对得上、有没有混进 CDN 外链或以 `/` 开头的绝对路径、页面体积是否超标、引用的本地文件是否存在、演示页有没有返回首页的链接。有错误时退出码为 1，只有提醒时为 0。
+
+想让它拦住不合格的提交，装一个本地钩子（钩子不进仓库，每台设备装一次）：
+
+```bash
+printf '#!/bin/sh\nnode tools/check.mjs || exit 1\n' > .git/hooks/pre-commit
+chmod +x .git/hooks/pre-commit
+```
+
 ## 新增一个演示
 
 1. 复制模板：`cp -r _template demos/我的演示slug`
 2. 打开 `demos/我的演示slug/index.html`，改标题、导语、`draw()` 里的绘制逻辑。
    文件内用 `① ② ③` 标出了需要修改的几处。
 3. 打开 `demos.js`，在 `demos` 数组里加一条记录（复制现有那条改字段）。
-4. 本地起服务看一眼，然后 commit + push。
+   **`topic` / `grade` / `book` 三项必须填**，缺一项这条演示就会在筛选里失踪。
+4. 跑 `node tools/check.mjs`，通过后再本地起服务看一眼，然后 commit + push。
 5. 删掉模板里的示例内容前，先确认新页面路径是 `demos/<slug>/index.html`——首页卡片就是靠这个路径跳转的。
 
 ### demos.js 字段
