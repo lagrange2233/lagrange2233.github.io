@@ -343,7 +343,7 @@
     <h2><span class="bar"></span>解题过程</h2>
     <p class="lead">先统一把条件化开：$x^{2}+y^{2}-4x+1=0\Longrightarrow(x-2)^{2}+y^{2}=3$，即圆心 $C(2,0)$、半径 $r=\sqrt3$。下面按顶部选中的类型显示对应过程。</p>
 
-    <div class="sol" data-pane="slope">
+    <div class="sol on" data-pane="slope">
       <div class="steps">
         <div class="step">
           <div class="num">1</div>
@@ -631,9 +631,10 @@
     ctx.fill();
   }
 
-  /* 在两点连线的中点、沿法向偏移 off 个单位放一个标签 */
-  function labelMid(x1, y1, x2, y2, tex, color, off, place){
-    var mx = (x1 + x2) / 2, my = (y1 + y2) / 2;
+  /* 在两点连线上取 t 处、沿法向偏移 off 个单位放一个标签 */
+  function labelMid(x1, y1, x2, y2, tex, color, off, place, tt){
+    tt = (tt === undefined) ? 0.5 : tt;
+    var mx = x1 + (x2 - x1) * tt, my = y1 + (y2 - y1) * tt;
     var dx = x2 - x1, dy = y2 - y1;
     var L = Math.hypot(dx, dy) || 1;
     tag(X(mx - dy / L * off), Y(my + dx / L * off), tex, color, place || 'center');
@@ -739,12 +740,9 @@
     /* 极值高亮：切线及切点 */
     if (ex){
       var kk = ex === 'max' ? KMAX : -KMAX;
-      var tp = { x: 0.5, y: kk * Math.sqrt(3) / 2 };
+      var tp = { x: 0.5, y: kk * 0.5 };   /* 切点 (1/2, ±√3/2) */
       glow(tp.x, tp.y, '217,138,0', t);
       dot(tp.x, tp.y, '#d98a00', 5);
-      tag(X(tp.x) + 13, Y(tp.y) - 13,
-          kk > 0 ? '\\left(\\tfrac12,\\tfrac{\\sqrt3}{2}\\right)' : '\\left(\\tfrac12,-\\tfrac{\\sqrt3}{2}\\right)',
-          '#b07300', 'right');
     }
 
     /* 点 */
@@ -857,14 +855,9 @@
     dot(P.x, P.y, '#2563eb', 6.2);
 
     /* 标签 */
-    var mq = { x: (Q.x + CX) / 2, y: (Q.y + CY) / 2 };
-    tag(X(mq.x) + 4, Y(mq.y) - 15, '\\sqrt{10}', '#7c3aed', 'left');
-
-    var mp = { x: (Q.x + P.x) / 2, y: (Q.y + P.y) / 2 };
-    var pn = { x: -(P.y - Q.y), y: (P.x - Q.x) };
-    var pl = Math.hypot(pn.x, pn.y) || 1;
-    tag(X(mp.x + pn.x / pl * 0.26), Y(mp.y + pn.y / pl * 0.26), '|PQ|', '#2563eb', 'center');
-
+    labelMid(Q.x, Q.y, CX, CY, '|CQ|=\\sqrt{10}', '#7c3aed', -0.26, 'center', 0.74);
+    var dir3 = { x: (P.x - CX) / R, y: (P.y - CY) / R };
+    tag(X(P.x + dir3.x * 0.42), Y(P.y + dir3.y * 0.42), 'P', '#2563eb', 'center');
     tag(X(Q.x) - 12, Y(Q.y) + 15, 'Q(-1,-1)', '#ea580c', 'left');
     tag(X(CX) + 11, Y(CY) - 14, 'C', '#1e3a8a', 'right');
 
