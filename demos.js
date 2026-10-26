@@ -26,6 +26,18 @@ window.DEMOS = {
      索引页的三行筛选就是按这三个字段做的，漏了这条演示在筛选里会失踪。 */
   demos: [
     {
+      slug: "circle-extrema",
+      path: "demos/circle-extrema/",
+      title: "借助式子的几何意义解决与圆有关的最值问题",
+      subtitle: "圆 $x^{2}+y^{2}-4x+1=0$ 上一点 $P(x,y)$：$\\dfrac{y}{x}$ 看成斜率、$y-x$ 看成截距、$(x+1)^{2}+(y+1)^{2}$ 看成两点距离的平方，拖动 $P$ 看最值在哪里取到",
+      topic: "解析几何",
+      grade: "高二",
+      book: "选择性必修一",
+      level: 3,
+      tags: ["直线与圆", "最值", "斜率", "截距", "两点间距离", "相切", "几何意义", "圆的最值"],
+      date: "2026-10-26"
+    },
+    {
       slug: "ellipse-rope",
       path: "demos/ellipse-rope/",
       title: "椭圆的第一定义",
