@@ -26,6 +26,30 @@ window.DEMOS = {
      索引页的三行筛选就是按这三个字段做的，漏了这条演示在筛选里会失踪。 */
   demos: [
     {
+      slug: "ellipse-rope",
+      path: "demos/ellipse-rope/",
+      title: "椭圆的第一定义",
+      subtitle: "定长细绳的两端从同一点慢慢拉开，笔尖的轨迹从圆连续变成椭圆，而两段绳长之和始终是定值 $2a$",
+      topic: "解析几何",
+      grade: "高二",
+      book: "选择性必修一",
+      level: 1,
+      tags: ["椭圆", "第一定义", "焦点", "绳长", "距离之和为定值", "圆锥曲线"],
+      date: "2026-10-26"
+    },
+    {
+      slug: "conic-sections",
+      path: "demos/conic-sections/",
+      title: "圆锥曲线",
+      subtitle: "转动截面与轴的夹角 $\\gamma$，看截口在圆、椭圆、抛物线、双曲线之间连续切换",
+      topic: "解析几何",
+      grade: "高二",
+      book: "选择性必修一",
+      level: 2,
+      tags: ["圆锥曲线", "截面", "离心率", "双曲线", "抛物线", "椭圆"],
+      date: "2026-10-26"
+    },
+    {
       slug: "circle-3points",
       path: "demos/circle-3points/",
       title: "圆上到直线距离等于定长的点的个数问题",

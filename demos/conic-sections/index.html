@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>圆锥曲线 · 高中数学动态演示</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%232563eb'/%3E%3Ctext x='16' y='23' font-size='19' font-family='Georgia,serif' font-style='italic' fill='%23fff' text-anchor='middle'%3Ef%3C/text%3E%3C/svg%3E" />
+<meta name="description" content="用一个平面去截双圆锥：截面与轴的夹角 γ 大于、等于、小于圆锥半顶角 β 时，截口曲线依次是椭圆、抛物线、双曲线，γ=90° 时是圆。拖动滑块转动截面，看曲线在哪一刻变脸。" />
+<link rel="stylesheet" href="../../assets/katex/katex.min.css" />
+<script src="../../assets/katex/katex.min.js"></script>
+<script src="../../assets/katex/auto-render.min.js"></script>
+<style>
+  :root{
+    --bg:#f1f5fa; --card:#fff; --ink:#16202f; --ink2:#5c6a7e; --ink3:#8c99ab;
+    --line:#e1e9f3; --blue:#2563eb; --amber:#d98a00; --green:#0f8a5f;
+    --violet:#7c3aed; --red:#dc2626;
+    --serif:"Cambria Math","Times New Roman",Georgia,serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:
+      radial-gradient(1100px 480px at 12% -10%, #e4efff 0%, rgba(228,239,255,0) 62%),
+      radial-gradient(900px 460px at 95% 0%, #fdf1e2 0%, rgba(253,241,226,0) 55%),
+      var(--bg);
+    color:var(--ink);
+    font-family:"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,-apple-system,sans-serif;
+    -webkit-font-smoothing:antialiased; line-height:1.65;
+  }
+  .page{max-width:1200px;margin:0 auto;padding:26px 20px 64px}
+
+  header{margin-bottom:18px}
+  .back{
+    display:inline-flex;align-items:center;gap:5px;margin-bottom:11px;
+    font-size:12.5px;font-weight:600;color:var(--ink2);text-decoration:none;
+    background:#fff;border:1px solid var(--line);border-radius:999px;padding:4px 12px;transition:.16s ease;
+  }
+  .back:hover{color:var(--blue);border-color:#a8c2e8;background:#f4f9ff;transform:translateY(-1px)}
+  .eyebrow{
+    display:inline-flex;align-items:center;gap:7px;font-size:12px;letter-spacing:.14em;
+    color:var(--blue);background:#e8f1ff;border:1px solid #cfe0fb;border-radius:999px;
+    padding:3px 11px;margin-bottom:10px;font-weight:600;
+  }
+  h1{font-size:23px;line-height:1.4;margin:0 0 8px;letter-spacing:.3px}
+  .sub{margin:0;color:var(--ink2);font-size:14px}
+  .katex{font-size:1.02em}
+  p .katex,li .katex,td .katex{font-size:1.04em}
+  .hl{background:linear-gradient(180deg,transparent 62%,#ffe9a8 62%);font-weight:600;padding:0 1px}
+
+  .main{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:18px;margin-top:18px;align-items:start}
+  .card{
+    background:var(--card);border:1px solid var(--line);border-radius:16px;
+    box-shadow:0 1px 2px rgba(22,32,47,.04), 0 12px 28px -18px rgba(22,32,47,.28);
+  }
+  .stage{position:relative;overflow:hidden}
+  .canvas-wrap{position:relative}
+  #cv{display:block;width:100%;height:560px;touch-action:none;cursor:grab}
+  #cv:active{cursor:grabbing}
+
+  .math-layer{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+  .mlabel{
+    position:absolute;left:0;top:0;padding:1px 6px;border-radius:7px;
+    background:rgba(255,255,255,.94);border:1px solid currentColor;
+    font-size:12.4px;line-height:1.2;white-space:nowrap;
+    box-shadow:0 1px 2px rgba(22,32,47,.05);
+  }
+  .mlabel .katex{font-size:1em}
+
+  .badge{
+    position:absolute;left:14px;top:13px;display:flex;align-items:center;gap:9px;
+    padding:7px 14px 7px 11px;border-radius:999px;
+    background:#fff;border:1.5px solid #ddd;color:#333;
+    font-size:14px;font-weight:800;letter-spacing:.6px;
+    box-shadow:0 8px 20px -12px rgba(22,32,47,.4);
+    transition:color .18s ease,border-color .18s ease,background .18s ease;
+    pointer-events:none;
+  }
+  .badge .dot{width:9px;height:9px;border-radius:50%;background:currentColor;box-shadow:0 0 0 4px rgba(0,0,0,.05)}
+  .badge .cond{
+    font-size:11.5px;font-weight:700;letter-spacing:.2px;color:var(--ink3);
+    border-left:1px solid #e6ecf5;padding-left:9px;
+  }
+  .hint{
+    position:absolute;right:14px;bottom:12px;font-size:11.5px;color:#a4b0c2;
+    background:rgba(255,255,255,.86);border:1px solid #eaf0f8;border-radius:999px;padding:2px 10px;
+    pointer-events:none;
+  }
+
+  .legend{display:flex;flex-wrap:wrap;gap:13px;padding:10px 16px 0;font-size:12px;color:var(--ink3)}
+  .legend i{display:inline-block;width:16px;height:0;border-top-width:3px;border-top-style:solid;vertical-align:middle;margin-right:6px;border-radius:2px}
+
+  .controls{
+    display:flex;flex-direction:column;gap:9px;padding:11px 15px 13px;
+    border-top:1px solid var(--line);background:linear-gradient(180deg,#fafcff,#f5f9ff);
+  }
+  .ctrl-row{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+  .btn{
+    font-family:inherit;font-size:13px;font-weight:600;color:var(--ink);
+    background:#fff;border:1px solid #d5e0ee;border-radius:10px;
+    padding:7px 13px;cursor:pointer;transition:.16s ease;white-space:nowrap;
+  }
+  .btn:hover{border-color:#a8c2e8;background:#f4f9ff;transform:translateY(-1px)}
+  .btn:active{transform:translateY(0)}
+  .btn.primary{background:var(--blue);border-color:var(--blue);color:#fff;box-shadow:0 6px 14px -8px rgba(37,99,235,.9);min-width:74px}
+  .btn.primary:hover{background:#1d4ed8;border-color:#1d4ed8}
+  .sep{width:1px;height:20px;background:#dde6f2;margin:0 3px}
+
+  .slider-wrap{display:flex;align-items:center;gap:9px;flex:1 1 240px;min-width:200px}
+  .slider-wrap .lab{font-size:12.5px;color:var(--ink3);font-weight:600;white-space:nowrap}
+  .slider-wrap .val{font-family:var(--serif);font-size:14.5px;font-weight:700;color:var(--ink);min-width:64px;text-align:right}
+  input[type=range]{
+    -webkit-appearance:none;appearance:none;flex:1;height:4px;border-radius:3px;
+    background:#dbe6f5;outline:none;cursor:pointer;
+  }
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none;width:16px;height:16px;border-radius:50%;
+    background:var(--blue);border:3px solid #fff;box-shadow:0 1px 6px rgba(37,99,235,.55);cursor:grab;
+  }
+  input[type=range]::-moz-range-thumb{
+    width:14px;height:14px;border-radius:50%;background:var(--blue);
+    border:3px solid #fff;box-shadow:0 1px 6px rgba(37,99,235,.55);cursor:grab;
+  }
+
+  .panel{padding:15px 17px 17px}
+  .panel h3{margin:0 0 2px;font-size:13px;letter-spacing:.1em;color:var(--ink3);font-weight:700}
+  .panel .cap{margin:0 0 2px;font-size:11.5px;color:#a4b0c2}
+  #cvx{display:block;width:100%;height:200px}
+  .metric{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:7px 0;border-bottom:1px dashed #edf2f9}
+  .metric:last-of-type{border-bottom:none}
+  .m-label{font-size:12.6px;color:var(--ink2)}
+  .m-val{font-family:var(--serif);font-size:15.5px;font-weight:700;white-space:nowrap}
+  .total{
+    margin-top:11px;padding:11px 14px;border-radius:12px;background:#f3f7fd;border:1px solid #e2ebf7;
+    font-size:13px;font-weight:700;color:#1d3a6b;display:flex;justify-content:space-between;align-items:center;gap:8px;
+    transition:.22s ease;
+  }
+  .total .num{font-size:19px;font-weight:800;letter-spacing:1px}
+  .tip{margin:11px 0 0;font-size:12.4px;line-height:1.75;color:var(--ink3)}
+  .tip b{color:var(--ink2)}
+
+  .solution{margin-top:18px;padding:22px 24px 22px}
+  .solution h2{font-size:16px;margin:0 0 4px;display:flex;align-items:center;gap:9px}
+  .solution h2 .bar{width:3px;height:16px;border-radius:2px;background:var(--blue)}
+  .solution .lead{margin:6px 0 16px;font-size:13.5px;color:var(--ink2)}
+
+  .gtable{width:100%;border-collapse:separate;border-spacing:0;font-size:13.2px;color:#28374d;margin:2px 0 16px;
+    border:1px solid #e7eef8;border-radius:12px;overflow:hidden}
+  .gtable th,.gtable td{padding:9px 12px;text-align:left;border-bottom:1px solid #f0f5fc;vertical-align:middle}
+  .gtable th{background:#f7fafd;font-size:12.2px;font-weight:700;color:#5b6b82;white-space:nowrap}
+  .gtable tbody tr:last-child td{border-bottom:none}
+  .gtable td.m{font-family:var(--serif);font-size:14px;white-space:nowrap}
+  .gtable td.ty{font-weight:800;white-space:nowrap}
+  .sw{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:7px;vertical-align:1px}
+
+  .genkey{padding:14px 16px;border-radius:12px;background:linear-gradient(180deg,#fffdf7,#fff8ec);border:1px solid #f3e2c3}
+  .genkey p{margin:0;font-size:13.5px;line-height:1.85;color:#4a3a20}
+  .genkey p+p{margin-top:6px}
+  .genkey .gform{font-family:var(--serif);font-size:17px;font-weight:700;color:#a26200;text-align:center;padding:6px 0 8px}
+
+  @media (max-width: 940px){
+    .main{grid-template-columns:1fr}
+    #cv{height:430px}
+    h1{font-size:20px}
+    .page{padding:20px 14px 48px}
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header>
+    <a class="back" href="../../index.html">&larr; 全部演示</a>
+    <div class="eyebrow">选择性必修一 · 解析几何 · 高二</div>
+    <h1>圆锥曲线</h1>
+    <p class="sub">同一个平面去截一个双圆锥，截口是什么曲线，全看两个角谁大谁小：<span class="hl">截面与轴的夹角 $\gamma$</span> 与 <span class="hl">圆锥半顶角 $\beta$</span>。$\gamma=90^{\circ}$ 是圆，$\gamma&gt;\beta$ 是椭圆，$\gamma=\beta$ 是抛物线，$\gamma&lt;\beta$ 是双曲线。拖动滑块转动截面，看曲线在哪一刻「变脸」；按住图形拖动可以换视角。</p>
+  </header>
+
+  <div class="main">
+    <section class="card stage">
+      <div class="canvas-wrap">
+        <canvas id="cv"></canvas>
+        <div class="math-layer" id="mlayer"></div>
+        <div class="badge" id="badge"><span class="dot"></span><span id="badgeTxt">椭圆</span><span class="cond" id="badgeCond">γ &gt; β</span></div>
+        <div class="hint">拖动可旋转视角</div>
+      </div>
+      <div class="legend">
+        <span><i style="border-color:#8fb0d6"></i>圆锥面</span>
+        <span><i style="border-color:#e0b56b;background:#fdf3e2;border-top-style:dashed"></i>截面</span>
+        <span><i style="border-color:#7c3aed" id="lgCurve"></i>截口曲线</span>
+        <span><i style="border-color:#b3c1d4;border-top-style:dashed"></i>圆锥的轴</span>
+      </div>
+      <div class="controls">
+        <div class="ctrl-row">
+          <button class="btn primary" id="play">暂停</button>
+          <span class="sep"></span>
+          <button class="btn" data-g="90">圆</button>
+          <button class="btn" data-g="62">椭圆</button>
+          <button class="btn" data-g="30">抛物线</button>
+          <button class="btn" data-g="18">双曲线</button>
+          <span class="sep"></span>
+          <button class="btn" id="reset">视角复位</button>
+        </div>
+        <div class="ctrl-row">
+          <div class="slider-wrap">
+            <span class="lab">截面与轴的夹角 $\gamma$</span>
+            <input type="range" id="slider" min="15" max="90" step="0.1" value="62" />
+            <span class="val" id="gRead">62.0&deg;</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <aside class="card panel">
+      <h3>轴向剖面：截面与轴的交角</h3>
+      <p class="cap">把圆锥沿轴剖开，$\gamma$ 与 $\beta$ 的大小关系一目了然</p>
+      <canvas id="cvx"></canvas>
+      <div class="metric"><span class="m-label">截面与轴的夹角 $\gamma$</span><span class="m-val" id="vG">62.0°</span></div>
+      <div class="metric"><span class="m-label">圆锥半顶角 $\beta$</span><span class="m-val">30°</span></div>
+      <div class="metric"><span class="m-label">判据</span><span class="m-val" id="vCmp"></span></div>
+      <div class="metric"><span class="m-label">离心率 $e=\dfrac{\cos\gamma}{\cos\beta}$</span><span class="m-val" id="vE">0.542</span></div>
+      <div class="total" id="vTotal"><span>截口曲线</span><span class="num" id="vType">椭圆</span></div>
+      <p class="tip">$\gamma$ 越小，截面越「立」起来，$e$ 越大：$e=0$ 是圆，$0&lt;e&lt;1$ 是椭圆，$e=1$ 是抛物线，$e&gt;1$ 是双曲线。<b>离心率不是新定义，它就是这把角尺量出来的数。</b></p>
+    </aside>
+  </div>
+
+  <section class="card solution">
+    <h2><span class="bar"></span>四类截口的判据</h2>
+    <p class="lead">设圆锥的半顶角为 $\beta$（母线与轴的夹角），截面与轴的夹角为 $\gamma$。关键不在于「切得深不深」，只在于 $\gamma$ 与 $\beta$ 谁大谁小 —— 等价地说，在于截面与几条母线平行。</p>
+
+    <table class="gtable">
+      <thead>
+        <tr><th>角的关系</th><th>截口曲线</th><th>截面与母线的关系</th><th>离心率</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="m">$\gamma=90^{\circ}$</td>
+          <td class="ty" style="color:#2563eb"><span class="sw" style="background:#2563eb"></span>圆</td>
+          <td>截面垂直于轴，与所有母线成等角</td>
+          <td class="m">$e=0$</td>
+        </tr>
+        <tr>
+          <td class="m">$\beta&lt;\gamma&lt;90^{\circ}$</td>
+          <td class="ty" style="color:#7c3aed"><span class="sw" style="background:#7c3aed"></span>椭圆</td>
+          <td>与每一条母线都相交，不平行于任何母线</td>
+          <td class="m">$0&lt;e&lt;1$</td>
+        </tr>
+        <tr>
+          <td class="m">$\gamma=\beta$</td>
+          <td class="ty" style="color:#0f8a5f"><span class="sw" style="background:#0f8a5f"></span>抛物线</td>
+          <td>恰好平行于一条母线，截口在这一侧「跑到无穷远」</td>
+          <td class="m">$e=1$</td>
+        </tr>
+        <tr>
+          <td class="m">$\gamma&lt;\beta$</td>
+          <td class="ty" style="color:#dc2626"><span class="sw" style="background:#dc2626"></span>双曲线</td>
+          <td>平行于两条母线，截口分成两支，分别落在上下两个锥面上</td>
+          <td class="m">$e&gt;1$</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="genkey">
+      <p><b>为什么临界情形是「平行于母线」？</b></p>
+      <p>截面与一条母线平行，这条母线与截面就永不相交 —— 截口顺着它一路延伸出去、收不回来，于是张开成抛物线。椭圆不平行于任何母线，每条母线都和截面交于一点，截口只能是封闭曲线；双曲线平行于两条母线，就有<b>两个</b>方向可以跑到无穷远，也就有了<b>两支</b>。</p>
+      <p class="gform">$e=\dfrac{\cos\gamma}{\cos\beta}$</p>
+      <p>这个式子把整张表压成一句话：$\gamma$ 从 $90^{\circ}$ 往小调，$e$ 从 $0$ 连续增大；越过 $\beta$ 的那一刻 $e=1$，椭圆被「拉断」成抛物线，再往下就成了双曲线。</p>
+    </div>
+
+    <p class="tip" style="margin-top:14px">补充：用<b>丹德林双球</b>（在圆锥内放两个同时与锥面、截面相切的球）可以证明，截口上任意一点到焦点的距离与到准线的距离之比恒等于上面这个 $e$ —— 这就是圆锥曲线的第二定义，也是「焦点」「准线」这两个名字的来历。</p>
+  </section>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var DEG = Math.PI / 180;
+
+  /* ---------- 几何常量 ---------- */
+  var BETA  = 30 * DEG;         // 圆锥半顶角 β
+  var TB    = Math.tan(BETA);
+  var YC    = 3.15;             // 锥面画到 |y| = YC
+  var RC    = YC * TB;          // 底面半径
+  var LW    = 4.0;              // 截面方片沿「竖直」方向的半边长
+  var L2    = 2.4;              // 截面方片沿「水平」方向的半边长
+  var G_MIN = 15, G_MAX = 90, B_DEG = 30;
+
+  var HOME = { A: -0.62, E: 0.42 };
+  /* 截面的方位角：先正对镜头，再侧开 20°，否则方片的边会正好落在屏幕的竖直/水平方向上 */
+  var PA   = HOME.A + 0.35;
+  var UX   = Math.sin(PA), UZ = Math.cos(PA);
+
+  var COL  = { circle:'#2563eb', ellipse:'#7c3aed', parabola:'#0f8a5f', hyperbola:'#dc2626' };
+  var NAME = { circle:'圆', ellipse:'椭圆', parabola:'抛物线', hyperbola:'双曲线' };
+  var COND = { circle:'γ = 90°', ellipse:'γ > β', parabola:'γ = β', hyperbola:'γ < β' };
+
+  var cv  = document.getElementById('cv');
+  var ctx = cv.getContext('2d');
+  var cvx = document.getElementById('cvx');
+
+  var state = { g: 62, playing: true, dir: -1, speed: 15, dwell: 0 };
+  var cam   = { A: HOME.A, E: HOME.E, ca:1, sa:0, ce:1, se:0 };
+
+  var W = 0, H = 0, S = 70, cx = 0, cy = 0;
+
+  if (window.renderMathInElement){
+    renderMathInElement(document.body, {
+      delimiters: [ { left:'$$', right:'$$', display:true }, { left:'$', right:'$', display:false } ],
+      ignoredTags: ['script','noscript','style','textarea','pre','code','option'],
+      throwOnError: false, strict: false
+    });
+  }
+
+  /* ---------- 相机 ---------- */
+  function camUpd(){
+    cam.ca = Math.cos(cam.A); cam.sa = Math.sin(cam.A);
+    cam.ce = Math.cos(cam.E); cam.se = Math.sin(cam.E);
+  }
+  function proj(x, y, z){
+    var sx =  x * cam.ca - z * cam.sa;
+    var sy = -x * cam.se * cam.sa + y * cam.ce - z * cam.se * cam.ca;
+    var dp =  x * cam.sa * cam.ce + y * cam.se + z * cam.ca * cam.ce;
+    return [ cx + sx * S, cy - sy * S, dp ];
+  }
+
+  /* 截面与轴的交点高度：γ 大时高一些，γ 小时向锥顶收拢，两支才都看得清 */
+  function h0(g){
+    var u = (g - G_MIN) / 30;
+    if (u < 0) u = 0; if (u > 1) u = 1;
+    return 0.95 + 0.95 * Math.pow(u, 0.85);
+  }
+
+  /* 截面的两个面内方向：w 在「轴—镜头」竖直面内，与轴成 γ 角；w2 与之垂直 */
+  function frame(gD){
+    var g = gD * DEG, sg = Math.sin(g), cg = Math.cos(g);
+    return {
+      sg: sg, cg: cg, h: h0(gD),
+      w:  [ -sg * UX, cg, -sg * UZ ],
+      w2: [ UZ, 0, -UX ]
+    };
+  }
+
+  function typeOf(g){
+    if (g > 89.3) return 'circle';
+    if (Math.abs(g - B_DEG) < 0.45) return 'parabola';
+    return g > B_DEG ? 'ellipse' : 'hyperbola';
+  }
+
+  function resize(){
+    var r = cv.getBoundingClientRect();
+    if (r.width < 10 || r.height < 10) return;
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    cv.width  = Math.round(r.width  * dpr);
+    cv.height = Math.round(r.height * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    W = r.width; H = r.height;
+    var k = W / 8.0;
+    if (H / 7.6 < k) k = H / 7.6;
+    S = k;
+    cx = W * 0.5;
+    cy = H * 0.5 + 0.42 * S;
+  }
+
+  /* ---------- 标签（HTML 浮层 + KaTeX） ---------- */
+  var mlayer = document.getElementById('mlayer');
+  var pool = [], used = 0, texCache = {}, szCache = {};
+
+  function texHTML(tex){
+    var c = texCache[tex];
+    if (c) return c;
+    var h;
+    try { h = katex.renderToString(tex, { output:'html', throwOnError:false, displayMode:false, strict:false }); }
+    catch (e){ h = '<span>' + tex + '</span>'; }
+    texCache[tex] = h; return h;
+  }
+  function tag(px, py, tex, color){
+    var el = pool[used];
+    if (!el){ el = document.createElement('div'); el.className = 'mlabel'; mlayer.appendChild(el); pool[used] = el; }
+    used++;
+    if (el.__tex !== tex){ el.innerHTML = texHTML(tex); el.__tex = tex; }
+    el.style.color = color; el.style.display = '';
+    var sz = szCache[tex];
+    if (!sz || !sz.w){ sz = { w: el.offsetWidth, h: el.offsetHeight }; if (sz.w) szCache[tex] = sz; }
+    var x = px - sz.w / 2, y = py - sz.h / 2;
+    x = Math.max(5, Math.min(W - sz.w - 5, x));
+    y = Math.max(5, Math.min(H - sz.h - 5, y));
+    el.style.left = x + 'px'; el.style.top = y + 'px';
+  }
+  function tagEnd(){ for (var i = used; i < pool.length; i++) pool[i].style.display = 'none'; used = 0; }
+  /* 出界就不标，免得被夹到画布边缘 */
+  function tagIf(px, py, tex, color){
+    if (px < 14 || px > W - 14 || py < 14 || py > H - 14) return;
+    tag(px, py, tex, color);
+  }
+
+  function rgba(hex, a){
+    var n = parseInt(hex.slice(1), 16);
+    return 'rgba(' + (n >> 16 & 255) + ',' + (n >> 8 & 255) + ',' + (n & 255) + ',' + a.toFixed(3) + ')';
+  }
+
+  /* ---------- 圆锥 ---------- */
+  function drawCone(){
+    var N = 88, i, t, p, s, sgn;
+
+    var gTop = proj(0,  YC, 0), gBot = proj(0, -YC, 0);
+    var lg = ctx.createLinearGradient(gBot[0], gBot[1], gTop[0], gTop[1]);
+    lg.addColorStop(0,   'rgba(37,99,235,0.10)');
+    lg.addColorStop(0.5, 'rgba(37,99,235,0.025)');
+    lg.addColorStop(1,   'rgba(37,99,235,0.10)');
+
+    for (s = 0; s < 2; s++){
+      sgn = s === 0 ? 1 : -1;
+      var apex = proj(0, 0, 0);
+      ctx.beginPath();
+      ctx.moveTo(apex[0], apex[1]);
+      for (i = 0; i <= N; i++){
+        t = i / N * 2 * Math.PI;
+        p = proj(RC * Math.cos(t), sgn * YC, RC * Math.sin(t));
+        ctx.lineTo(p[0], p[1]);
+      }
+      ctx.closePath();
+      ctx.fillStyle = lg; ctx.fill();
+    }
+
+    /* 母线：朝向镜头的实一些 */
+    var NG = 18;
+    for (i = 0; i < NG; i++){
+      t = i / NG * 2 * Math.PI;
+      var fr = 0.5 + 0.5 * Math.sin(t + cam.A);
+      var al = 0.10 + 0.24 * fr;
+      var a0 = proj(0, 0, 0);
+      for (s = 0; s < 2; s++){
+        sgn = s === 0 ? 1 : -1;
+        var a1 = proj(RC * Math.cos(t), sgn * YC, RC * Math.sin(t));
+        ctx.beginPath(); ctx.moveTo(a0[0], a0[1]); ctx.lineTo(a1[0], a1[1]);
+        ctx.strokeStyle = 'rgba(59,110,165,' + al.toFixed(3) + ')';
+        ctx.lineWidth = 1.15; ctx.stroke();
+      }
+    }
+
+    for (s = 0; s < 2; s++){
+      sgn = s === 0 ? 1 : -1;
+      ctx.beginPath();
+      for (i = 0; i <= N; i++){
+        t = i / N * 2 * Math.PI;
+        p = proj(RC * Math.cos(t), sgn * YC, RC * Math.sin(t));
+        if (i === 0) ctx.moveTo(p[0], p[1]); else ctx.lineTo(p[0], p[1]);
+      }
+      ctx.strokeStyle = 'rgba(59,110,165,0.40)'; ctx.lineWidth = 1.4; ctx.stroke();
+    }
+  }
+
+  function drawAxis(){
+    var a = proj(0, -YC - 0.3, 0), b = proj(0, YC + 0.3, 0);
+    ctx.save();
+    ctx.setLineDash([5, 5]);
+    ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]);
+    ctx.strokeStyle = 'rgba(150,166,188,0.9)'; ctx.lineWidth = 1.3; ctx.stroke();
+    ctx.restore();
+  }
+
+  /* ---------- 截面方片 ---------- */
+  function corners(fr){
+    var q = [[-1,-1],[1,-1],[1,1],[-1,1]], out = [], i;
+    for (i = 0; i < 4; i++){
+      var a = q[i][0] * LW, b = q[i][1] * L2;
+      out.push([ a * fr.w[0] + b * fr.w2[0],
+                 fr.h + a * fr.w[1] + b * fr.w2[1],
+                 a * fr.w[2] + b * fr.w2[2] ]);
+    }
+    return out;
+  }
+
+  function drawPlaneFill(fr){
+    var c = corners(fr), i, p, pc = proj(0, fr.h, 0);
+    ctx.beginPath();
+    for (i = 0; i < 4; i++){
+      p = proj(c[i][0], c[i][1], c[i][2]);
+      if (i === 0) ctx.moveTo(p[0], p[1]); else ctx.lineTo(p[0], p[1]);
+    }
+    ctx.closePath();
+    /* 越靠近曲线越浓、向四面淡出，方片再大也不会糊住整幅图 */
+    var g = ctx.createRadialGradient(pc[0], pc[1], 0, pc[0], pc[1], S * 3.0);
+    g.addColorStop(0,   'rgba(217,138,0,0.10)');
+    g.addColorStop(0.45,'rgba(217,138,0,0.05)');
+    g.addColorStop(1,   'rgba(217,138,0,0)');
+    ctx.fillStyle = g; ctx.fill();
+  }
+
+  function drawPlaneEdge(fr){
+    var c = corners(fr), i, p;
+    ctx.save();
+    ctx.setLineDash([7, 6]);
+    ctx.beginPath();
+    for (i = 0; i < 5; i++){
+      p = proj(c[i % 4][0], c[i % 4][1], c[i % 4][2]);
+      if (i === 0) ctx.moveTo(p[0], p[1]); else ctx.lineTo(p[0], p[1]);
+    }
+    ctx.strokeStyle = 'rgba(200,140,40,0.5)'; ctx.lineWidth = 1.3; ctx.stroke();
+
+    /* 截面在轴向剖面里的迹线（过轴的那个方向） */
+    var p1 = proj(-LW * fr.w[0], fr.h - LW * fr.w[1], -LW * fr.w[2]);
+    var p2 = proj( LW * fr.w[0], fr.h + LW * fr.w[1],  LW * fr.w[2]);
+    ctx.setLineDash([4, 5]);
+    ctx.beginPath(); ctx.moveTo(p1[0], p1[1]); ctx.lineTo(p2[0], p2[1]);
+    ctx.strokeStyle = 'rgba(200,140,40,0.45)'; ctx.lineWidth = 1.2; ctx.stroke();
+    ctx.restore();
+  }
+
+  /* ---------- 截口曲线 ----------
+     圆锥上的点写成 P(t) = (y·tanβ·cos t, y, y·tanβ·sin t)，
+     代入平面方程 n·(P − P₀) = 0 解出
+        y(t) = h·sinγ / (tanβ·cosγ·sin(t+ψ) + sinγ)
+     分母为零时点跑到无穷远 —— 抛物线有一个零点，双曲线有两个。 */
+  function drawCurve(gD, col, fr){
+    var N = 260, i, pts = [];
+
+    for (i = 0; i <= N; i++){
+      var t = i / N * 2 * Math.PI;
+      var den = TB * fr.cg * Math.sin(t + PA) + fr.sg;
+      var y, ok = Math.abs(den) > 2e-3;
+      if (ok){
+        y = fr.h * fr.sg / den;
+        if (Math.abs(y) > YC * 1.3) ok = false;
+      }
+      if (!ok){ pts.push(null); continue; }
+      var r = y * TB;
+      var x = r * Math.cos(t), z = r * Math.sin(t);
+      var a = (x) * fr.w[0] + (y - fr.h) * fr.w[1] + (z) * fr.w[2];
+      var b = (x) * fr.w2[0] + (z) * fr.w2[2];
+      var al = Math.min(1,
+        (YC - Math.abs(y)) / 0.55,
+        (LW - Math.abs(a)) / 0.30,
+        (L2 - Math.abs(b)) / 0.30);
+      pts.push({ x:x, y:y, z:z, al: Math.max(0, al) });
+    }
+
+    var segs = [];
+    for (i = 1; i < pts.length; i++){
+      if (pts[i] && pts[i-1]) segs.push([pts[i-1], pts[i], Math.min(pts[i].al, pts[i-1].al)]);
+    }
+
+    var j, s, A, B, al2;
+    ctx.lineCap = 'round';
+    for (j = 0; j < segs.length; j++){
+      s = segs[j]; if (s[2] < 0.05) continue;
+      A = proj(s[0].x, s[0].y, s[0].z); B = proj(s[1].x, s[1].y, s[1].z);
+      ctx.beginPath(); ctx.moveTo(A[0], A[1]); ctx.lineTo(B[0], B[1]);
+      ctx.strokeStyle = rgba(col, 0.14 * s[2]); ctx.lineWidth = 10; ctx.stroke();
+    }
+    for (j = 0; j < segs.length; j++){
+      s = segs[j]; al2 = s[2]; if (al2 < 0.03) continue;
+      A = proj(s[0].x, s[0].y, s[0].z); B = proj(s[1].x, s[1].y, s[1].z);
+      ctx.beginPath(); ctx.moveTo(A[0], A[1]); ctx.lineTo(B[0], B[1]);
+      ctx.strokeStyle = rgba(col, 0.22 + 0.78 * al2); ctx.lineWidth = 3.1; ctx.stroke();
+    }
+    ctx.lineCap = 'butt';
+  }
+
+  /* ---------- 顶点、角标、文字 ---------- */
+  function drawMarks(gD, col, fr){
+    var O = proj(0, 0, 0);
+    ctx.beginPath(); ctx.arc(O[0], O[1], 3.4, 0, Math.PI * 2);
+    ctx.fillStyle = '#1e3a8a'; ctx.fill();
+
+    var P0 = proj(0, fr.h, 0);
+    ctx.beginPath(); ctx.arc(P0[0], P0[1], 3.6, 0, Math.PI * 2);
+    ctx.fillStyle = '#fff'; ctx.fill();
+    ctx.lineWidth = 2; ctx.strokeStyle = 'rgba(217,138,0,0.95)'; ctx.stroke();
+
+    /* γ 角：在截面内由轴方向转到截面方向 */
+    var R = 1.02, i, phi, p, first = true;
+    ctx.beginPath();
+    for (i = 0; i <= 26; i++){
+      phi = (gD * DEG) * i / 26;
+      p = proj(-R * Math.sin(phi) * UX, fr.h + R * Math.cos(phi), -R * Math.sin(phi) * UZ);
+      if (first){ ctx.moveTo(p[0], p[1]); first = false; } else ctx.lineTo(p[0], p[1]);
+    }
+    ctx.strokeStyle = 'rgba(200,140,40,0.85)'; ctx.lineWidth = 1.7; ctx.stroke();
+
+    var hg = gD * DEG / 2;
+    var mp = proj(-R * 1.32 * Math.sin(hg) * UX, fr.h + R * 1.32 * Math.cos(hg), -R * 1.32 * Math.sin(hg) * UZ);
+    tag(mp[0], mp[1], '\\gamma', '#a86f0a');
+
+    var tp = proj(0, YC + 0.7, 0);
+    tag(tp[0], tp[1], '\\text{轴}', '#93a1b4');
+    tag(O[0] - 16, O[1] + 14, 'O', '#1e3a8a');
+
+    /* 「截面」标在方片四条边中点里第一个落在画布内的 */
+    var edge = [[LW, 0], [0, L2], [-LW, 0], [0, -L2]], e, cp;
+    for (i = 0; i < 4; i++){
+      e = edge[i];
+      cp = proj(e[0] * 0.86 * fr.w[0] + e[1] * 0.86 * fr.w2[0],
+                fr.h + e[0] * 0.86 * fr.w[1] + e[1] * 0.86 * fr.w2[1],
+                e[0] * 0.86 * fr.w[2] + e[1] * 0.86 * fr.w2[2]);
+      if (cp[0] > 26 && cp[0] < W - 26 && cp[1] > 20 && cp[1] < H - 20){
+        tag(cp[0], cp[1], '\\text{截面}', '#a8720a');
+        break;
+      }
+    }
+
+    /* 抛物线：把那条与截面平行的母线单独描出来 */
+    if (typeOf(gD) === 'parabola'){
+      var tt = -Math.PI / 2 - PA;
+      var e1 = proj(RC * Math.cos(tt), YC, RC * Math.sin(tt));
+      var e2 = proj(-RC * Math.cos(tt), -YC, -RC * Math.sin(tt));
+      ctx.save();
+      ctx.setLineDash([6, 5]);
+      ctx.beginPath(); ctx.moveTo(e1[0], e1[1]); ctx.lineTo(e2[0], e2[1]);
+      ctx.strokeStyle = 'rgba(15,138,95,0.95)'; ctx.lineWidth = 2.1; ctx.stroke();
+      ctx.restore();
+      var lm = [(O[0] + e2[0]) / 2, (O[1] + e2[1]) / 2];
+      tagIf(lm[0] + (e2[0] > O[0] ? 34 : -34), lm[1], '\\text{母线}', '#0f8a5f');
+    }
+  }
+
+  function draw(){
+    ctx.clearRect(0, 0, W, H);
+    var gd = ctx.createLinearGradient(0, 0, 0, H);
+    gd.addColorStop(0, '#ffffff'); gd.addColorStop(1, '#fbfdff');
+    ctx.fillStyle = gd; ctx.fillRect(0, 0, W, H);
+
+    var g = state.g, col = COL[typeOf(g)], fr = frame(g);
+
+    drawPlaneFill(fr);
+    drawCone();
+    drawAxis();
+    drawCurve(g, col, fr);
+    drawPlaneEdge(fr);
+    drawMarks(g, col, fr);
+    tagEnd();
+  }
+
+  /* ---------- 轴向剖面小图 ---------- */
+  function drawAxial(){
+    var r = cvx.getBoundingClientRect();
+    if (r.width < 10) return;
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    cvx.width = Math.round(r.width * dpr);
+    cvx.height = Math.round(r.height * dpr);
+    var c = cvx.getContext('2d');
+    c.setTransform(dpr, 0, 0, dpr, 0, 0);
+    var W2 = r.width, H2 = r.height;
+    c.clearRect(0, 0, W2, H2);
+
+    var g = state.g, gr = g * DEG, col = COL[typeOf(g)], Hh = h0(g);
+    var s2 = Math.min((H2 - 22) / 7.2, (W2 - 16) / 4.4);
+    var ax = W2 * 0.5, ay = H2 * 0.5;
+    function PX(x, y){ return [ax + x * s2, ay - y * s2]; }
+
+    var L = 3.45, k, p, i, phi, t0, t1;
+    var dirs = [[1,1],[-1,1],[1,-1],[-1,-1]];
+
+    /* 两个锥面（剖面里的两片三角形） */
+    for (k = 0; k < 2; k++){
+      var sy = k === 0 ? 1 : -1;
+      var pl = PX(-Math.sin(BETA) * L, sy * Math.cos(BETA) * L);
+      var pr = PX( Math.sin(BETA) * L, sy * Math.cos(BETA) * L);
+      c.beginPath(); c.moveTo(ax, ay); c.lineTo(pl[0], pl[1]); c.lineTo(pr[0], pr[1]); c.closePath();
+      c.fillStyle = 'rgba(37,99,235,0.05)'; c.fill();
+    }
+    for (k = 0; k < 4; k++){
+      p = PX(dirs[k][0] * Math.sin(BETA) * L, dirs[k][1] * Math.cos(BETA) * L);
+      c.beginPath(); c.moveTo(ax, ay); c.lineTo(p[0], p[1]);
+      c.strokeStyle = 'rgba(59,110,165,0.65)'; c.lineWidth = 1.5; c.stroke();
+    }
+
+    c.save(); c.setLineDash([4, 4]);
+    c.beginPath(); c.moveTo(ax, ay - L * s2); c.lineTo(ax, ay + L * s2);
+    c.strokeStyle = 'rgba(150,166,188,0.75)'; c.lineWidth = 1.2; c.stroke();
+    c.restore();
+
+    /* 截面：过 (0,h0)，与轴成 γ 角 */
+    var dx = -Math.sin(gr), dy = Math.cos(gr), K = 8;
+    var q1 = PX(dx * K, Hh + dy * K), q2 = PX(-dx * K, Hh - dy * K);
+    c.beginPath(); c.moveTo(q1[0], q1[1]); c.lineTo(q2[0], q2[1]);
+    c.strokeStyle = rgba(col, 0.12); c.lineWidth = 7; c.stroke();
+    c.beginPath(); c.moveTo(q1[0], q1[1]); c.lineTo(q2[0], q2[1]);
+    c.strokeStyle = col; c.lineWidth = 2.1; c.stroke();
+
+    /* 交点 */
+    var P0 = PX(0, Hh);
+    c.beginPath(); c.arc(P0[0], P0[1], 3.2, 0, Math.PI * 2);
+    c.fillStyle = '#fff'; c.fill();
+    c.lineWidth = 1.8; c.strokeStyle = rgba(col, 0.95); c.stroke();
+
+    c.font = 'italic 700 12.5px "Cambria Math",Georgia,serif';
+    c.textAlign = 'center'; c.textBaseline = 'middle';
+
+    /* β 角弧：画在下半锥（上半锥的右侧被截面线挤得很窄），从轴向下转到左下母线 */
+    var r1 = 0.86;
+    c.beginPath();
+    for (i = 0; i <= 16; i++){
+      phi = BETA * i / 16;
+      t0 = PX(-r1 * Math.sin(phi), -r1 * Math.cos(phi));
+      if (i === 0) c.moveTo(t0[0], t0[1]); else c.lineTo(t0[0], t0[1]);
+    }
+    c.strokeStyle = 'rgba(59,110,165,0.85)'; c.lineWidth = 1.4; c.stroke();
+    t1 = PX(-r1 * 1.38 * Math.sin(BETA * 1.35), -r1 * 1.38 * Math.cos(BETA * 1.35));
+    c.fillStyle = '#3b6ea5'; c.fillText('β', t1[0], t1[1]);
+
+    /* γ 角弧：截面与轴的交点处，从轴向转到截面线 */
+    var r2 = 1.0;
+    c.beginPath();
+    for (i = 0; i <= 24; i++){
+      phi = gr * i / 24;
+      t0 = PX(-r2 * Math.sin(phi), Hh + r2 * Math.cos(phi));
+      if (i === 0) c.moveTo(t0[0], t0[1]); else c.lineTo(t0[0], t0[1]);
+    }
+    c.strokeStyle = 'rgba(217,138,0,0.95)'; c.lineWidth = 1.6; c.stroke();
+    /* 标签放到截面线的另一侧，才不会压在线上 */
+    phi = gr + 26 * DEG;
+    if (phi > 2.3) phi = 2.3;
+    t1 = PX(-r2 * 1.22 * Math.sin(phi), Hh + r2 * 1.22 * Math.cos(phi));
+    c.fillStyle = '#a86f0a'; c.fillText('γ', t1[0], t1[1]);
+  }
+
+  /* ---------- 面板 ---------- */
+  var badge = document.getElementById('badge');
+  var badgeTxt = document.getElementById('badgeTxt');
+  var badgeCond = document.getElementById('badgeCond');
+  var lgCurve = document.getElementById('lgCurve');
+  var els = {
+    play: document.getElementById('play'),
+    slider: document.getElementById('slider'),
+    gRead: document.getElementById('gRead'),
+    vG: document.getElementById('vG'),
+    vCmp: document.getElementById('vCmp'),
+    vE: document.getElementById('vE'),
+    vTotal: document.getElementById('vTotal'),
+    vType: document.getElementById('vType')
+  };
+
+  var uiKey = '';
+  function updateUI(){
+    var g = state.g, ty = typeOf(g), col = COL[ty];
+    var key = ty + '|' + g.toFixed(1);
+    if (key === uiKey) return;
+    uiKey = key;
+
+    badge.style.color = col;
+    badge.style.borderColor = col;
+    badge.style.background = rgba(col, 0.06);
+    badgeTxt.textContent = NAME[ty];
+    badgeCond.textContent = COND[ty];
+    lgCurve.style.borderColor = col;
+
+    els.gRead.innerHTML = g.toFixed(1) + '&deg;';
+    els.vG.textContent = g.toFixed(1) + '°';
+    els.vType.textContent = NAME[ty];
+    els.vType.style.color = col;
+    els.vTotal.style.background = rgba(col, 0.05);
+    els.vTotal.style.borderColor = rgba(col, 0.22);
+    els.vE.textContent = (Math.cos(g * DEG) / Math.cos(BETA)).toFixed(3);
+
+    var cmp = ty === 'circle' ? '\\gamma=90^{\\circ}' : (ty === 'parabola' ? '\\gamma=\\beta' : (g > B_DEG ? '\\gamma>\\beta' : '\\gamma<\\beta'));
+    if (els.vCmp.__tex !== cmp){ els.vCmp.__tex = cmp; els.vCmp.innerHTML = texHTML(cmp); }
+
+    if (document.activeElement !== els.slider) els.slider.value = g;
+  }
+
+  /* ---------- 动画 ---------- */
+  var last = performance.now();
+  function loop(now){
+    var dt = Math.min(0.05, (now - last) / 1000);
+    if (!isFinite(dt) || dt < 0) dt = 0.016;
+    last = now;
+
+    if (state.playing){
+      if (state.dwell > 0){ state.dwell -= dt; if (state.dwell < 0) state.dwell = 0; }
+      else {
+        var prev = state.g, na = prev + state.dir * state.speed * dt;
+        if (na >= G_MAX){ na = G_MAX; state.dir = -1; }
+        if (na <= G_MIN){ na = G_MIN; state.dir = 1; }
+        if ((prev < B_DEG && na >= B_DEG) || (prev > B_DEG && na <= B_DEG)){ na = B_DEG; state.dwell = 1.7; }
+        state.g = na;
+      }
+    }
+
+    draw();
+    drawAxial();
+    updateUI();
+    requestAnimationFrame(loop);
+  }
+
+  /* ---------- 交互 ---------- */
+  function setPlaying(v){ state.playing = v; els.play.textContent = v ? '暂停' : '播放'; }
+
+  function jumpTo(g){
+    state.g = Math.max(G_MIN, Math.min(G_MAX, g));
+    state.dwell = 0;
+    setPlaying(false);
+    els.slider.value = state.g;
+    uiKey = '';
+  }
+
+  els.play.addEventListener('click', function(){
+    if (state.playing){ setPlaying(false); return; }
+    if (state.g >= G_MAX - 1e-9) state.dir = -1;
+    if (state.g <= G_MIN + 1e-9) state.dir = 1;
+    setPlaying(true);
+  });
+
+  var btns = document.querySelectorAll('.btn[data-g]');
+  for (var i = 0; i < btns.length; i++){
+    btns[i].addEventListener('click', function(){ jumpTo(parseFloat(this.getAttribute('data-g'))); });
+  }
+
+  document.getElementById('reset').addEventListener('click', function(){
+    cam.A = HOME.A; cam.E = HOME.E; camUpd();
+  });
+
+  els.slider.addEventListener('input', function(){
+    state.g = parseFloat(els.slider.value);
+    state.dwell = 0;
+    setPlaying(false);
+    uiKey = '';
+  });
+
+  var drag = null;
+  cv.addEventListener('pointerdown', function(e){
+    drag = { x: e.clientX, y: e.clientY, A: cam.A, E: cam.E };
+    cv.setPointerCapture(e.pointerId);
+  });
+  cv.addEventListener('pointermove', function(e){
+    if (!drag) return;
+    cam.A = drag.A + (e.clientX - drag.x) * 0.007;
+    cam.E = Math.max(0.04, Math.min(1.2, drag.E - (e.clientY - drag.y) * 0.005));
+    camUpd();
+  });
+  cv.addEventListener('pointerup', function(e){ drag = null; try { cv.releasePointerCapture(e.pointerId); } catch (err){} });
+  cv.addEventListener('pointercancel', function(){ drag = null; });
+
+  window.addEventListener('keydown', function(e){
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    var tg = e.target;
+    if (tg && /^(INPUT|TEXTAREA|SELECT)$/.test(tg.tagName)) return;
+    if (e.key === 'ArrowLeft'){ jumpTo(state.g - 2); e.preventDefault(); }
+    if (e.key === 'ArrowRight'){ jumpTo(state.g + 2); e.preventDefault(); }
+  });
+
+  window.addEventListener('resize', function(){ resize(); });
+  if (window.ResizeObserver) new ResizeObserver(function(){ resize(); }).observe(cv);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(function(){ szCache = {}; });
+
+  camUpd();
+  resize();
+  requestAnimationFrame(loop);
+})();
+</script>
+<script>
+  window.addEventListener('load', function(){
+    if (window.katex && window.renderMathInElement) return;
+    var w = document.createElement('div');
+    w.textContent = '公式渲染库未能加载：请确认 assets/katex/ 目录下的文件完整（尤其是 fonts 文件夹）。';
+    w.style.cssText = 'position:fixed;left:50%;top:12px;transform:translateX(-50%);z-index:99;' +
+      'background:#fff5f5;border:1px solid #f6b9b9;color:#b91c1c;padding:8px 16px;border-radius:999px;' +
+      'font:600 13px/1.4 "Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;' +
+      'box-shadow:0 8px 20px -10px rgba(185,28,28,.5)';
+    document.body.appendChild(w);
+  });
+</script>
+</body>
+</html>

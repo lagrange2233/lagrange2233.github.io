@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>椭圆的第一定义 · 高中数学动态演示</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%232563eb'/%3E%3Ctext x='16' y='23' font-size='19' font-family='Georgia,serif' font-style='italic' fill='%23fff' text-anchor='middle'%3Ef%3C/text%3E%3C/svg%3E" />
+<meta name="description" content="一条定长细绳，两端钉在同一点，笔尖画出圆；把两枚图钉拉开，拉紧绳子画出的就是椭圆。拖动滑块把两钉慢慢拉开，看圆怎样被拽成椭圆，同时盯着 |PF₁|+|PF₂| 始终等于绳长。" />
+<link rel="stylesheet" href="../../assets/katex/katex.min.css" />
+<script src="../../assets/katex/katex.min.js"></script>
+<script src="../../assets/katex/auto-render.min.js"></script>
+<style>
+  :root{
+    --bg:#f1f5fa; --card:#fff; --ink:#16202f; --ink2:#5c6a7e; --ink3:#8c99ab;
+    --line:#e1e9f3; --blue:#2563eb; --amber:#d98a00; --green:#0f8a5f;
+    --violet:#7c3aed; --red:#dc2626;
+    --serif:"Cambria Math","Times New Roman",Georgia,serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:
+      radial-gradient(1100px 480px at 12% -10%, #e4efff 0%, rgba(228,239,255,0) 62%),
+      radial-gradient(900px 460px at 95% 0%, #fdf1e2 0%, rgba(253,241,226,0) 55%),
+      var(--bg);
+    color:var(--ink);
+    font-family:"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,-apple-system,sans-serif;
+    -webkit-font-smoothing:antialiased; line-height:1.65;
+  }
+  .page{max-width:1200px;margin:0 auto;padding:26px 20px 64px}
+
+  header{margin-bottom:18px}
+  .back{
+    display:inline-flex;align-items:center;gap:5px;margin-bottom:11px;
+    font-size:12.5px;font-weight:600;color:var(--ink2);text-decoration:none;
+    background:#fff;border:1px solid var(--line);border-radius:999px;padding:4px 12px;transition:.16s ease;
+  }
+  .back:hover{color:var(--blue);border-color:#a8c2e8;background:#f4f9ff;transform:translateY(-1px)}
+  .eyebrow{
+    display:inline-flex;align-items:center;gap:7px;font-size:12px;letter-spacing:.14em;
+    color:var(--blue);background:#e8f1ff;border:1px solid #cfe0fb;border-radius:999px;
+    padding:3px 11px;margin-bottom:10px;font-weight:600;
+  }
+  h1{font-size:23px;line-height:1.4;margin:0 0 8px;letter-spacing:.3px}
+  .sub{margin:0;color:var(--ink2);font-size:14px}
+  .katex{font-size:1.02em}
+  p .katex,li .katex,td .katex{font-size:1.04em}
+  .hl{background:linear-gradient(180deg,transparent 62%,#ffe9a8 62%);font-weight:600;padding:0 1px}
+
+  .main{display:grid;grid-template-columns:minmax(0,1fr) 336px;gap:18px;margin-top:18px;align-items:start}
+  .card{
+    background:var(--card);border:1px solid var(--line);border-radius:16px;
+    box-shadow:0 1px 2px rgba(22,32,47,.04), 0 12px 28px -18px rgba(22,32,47,.28);
+  }
+  .stage{position:relative;overflow:hidden}
+  .canvas-wrap{position:relative}
+  #cv{display:block;width:100%;height:560px;touch-action:none}
+
+  .math-layer{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+  .mlabel{
+    position:absolute;left:0;top:0;padding:1px 6px;border-radius:7px;
+    background:rgba(255,255,255,.94);border:1px solid currentColor;
+    font-size:12.4px;line-height:1.2;white-space:nowrap;
+    box-shadow:0 1px 2px rgba(22,32,47,.05);
+  }
+  .mlabel .katex{font-size:1em}
+
+  .badge{
+    position:absolute;left:14px;top:13px;display:flex;align-items:center;gap:9px;
+    padding:7px 14px 7px 11px;border-radius:999px;
+    background:#fff;border:1.5px solid #ddd;color:#333;
+    font-size:14px;font-weight:800;letter-spacing:.6px;
+    box-shadow:0 8px 20px -12px rgba(22,32,47,.4);
+    transition:color .18s ease,border-color .18s ease,background .18s ease;
+    pointer-events:none;
+  }
+  .badge .dot{width:9px;height:9px;border-radius:50%;background:currentColor;box-shadow:0 0 0 4px rgba(0,0,0,.05)}
+  .badge .cond{
+    font-size:11.5px;font-weight:700;letter-spacing:.2px;color:var(--ink3);
+    border-left:1px solid #e6ecf5;padding-left:9px;font-family:var(--serif);
+  }
+  .hint{
+    position:absolute;right:14px;bottom:12px;font-size:11.5px;color:#a4b0c2;
+    background:rgba(255,255,255,.86);border:1px solid #eaf0f8;border-radius:999px;padding:2px 10px;
+    pointer-events:none;
+  }
+
+  .legend{display:flex;flex-wrap:wrap;gap:13px;padding:10px 16px 0;font-size:12px;color:var(--ink3)}
+  .legend i{display:inline-block;width:16px;height:0;border-top-width:3px;border-top-style:solid;vertical-align:middle;margin-right:6px;border-radius:2px}
+  .legend .katex{font-size:1em}
+
+  .controls{
+    display:flex;flex-direction:column;gap:9px;padding:11px 15px 13px;
+    border-top:1px solid var(--line);background:linear-gradient(180deg,#fafcff,#f5f9ff);
+  }
+  .ctrl-row{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+  .btn{
+    font-family:inherit;font-size:13px;font-weight:600;color:var(--ink);
+    background:#fff;border:1px solid #d5e0ee;border-radius:10px;
+    padding:7px 13px;cursor:pointer;transition:.16s ease;white-space:nowrap;
+  }
+  .btn:hover{border-color:#a8c2e8;background:#f4f9ff;transform:translateY(-1px)}
+  .btn:active{transform:translateY(0)}
+  .btn.primary{background:var(--blue);border-color:var(--blue);color:#fff;box-shadow:0 6px 14px -8px rgba(37,99,235,.9);min-width:74px}
+  .btn.primary:hover{background:#1d4ed8;border-color:#1d4ed8}
+  .sep{width:1px;height:20px;background:#dde6f2;margin:0 3px}
+
+  .slider-wrap{display:flex;align-items:center;gap:9px;flex:1 1 260px;min-width:200px}
+  .slider-wrap .lab{font-size:12.5px;color:var(--ink3);font-weight:600;white-space:nowrap}
+  .slider-wrap .val{font-family:var(--serif);font-size:14.5px;font-weight:700;color:var(--ink);min-width:58px;text-align:right}
+  .chip{
+    font-size:12.6px;color:#7b8798;background:#fff;border:1px dashed #d5e0ee;
+    border-radius:9px;padding:5px 11px;white-space:nowrap;
+  }
+  input[type=range]{
+    -webkit-appearance:none;appearance:none;flex:1;height:4px;border-radius:3px;
+    background:#dbe6f5;outline:none;cursor:pointer;
+  }
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none;width:16px;height:16px;border-radius:50%;
+    background:var(--blue);border:3px solid #fff;box-shadow:0 1px 6px rgba(37,99,235,.55);cursor:grab;
+  }
+  input[type=range]::-moz-range-thumb{
+    width:14px;height:14px;border-radius:50%;background:var(--blue);
+    border:3px solid #fff;box-shadow:0 1px 6px rgba(37,99,235,.55);cursor:grab;
+  }
+
+  .panel{padding:15px 17px 17px}
+  .panel h3{margin:0 0 2px;font-size:13px;letter-spacing:.1em;color:var(--ink3);font-weight:700}
+  .panel .cap{margin:0 0 11px;font-size:11.5px;color:#a4b0c2;line-height:1.6}
+
+  .bar{
+    display:flex;height:34px;border-radius:10px;overflow:hidden;
+    border:1px solid #e2ebf7;background:#f7fafd;
+  }
+  .bar span{display:block;height:100%}
+  #seg1{background:linear-gradient(180deg,#dbe8fb,#b6d0f5);border-right:1px solid #fff}
+  #seg2{background:linear-gradient(180deg,#fbe8c9,#f2d097)}
+  .barlab{display:flex;justify-content:space-between;gap:8px;margin:6px 0 12px;font-size:11.6px;font-weight:700}
+  .barlab .katex{font-size:1em}
+  .barlab span:first-child{color:#1f56b3}
+  .barlab span:last-child{color:#a86f0a}
+
+  .metric{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:6px 0;border-bottom:1px dashed #edf2f9}
+  .metric:last-of-type{border-bottom:none}
+  .m-label{font-size:12.6px;color:var(--ink2)}
+  .m-val{font-family:var(--serif);font-size:15.5px;font-weight:700;white-space:nowrap}
+  .m-val.small{font-size:14px;color:var(--ink2);font-weight:600}
+  .total{
+    margin-top:11px;padding:11px 14px;border-radius:12px;background:#f3f7fd;border:1px solid #e2ebf7;
+    font-size:13px;font-weight:700;color:#1d3a6b;display:flex;justify-content:space-between;align-items:center;gap:8px;
+    transition:.22s ease;
+  }
+  .total .num{font-size:19px;font-weight:800;letter-spacing:1px}
+  .tip{margin:11px 0 0;font-size:12.4px;line-height:1.75;color:var(--ink3)}
+  .tip b{color:var(--ink2)}
+
+  .solution{margin-top:18px;padding:22px 24px 22px}
+  .solution h2{font-size:16px;margin:0 0 4px;display:flex;align-items:center;gap:9px}
+  .solution h2 .bar2{width:3px;height:16px;border-radius:2px;background:var(--blue)}
+  .solution .lead{margin:6px 0 16px;font-size:13.5px;color:var(--ink2)}
+
+  .steps{margin:0 0 16px;padding:0;list-style:none;counter-reset:s}
+  .steps li{position:relative;padding:0 0 14px 40px;counter-increment:s}
+  .steps li::before{
+    content:counter(s);position:absolute;left:0;top:1px;width:25px;height:25px;border-radius:8px;
+    background:#e8f1ff;color:var(--blue);font-size:13px;font-weight:800;
+    display:flex;align-items:center;justify-content:center;border:1px solid #cfe0fb;
+  }
+  .steps li:last-child{padding-bottom:0}
+  .steps p{margin:0 0 6px;font-size:13.6px;color:#25344a;line-height:1.85}
+  .steps .fml{font-family:var(--serif);font-size:16px;color:#1d3a6b;text-align:center;padding:8px 0 6px}
+
+  .defbox{
+    padding:15px 18px;border-radius:12px;background:linear-gradient(180deg,#fffdf7,#fff8ec);
+    border:1px solid #f3e2c3;margin:4px 0 16px;
+  }
+  .defbox p{margin:0;font-size:13.6px;line-height:1.85;color:#4a3a20}
+  .defbox .big{text-align:center;font-family:var(--serif);font-size:17px;font-weight:700;color:#a26200;padding:7px 0 8px}
+  .defbox .tagline{font-size:11.5px;letter-spacing:.16em;color:#c08a2a;font-weight:800;margin-bottom:2px}
+
+  .gtable{width:100%;border-collapse:separate;border-spacing:0;font-size:13.2px;color:#28374d;margin:2px 0 16px;
+    border:1px solid #e7eef8;border-radius:12px;overflow:hidden}
+  .gtable th,.gtable td{padding:9px 12px;text-align:left;border-bottom:1px solid #f0f5fc;vertical-align:middle}
+  .gtable th{background:#f7fafd;font-size:12.2px;font-weight:700;color:#5b6b82;white-space:nowrap}
+  .gtable tbody tr:last-child td{border-bottom:none}
+  .gtable td.m{font-family:var(--serif);font-size:14px;white-space:nowrap}
+  .gtable td.ty{font-weight:800;white-space:nowrap}
+  .sw{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:7px;vertical-align:1px}
+
+  .ask{margin-top:16px;padding:13px 16px;border-radius:12px;background:#f6f9fe;border:1px solid #e3ecf8}
+  .ask p{margin:0 0 6px;font-size:13.2px;line-height:1.8;color:#2b3b52;font-weight:600}
+  .ask ol{margin:0;padding-left:20px}
+  .ask li{font-size:13px;line-height:1.85;color:#3b4b62}
+  .ask li+li{margin-top:2px}
+
+  @media (max-width: 940px){
+    .main{grid-template-columns:1fr}
+    #cv{height:430px}
+    h1{font-size:20px}
+    .page{padding:20px 14px 48px}
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header>
+    <a class="back" href="../../index.html">&larr; 全部演示</a>
+    <div class="eyebrow">选择性必修一 · 解析几何 · 高二</div>
+    <h1>椭圆的第一定义</h1>
+    <p class="sub">一条定长细绳，两端都钉在<span class="hl">同一点</span>，套上铅笔拉紧绕一圈，画出的是圆。把绳子的两端<span class="hl">拉开一段距离</span>，分别钉在 $F_1,F_2$ 上，同样拉紧绳子移动笔尖 —— 画出来的是什么？拖动下面的滑块把两枚图钉慢慢拉开，注意右边那根「$2a$」的绳子：<b>不管笔尖走到哪里，两段绳长之和从来没变过。</b></p>
+  </header>
+
+  <div class="main">
+    <section class="card stage">
+      <div class="canvas-wrap">
+        <canvas id="cv"></canvas>
+        <div class="math-layer" id="mlayer"></div>
+        <div class="badge" id="badge"><span class="dot"></span><span id="badgeTxt">椭圆</span><span class="cond" id="badgeCond">0 &lt; 2c &lt; 2a</span></div>
+        <div class="hint">&larr; &rarr; 微调两钉间距</div>
+      </div>
+      <div class="legend">
+        <span><i style="border-color:#d98a00"></i>拉紧的细绳（两段之和 $=2a$）</span>
+        <span><i style="border-color:#7c3aed" id="lgCurve"></i>笔尖画出的轨迹</span>
+        <span><i style="border-color:#22405f"></i>图钉 $F_1,F_2$（焦点）</span>
+        <span><i style="border-color:#b9c6da;border-top-style:dashed"></i>半径 $a$ 的参考圆</span>
+      </div>
+      <div class="controls">
+        <div class="ctrl-row">
+          <button class="btn primary" id="play">暂停</button>
+          <span class="sep"></span>
+          <button class="btn" id="p0">① 两端钉在同一点</button>
+          <button class="btn" id="p1">② 拉开一段距离</button>
+          <button class="btn" id="p2">③ 快拉到底</button>
+          <span class="sep"></span>
+          <button class="btn" id="re">重画一遍</button>
+        </div>
+        <div class="ctrl-row">
+          <div class="slider-wrap">
+            <span class="lab">两钉间距 $2c$</span>
+            <input type="range" id="slider" min="0" max="0.99" step="0.005" value="0.62" />
+            <span class="val" id="cRead">2.48</span>
+          </div>
+          <span class="chip">绳长 $2a$ = 4.00（固定）</span>
+        </div>
+      </div>
+    </section>
+
+    <aside class="card panel">
+      <h3>绳子被笔尖分成的两段</h3>
+      <p class="cap">总长 $2a=4.00$ 是定值，笔尖走到哪里，只是改变两段的比例</p>
+      <div class="bar"><span id="seg1" style="width:50%"></span><span id="seg2" style="width:50%"></span></div>
+      <div class="barlab">
+        <span>$|PF_1|$ = <b id="r1v">2.00</b></span>
+        <span>$|PF_2|$ = <b id="r2v">2.00</b></span>
+      </div>
+
+      <div class="metric"><span class="m-label">两段之和 $|PF_1|+|PF_2|$</span><span class="m-val" id="vSum" style="color:#0f8a5f">4.00</span></div>
+      <div class="metric"><span class="m-label">绳长 $2a$</span><span class="m-val">4.00</span></div>
+      <div class="metric"><span class="m-label">两钉间距 $2c$</span><span class="m-val" id="v2c">2.48</span></div>
+      <div class="metric"><span class="m-label">短半轴 $b=\sqrt{a^{2}-c^{2}}$</span><span class="m-val" id="vB">1.57</span></div>
+      <div class="metric"><span class="m-label">离心率 $e=\dfrac{c}{a}$</span><span class="m-val" id="vE">0.620</span></div>
+      <div class="total" id="vTotal"><span>笔尖的轨迹</span><span class="num" id="vType">椭圆</span></div>
+      <p class="tip">把滑块推到最左，两枚钉子重合 —— 此时两段绳子永远等长，轨迹退化成<b>圆</b>；往右拉，$b$ 越来越小，椭圆越来越<b>扁</b>。</p>
+    </aside>
+  </div>
+
+  <section class="card solution">
+    <h2><span class="bar2"></span>为什么把绳子拉开，圆就变成了椭圆</h2>
+    <p class="lead">这道题只问一件事：<b>绳长固定、钉子固定，笔尖到两个定点的距离之和是不是定值？</b>答案是——是，而且是同一个定值，只是笔尖到定点的「个数」从 1 个变成了 2 个。</p>
+
+    <ol class="steps">
+      <li>
+        <p><b>两端钉在同一点：圆。</b>绳子从钉子 $O$ 出发、绕过铅笔、再回到这同一个钉子。拉紧后两段绳子一样长，各是绳长的一半，于是笔尖到钉子的距离恒为 $a$：</p>
+        <p class="fml">$|PO|=\dfrac{l}{2}=a$　（定值）$\Longrightarrow$ 轨迹是以 $O$ 为圆心、$a$ 为半径的圆</p>
+        <p style="font-size:12.8px;color:#8c99ab">注意：半径是绳长的<b>一半</b>，不是绳长。这是这一节最常见的错。</p>
+      </li>
+      <li>
+        <p><b>两端拉开：椭圆。</b>两个端点分别钉在 $F_1,F_2$，绳长还是 $l=2a$。拉紧时，绳子被笔尖分成两段，两段之和恒等于绳长：</p>
+        <p class="fml">$|PF_1|+|PF_2|=2a$</p>
+        <p>而两枚钉子的间距是 $|F_1F_2|=2c$。只要 $2a&gt;2c$，笔尖就被这根绳子「撑」在一条封闭曲线上——这条曲线就是椭圆，两个钉子就是它的两个焦点。</p>
+      </li>
+      <li>
+        <p><b>为什么必须有 $2a&gt;2c$。</b>三角形两边之和大于第三边：$|PF_1|+|PF_2|\ge|F_1F_2|$。等号成立时 $P$ 落在线段 $F_1F_2$ 上，绳子被拉到最直，笔尖只能在线段上来回，曲线塌成一条线段；若 $2a&lt;2c$，绳子根本够不着，一笔也画不出来。</p>
+      </li>
+    </ol>
+
+    <div class="defbox">
+      <p class="tagline">椭 圆 的 定 义</p>
+      <p>平面内与两个定点 $F_1,F_2$ 的距离之和等于常数（<b>大于 $|F_1F_2|$</b>）的点的轨迹叫做<b>椭圆</b>。两个定点叫椭圆的<b>焦点</b>，两焦点间的距离叫<b>焦距</b>。</p>
+      <p class="big">$|PF_1|+|PF_2|=2a\;>\;|F_1F_2|=2c$</p>
+      <p style="text-align:center;font-size:12.6px;color:#8a6a33">其中 $a$ 是长半轴、$c$ 是半焦距，且 $b^{2}=a^{2}-c^{2}$，$e=\dfrac{c}{a}\in[0,1)$</p>
+    </div>
+
+    <table class="gtable">
+      <thead>
+        <tr><th>两钉间距 $2c$</th><th>笔尖的轨迹</th><th>原因</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="m">$2c=0$</td>
+          <td class="ty" style="color:#2563eb"><span class="sw" style="background:#2563eb"></span>圆</td>
+          <td>两焦点重合，$|PF_1|=|PF_2|=a$，此时 $b=a$、$e=0$</td>
+        </tr>
+        <tr>
+          <td class="m">$0&lt;2c&lt;2a$</td>
+          <td class="ty" style="color:#7c3aed"><span class="sw" style="background:#7c3aed"></span>椭圆</td>
+          <td>距离之和为定值 $2a$，且大于焦距，$b=\sqrt{a^{2}-c^{2}}&gt;0$</td>
+        </tr>
+        <tr>
+          <td class="m">$2c=2a$</td>
+          <td class="ty" style="color:#d98a00"><span class="sw" style="background:#d98a00"></span>线段 $F_1F_2$</td>
+          <td>三角形不等式取等，$b=0$，椭圆被压扁成线段（退化，不算椭圆）</td>
+        </tr>
+        <tr>
+          <td class="m">$2c&gt;2a$</td>
+          <td class="ty" style="color:#dc2626"><span class="sw" style="background:#dc2626"></span>无轨迹</td>
+          <td>绳子不够长，笔尖够不着两个钉子</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="ask">
+      <p>课堂上可以接着追问：</p>
+      <ol>
+        <li>绳长不变，把钉子越拉越开，椭圆变「胖」还是变「扁」？为什么 $e$ 会跟着变大？（答：变扁。$c$ 变大而 $a$ 不变，$b=\sqrt{a^{2}-c^{2}}$ 变小，$e=\frac{c}{a}$ 变大）</li>
+        <li>为什么强调「拉紧」？绳子松着的时候，笔尖到两枚钉子的实际路程之和仍是绳长，可两点间的距离之和 $|PF_1|+|PF_2|$ 却<b>小于</b>绳长（绳子弯了），笔尖就不在椭圆上了。</li>
+        <li>把两个端点同时平移、绳长不变，笔尖画出的还是同一个椭圆吗？（答：不是，焦点换了，位置也换了）</li>
+      </ol>
+    </div>
+
+    <p class="tip" style="margin-top:14px">动手做一遍最有效：两枚图钉、一段不打结的细绳（两端各留一小段打个环）、一支铅笔。绳长取 $30$ cm 左右，两钉间距先取 $0$ 再取 $18$ cm，两次画出的曲线放在一起对比，定义里的「距离之和为常数」就变成看得见的事了。</p>
+  </section>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ---------- 几何常量：绳长 2a 固定为 4.00 ---------- */
+  var A = 2.0;          /* 半绳长 a */
+  var TAU = Math.PI * 2;
+
+  var cv = document.getElementById('cv');
+  var ctx = cv.getContext('2d');
+  var mlayer = document.getElementById('mlayer');
+
+  /* k = c/a，滑块调它；t 是笔尖的参数角，prog 是已画出的弧长（弧度） */
+  var state = { k: 0.62, t: 0, prog: 0, playing: true };
+
+  var W = 0, H = 0, S = 100, ox = 0, oy = 0;
+
+  function CC() { return state.k * A; }
+  function BB() { var c = CC(); return Math.sqrt(Math.max(0, A * A - c * c)); }
+  function TX(x) { return ox + x * S; }
+  function TY(y) { return oy - y * S; }
+  function isCircle() { return state.k < 0.015; }
+  function curveColor() { return isCircle() ? '#2563eb' : '#7c3aed'; }
+
+  function rgba(hex, a) {
+    var n = parseInt(hex.slice(1), 16);
+    return 'rgba(' + (n >> 16 & 255) + ',' + (n >> 8 & 255) + ',' + (n & 255) + ',' + a.toFixed(3) + ')';
+  }
+
+  function resize() {
+    var r = cv.getBoundingClientRect();
+    if (r.width < 10 || r.height < 10) return;
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    cv.width = Math.round(r.width * dpr);
+    cv.height = Math.round(r.height * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    W = r.width; H = r.height;
+    S = Math.min(W / 5.0, H / 5.4);
+    ox = W * 0.5; oy = H * 0.5;
+  }
+
+  /* ---------- 文字标签（HTML 浮层 + KaTeX） ---------- */
+  var pool = [], used = 0, texCache = {}, szCache = {};
+
+  function texHTML(tex) {
+    var hit = texCache[tex];
+    if (hit) return hit;
+    var h;
+    try { h = katex.renderToString(tex, { output: 'html', throwOnError: false, displayMode: false, strict: false }); }
+    catch (e) { h = '<span>' + tex + '</span>'; }
+    texCache[tex] = h; return h;
+  }
+  function tag(px, py, tex, col) {
+    var el = pool[used];
+    if (!el) { el = document.createElement('div'); el.className = 'mlabel'; mlayer.appendChild(el); pool[used] = el; }
+    used++;
+    if (el.__tex !== tex) { el.innerHTML = texHTML(tex); el.__tex = tex; }
+    el.style.color = col; el.style.display = '';
+    var sz = szCache[tex];
+    if (!sz || !sz.w) { sz = { w: el.offsetWidth, h: el.offsetHeight }; if (sz.w) szCache[tex] = sz; }
+    var x = px - sz.w / 2, y = py - sz.h / 2;
+    x = Math.max(5, Math.min(W - sz.w - 5, x));
+    y = Math.max(5, Math.min(H - sz.h - 5, y));
+    el.style.left = x + 'px'; el.style.top = y + 'px';
+  }
+  function tagEnd() { for (var i = used; i < pool.length; i++) pool[i].style.display = 'none'; used = 0; }
+
+  /* ---------- 图板 ---------- */
+  function paintBoard() {
+    ctx.clearRect(0, 0, W, H);
+    var g = ctx.createLinearGradient(0, 0, 0, H);
+    g.addColorStop(0, '#ffffff'); g.addColorStop(1, '#fbfdff');
+    ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+
+    var i, j;
+    ctx.fillStyle = '#e6eef8';
+    for (i = -6; i <= 6; i++) {
+      for (j = -5; j <= 5; j++) {
+        ctx.beginPath();
+        ctx.arc(TX(i * 0.5), TY(j * 0.5), 1.15, 0, TAU);
+        ctx.fill();
+      }
+    }
+  }
+
+  /* 参考圆：半径 a，两端重合时笔尖正好画它 */
+  function drawGhost(c) {
+    if (isCircle()) return;
+    ctx.save();
+    ctx.setLineDash([5, 6]);
+    ctx.beginPath();
+    ctx.arc(TX(0), TY(0), A * S, 0, TAU);
+    ctx.strokeStyle = 'rgba(150,166,188,0.50)'; ctx.lineWidth = 1.3; ctx.stroke();
+    ctx.restore();
+    var ang = Math.PI * 0.75;
+    tag(TX(A * Math.cos(ang)) - 4, TY(A * Math.sin(ang)) - 14, '\\text{半径 }a\\text{ 的圆}', '#9aa9bd');
+  }
+
+  /* 两焦点的连线 */
+  function drawFocal(c) {
+    if (c < 0.02) return;
+    ctx.save();
+    ctx.setLineDash([4, 5]);
+    ctx.beginPath(); ctx.moveTo(TX(-c), TY(0)); ctx.lineTo(TX(c), TY(0));
+    ctx.strokeStyle = 'rgba(203,216,234,0.95)'; ctx.lineWidth = 1.4; ctx.stroke();
+    ctx.restore();
+  }
+
+  /* 已经画出的那一段轨迹 */
+  function drawTrace() {
+    var span = Math.min(state.prog, TAU);
+    if (span < 0.004) return;
+    var b = BB(), col = curveColor();
+    var t1 = state.t, t0 = t1 - span;
+    var N = Math.max(30, Math.ceil(span / 0.028));
+    var i, ang, x, y;
+
+    ctx.beginPath();
+    for (i = 0; i <= N; i++) {
+      ang = t0 + span * i / N;
+      x = TX(A * Math.cos(ang)); y = TY(b * Math.sin(ang));
+      if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    }
+    ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+    ctx.strokeStyle = rgba(col, 0.09); ctx.lineWidth = 12; ctx.stroke();
+    ctx.strokeStyle = rgba(col, 0.17); ctx.lineWidth = 6; ctx.stroke();
+    ctx.strokeStyle = col; ctx.lineWidth = 2.6; ctx.stroke();
+    ctx.lineCap = 'butt';
+  }
+
+  /* 细绳：两段，拉直 */
+  function drawString(px, py) {
+    var c = CC();
+    var P1 = [TX(-c), TY(0)], P2 = [TX(c), TY(0)], P = [px, py];
+    var segs = [];
+
+    if (c < 0.02) {
+      /* 两端重合：两条绳子几乎叠在一起，稍微错开一点才看得出是两段 */
+      var dx = P[0] - P1[0], dy = P[1] - P1[1], L = Math.sqrt(dx * dx + dy * dy) || 1;
+      var ux = -dy / L * 2.4, uy = dx / L * 2.4;
+      segs.push([[P1[0] + ux, P1[1] + uy], [P[0] + ux, P[1] + uy]]);
+      segs.push([[P1[0] - ux, P1[1] - uy], [P[0] - ux, P[1] - uy]]);
+    } else {
+      segs.push([P1, P]);
+      segs.push([P2, P]);
+    }
+
+    ctx.lineCap = 'round';
+    var i, s;
+    for (i = 0; i < segs.length; i++) {
+      s = segs[i];
+      ctx.beginPath(); ctx.moveTo(s[0][0], s[0][1]); ctx.lineTo(s[1][0], s[1][1]);
+      ctx.strokeStyle = 'rgba(217,138,0,0.16)'; ctx.lineWidth = 9; ctx.stroke();
+    }
+    for (i = 0; i < segs.length; i++) {
+      s = segs[i];
+      ctx.beginPath(); ctx.moveTo(s[0][0], s[0][1]); ctx.lineTo(s[1][0], s[1][1]);
+      ctx.strokeStyle = '#d98a00'; ctx.lineWidth = 2.7; ctx.stroke();
+    }
+    ctx.lineCap = 'butt';
+  }
+
+  function drawPin(x, y) {
+    ctx.beginPath(); ctx.arc(x, y + 1.6, 7, 0, TAU);
+    ctx.fillStyle = 'rgba(22,32,47,0.10)'; ctx.fill();
+    ctx.beginPath(); ctx.arc(x, y, 5.8, 0, TAU);
+    ctx.fillStyle = '#22405f'; ctx.fill();
+    ctx.lineWidth = 2; ctx.strokeStyle = '#fff'; ctx.stroke();
+    ctx.beginPath(); ctx.arc(x - 1.8, y - 1.9, 1.6, 0, TAU);
+    ctx.fillStyle = 'rgba(255,255,255,0.55)'; ctx.fill();
+  }
+
+  function drawPins(c) {
+    if (c < 0.02) {
+      var x = TX(0), y = TY(0);
+      ctx.save();
+      ctx.setLineDash([3, 4]);
+      ctx.beginPath(); ctx.arc(x, y, 11, 0, TAU);
+      ctx.strokeStyle = 'rgba(37,99,235,0.5)'; ctx.lineWidth = 1.6; ctx.stroke();
+      ctx.restore();
+      drawPin(x, y);
+    } else {
+      drawPin(TX(-c), TY(0));
+      drawPin(TX(c), TY(0));
+    }
+  }
+
+  /* 铅笔：笔尖落在 P 上，笔杆沿外法线方向 */
+  function drawPencil(px, py, wx, wy) {
+    var b = BB();
+    var nx = wx / (A * A), ny = wy / (b * b);
+    var len = Math.sqrt(nx * nx + ny * ny) || 1;
+    var ang = Math.atan2(-ny / len, nx / len);
+
+    ctx.save();
+    ctx.translate(px, py);
+    ctx.rotate(ang);
+
+    /* 铅芯 */
+    ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(6.2, -2.3); ctx.lineTo(6.2, 2.3); ctx.closePath();
+    ctx.fillStyle = '#2f3a4a'; ctx.fill();
+
+    /* 木笔尖 */
+    ctx.beginPath();
+    ctx.moveTo(5.8, -2.3); ctx.lineTo(15.5, -5.3); ctx.lineTo(15.5, 5.3); ctx.lineTo(5.8, 2.3);
+    ctx.closePath();
+    ctx.fillStyle = '#ecd3ac'; ctx.fill();
+    ctx.strokeStyle = 'rgba(158,128,88,0.55)'; ctx.lineWidth = 1; ctx.stroke();
+
+    /* 笔杆 */
+    ctx.beginPath();
+    if (ctx.roundRect) ctx.roundRect(15.5, -5.3, 27, 10.6, 2.6);
+    else ctx.rect(15.5, -5.3, 27, 10.6);
+    ctx.fillStyle = '#4a7fc1'; ctx.fill();
+    ctx.fillStyle = 'rgba(255,255,255,0.38)';
+    ctx.fillRect(16.5, -4.2, 24.5, 2.2);
+
+    /* 金属箍 */
+    ctx.fillStyle = '#cdd6e0'; ctx.fillRect(39, -5.3, 4.6, 10.6);
+    ctx.fillStyle = 'rgba(0,0,0,0.10)'; ctx.fillRect(39, 2.4, 4.6, 2.9);
+
+    ctx.restore();
+  }
+
+  function drawLabels(c, b, px, py) {
+    if (c < 0.02) {
+      tag(TX(0), TY(0) - 26, 'F_1,\\,F_2\\text{ 重合}', '#22405f');
+    } else {
+      tag(TX(-c) - 2, TY(0) - 22, 'F_1', '#22405f');
+      tag(TX(c) + 2, TY(0) - 22, 'F_2', '#22405f');
+      /* 焦点间距 2c */
+      if (c * S > 74) tag(TX(0), TY(0) + 17, '2c', '#9fb0c7');
+      /* 两段绳子的长度 */
+      var mid1 = [(TX(-c) + px) / 2, (TY(0) + py) / 2];
+      var mid2 = [(TX(c) + px) / 2, (TY(0) + py) / 2];
+      if (Math.sqrt(Math.pow(px - TX(-c), 2) + Math.pow(py - TY(0), 2)) > 90) tag(mid1[0], mid1[1], '|PF_1|', '#c07f04');
+      if (Math.sqrt(Math.pow(px - TX(c), 2) + Math.pow(py - TY(0), 2)) > 90) tag(mid2[0], mid2[1], '|PF_2|', '#c07f04');
+    }
+
+    /* 笔尖 P：标在法线反方向，避开铅笔 */
+    var b2 = b;
+    var nnx = (A * Math.cos(state.t)) / (A * A), nny = (b2 * Math.sin(state.t)) / (b2 * b2);
+    var ln = Math.sqrt(nnx * nnx + nny * nny) || 1;
+    tag(px - nnx / ln * 17, py + nny / ln * 17, 'P', '#5b2ec4');
+  }
+
+  function draw() {
+    paintBoard();
+    var c = CC(), b = BB(), t = state.t;
+    var px = TX(A * Math.cos(t)), py = TY(b * Math.sin(t));
+
+    drawGhost(c);
+    drawFocal(c);
+    drawTrace();
+    drawString(px, py);
+    drawPins(c);
+    drawPencil(px, py, A * Math.cos(t), b * Math.sin(t));
+    drawLabels(c, b, px, py);
+    tagEnd();
+  }
+
+  /* ---------- 面板 ---------- */
+  var badge = document.getElementById('badge');
+  var badgeTxt = document.getElementById('badgeTxt');
+  var badgeCond = document.getElementById('badgeCond');
+  var lgCurve = document.getElementById('lgCurve');
+  var els = {
+    play: document.getElementById('play'),
+    slider: document.getElementById('slider'),
+    cRead: document.getElementById('cRead'),
+    seg1: document.getElementById('seg1'),
+    seg2: document.getElementById('seg2'),
+    r1v: document.getElementById('r1v'),
+    r2v: document.getElementById('r2v'),
+    vSum: document.getElementById('vSum'),
+    v2c: document.getElementById('v2c'),
+    vB: document.getElementById('vB'),
+    vE: document.getElementById('vE'),
+    vTotal: document.getElementById('vTotal'),
+    vType: document.getElementById('vType')
+  };
+
+  var lastType = '';
+  function updateUI() {
+    var c = CC(), b = BB(), t = state.t;
+    var r1 = A + c * Math.cos(t);      /* |PF1| */
+    var r2 = A - c * Math.cos(t);      /* |PF2| */
+
+    els.r1v.textContent = r1.toFixed(2);
+    els.r2v.textContent = r2.toFixed(2);
+    els.seg1.style.width = (r1 / (2 * A) * 100).toFixed(2) + '%';
+    els.seg2.style.width = (r2 / (2 * A) * 100).toFixed(2) + '%';
+
+    els.vSum.textContent = (r1 + r2).toFixed(2);
+    els.v2c.textContent = (2 * c).toFixed(2);
+    els.vB.textContent = b.toFixed(2);
+    els.vE.textContent = (c / A).toFixed(3);
+    els.cRead.textContent = (2 * c).toFixed(2);
+
+    var ty = isCircle() ? '圆' : '椭圆';
+    if (ty !== lastType) {
+      lastType = ty;
+      var col = curveColor();
+      badge.style.color = col;
+      badge.style.borderColor = col;
+      badge.style.background = rgba(col, 0.06);
+      badgeTxt.textContent = ty;
+      lgCurve.style.borderColor = col;
+      els.vType.textContent = ty;
+      els.vType.style.color = col;
+      els.vTotal.style.background = rgba(col, 0.05);
+      els.vTotal.style.borderColor = rgba(col, 0.22);
+    }
+    badgeCond.textContent = isCircle() ? '2c = 0' : '0 < 2c < 2a';
+    if (document.activeElement !== els.slider) els.slider.value = state.k;
+  }
+
+  /* ---------- 动画 ---------- */
+  var OMEGA = 0.95;   /* 弧度 / 秒 */
+  var last = performance.now();
+  function loop(now) {
+    var dt = (now - last) / 1000;
+    if (!isFinite(dt) || dt < 0) dt = 0.016;
+    if (dt > 0.05) dt = 0.05;
+    last = now;
+
+    if (state.playing) {
+      state.t += OMEGA * dt;
+      if (state.t >= TAU) state.t -= TAU;
+      state.prog = Math.min(TAU, state.prog + OMEGA * dt);
+    }
+
+    draw();
+    updateUI();
+    requestAnimationFrame(loop);
+  }
+
+  /* ---------- 交互 ---------- */
+  function setPlaying(v) { state.playing = v; els.play.textContent = v ? '暂停' : '播放'; }
+
+  function preset(k) {
+    state.k = Math.max(0, Math.min(0.99, k));
+    state.prog = 0;
+    state.t = 0;
+    els.slider.value = state.k;
+    lastType = '';
+    setPlaying(true);
+  }
+
+  els.play.addEventListener('click', function () { setPlaying(!state.playing); });
+  document.getElementById('p0').addEventListener('click', function () { preset(0); });
+  document.getElementById('p1').addEventListener('click', function () { preset(0.62); });
+  document.getElementById('p2').addEventListener('click', function () { preset(0.965); });
+  document.getElementById('re').addEventListener('click', function () { state.prog = 0; setPlaying(true); });
+
+  els.slider.addEventListener('input', function () {
+    state.k = parseFloat(els.slider.value);
+    lastType = '';
+  });
+
+  window.addEventListener('keydown', function (e) {
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    var tg = e.target;
+    if (tg && /^(INPUT|TEXTAREA|SELECT)$/.test(tg.tagName)) return;
+    if (e.key === 'ArrowLeft') { state.k = Math.max(0, state.k - 0.01); els.slider.value = state.k; lastType = ''; e.preventDefault(); }
+    if (e.key === 'ArrowRight') { state.k = Math.min(0.99, state.k + 0.01); els.slider.value = state.k; lastType = ''; e.preventDefault(); }
+    if (e.key === ' ') { setPlaying(!state.playing); e.preventDefault(); }
+  });
+
+  window.addEventListener('resize', resize);
+  if (window.ResizeObserver) new ResizeObserver(resize).observe(cv);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { szCache = {}; });
+
+  if (window.renderMathInElement) {
+    renderMathInElement(document.body, {
+      delimiters: [ { left: '$$', right: '$$', display: true }, { left: '$', right: '$', display: false } ],
+      ignoredTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code', 'option'],
+      throwOnError: false, strict: false
+    });
+  }
+
+  resize();
+  requestAnimationFrame(loop);
+})();
+</script>
+<script>
+  window.addEventListener('load', function () {
+    if (window.katex && window.renderMathInElement) return;
+    var w = document.createElement('div');
+    w.textContent = '公式渲染库未能加载：请确认 assets/katex/ 目录下的文件完整（尤其是 fonts 文件夹）。';
+    w.style.cssText = 'position:fixed;left:50%;top:12px;transform:translateX(-50%);z-index:99;' +
+      'background:#fff5f5;border:1px solid #f6b9b9;color:#b91c1c;padding:8px 16px;border-radius:999px;' +
+      'font:600 13px/1.4 "Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;' +
+      'box-shadow:0 8px 20px -10px rgba(185,28,28,.5)';
+    document.body.appendChild(w);
+  });
+</script>
+</body>
+</html>

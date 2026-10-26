@@ -19,7 +19,8 @@ site/                     ← 这个目录就是网站根目录（也是 git 仓
 ├── .nojekyll             关闭 Jekyll，否则 _template/ 这类下划线目录会被吞掉
 ├── assets/katex/         KaTeX 本地副本：css + js + 20 个 woff2 字体
 ├── demos/
-│   ├── circle-3points/   一个演示一个文件夹，入口统一叫 index.html
+│   ├── conic-sections/   一个演示一个文件夹，入口统一叫 index.html
+│   ├── circle-3points/
 │   └── chord-min/
 ├── _template/            新演示模板，复制改名即可开始
 └── tools/
