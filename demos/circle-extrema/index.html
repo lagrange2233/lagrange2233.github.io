@@ -728,13 +728,13 @@
     var sg = CX * n.x + CY * n.y;
     var foot = { x: CX - sg * n.x, y: CY - sg * n.y };
     var d = Math.abs(sg);
-    var near = Math.abs(d - R) < 0.05;
+    var near = Math.abs(d - R) < 0.02;
 
     if (d > 0.12){
       seg(CX, CY, foot.x, foot.y, near ? '#d98a00' : 'rgba(217,138,0,.7)', near ? 2.2 : 1.5, [5, 5]);
-      rightAngle(foot.x, foot.y, -u.x, -u.y, (foot.x - CX) / d, (foot.y - CY) / d,
+      rightAngle(foot.x, foot.y, -u.x, -u.y, (CX - foot.x) / d, (CY - foot.y) / d,
                  near ? '#c68a16' : 'rgba(198,138,22,.7)');
-      labelMid(CX, CY, foot.x, foot.y, near ? 'd=r' : 'd', '#b07300', 0.22);
+      if (d > 0.34) labelMid(CX, CY, foot.x, foot.y, near ? 'd=r' : 'd', '#b07300', 0.3);
     }
 
     /* 极值高亮：切线及切点 */
@@ -783,14 +783,14 @@
     var val = CX - CY + tv;                 // 直线 x-y+t=0 在 C 处的值
     var dd  = Math.abs(val) / Math.SQRT2;
     var foot = { x: CX - val / 2, y: CY + val / 2 };
-    var near = Math.abs(dd - R) < 0.05;
+    var near = Math.abs(dd - R) < 0.02;
 
     if (dd > 0.12){
       seg(CX, CY, foot.x, foot.y, near ? '#d98a00' : 'rgba(217,138,0,.7)', near ? 2.2 : 1.5, [5, 5]);
       rightAngle(foot.x, foot.y, Math.SQRT1_2, Math.SQRT1_2,
-                 (foot.x - CX) / dd, (foot.y - CY) / dd,
+                 (CX - foot.x) / dd, (CY - foot.y) / dd,
                  near ? '#c68a16' : 'rgba(198,138,22,.7)');
-      labelMid(CX, CY, foot.x, foot.y, near ? 'd=r' : 'd', '#b07300', 0.22);
+      if (dd > 0.34) labelMid(CX, CY, foot.x, foot.y, near ? 'd=r' : 'd', '#b07300', 0.3);
     }
 
     /* 纵截距 t */
