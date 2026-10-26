@@ -3,9 +3,9 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>椭圆的第一定义 · 高中数学动态演示</title>
+<title>椭圆的第一定义与第三定义 · 高中数学动态演示</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%232563eb'/%3E%3Ctext x='16' y='23' font-size='19' font-family='Georgia,serif' font-style='italic' fill='%23fff' text-anchor='middle'%3Ef%3C/text%3E%3C/svg%3E" />
-<meta name="description" content="一条定长细绳，两端钉在同一点，笔尖画出圆；把两枚图钉拉开，拉紧绳子画出的就是椭圆。拖动滑块把两钉慢慢拉开，看圆怎样被拽成椭圆，同时盯着 |PF₁|+|PF₂| 始终等于绳长。" />
+<meta name="description" content="两个页签切换：第一定义用一根定长细绳，把两枚图钉从重合拉开，看圆怎样被拽成椭圆；第三定义是例 3——A(-5,0)、B(5,0) 与动点 M 连线的斜率之积恒为 -4/9，M 的轨迹同样是椭圆，且焦点不是 A、B。" />
 <link rel="stylesheet" href="../../assets/katex/katex.min.css" />
 <script src="../../assets/katex/katex.min.js"></script>
 <script src="../../assets/katex/auto-render.min.js"></script>
@@ -54,7 +54,7 @@
   }
   .stage{position:relative;overflow:hidden}
   .canvas-wrap{position:relative}
-  #cv{display:block;width:100%;height:560px;touch-action:none}
+  #cv,#cv2{display:block;width:100%;height:560px;touch-action:none}
 
   .math-layer{position:absolute;inset:0;pointer-events:none;overflow:hidden}
   .mlabel{
@@ -196,11 +196,46 @@
   .ask li{font-size:13px;line-height:1.85;color:#3b4b62}
   .ask li+li{margin-top:2px}
 
+  /* ---------- 两个定义之间的切换 ---------- */
+  [hidden]{display:none !important}
+  .tabs{
+    display:flex;gap:5px;padding:4px;background:#fff;border:1px solid var(--line);
+    border-radius:13px;width:fit-content;margin:0 0 15px;
+    box-shadow:0 1px 2px rgba(22,32,47,.05), 0 10px 22px -18px rgba(22,32,47,.5);
+  }
+  .tabs button{
+    font-family:inherit;font-size:13px;font-weight:700;color:var(--ink2);letter-spacing:.2px;
+    background:transparent;border:none;border-radius:9px;padding:8px 16px;cursor:pointer;transition:.16s ease;
+  }
+  .tabs button:hover{color:var(--blue);background:#f2f7fe}
+  .tabs button.on{background:var(--blue);color:#fff;box-shadow:0 6px 14px -8px rgba(37,99,235,.95)}
+  .tabs button.on:hover{background:var(--blue);color:#fff}
+
+  .btn.on{background:#eaf6ef;border-color:#a7d8bf;color:#0b6b4a}
+  .btn.on:hover{background:#e2f2e9;border-color:#8fcdb1}
+
+  /* 两条斜率：从中间出发，一正一负 */
+  .ks{display:flex;flex-direction:column;gap:7px;margin:8px 0 12px}
+  .ksrow{display:flex;align-items:center;gap:8px}
+  .ksl{font-family:var(--serif);font-size:12.6px;font-weight:700;color:var(--ink2);width:26px;flex:0 0 auto;text-align:right}
+  .ksl .katex{font-size:1em}
+  .kstrack{position:relative;flex:1;height:13px;background:#f5f9fe;border:1px solid #e6eef8;border-radius:5px;overflow:hidden}
+  .kstrack::after{content:"";position:absolute;left:50%;top:1px;bottom:1px;width:1px;background:#d7e2f0}
+  .kstrack i{position:absolute;top:2px;bottom:2px;border-radius:3px;transition:width .08s linear}
+  .ksv{font-family:var(--serif);font-size:13px;font-weight:700;color:var(--ink);width:50px;text-align:right;flex:0 0 auto}
+  .eqbox{
+    margin-top:11px;padding:9px 10px;border-radius:11px;text-align:center;
+    background:#f8fbff;border:1px solid #e3ecf8;color:#1d3a6b;
+  }
+  .eqbox .katex{font-size:1.02em}
+
   @media (max-width: 940px){
     .main{grid-template-columns:1fr}
-    #cv{height:430px}
+    #cv,#cv2{height:430px}
     h1{font-size:20px}
     .page{padding:20px 14px 48px}
+    .tabs{width:100%}
+    .tabs button{flex:1;padding:8px 6px;font-size:12.5px}
   }
 </style>
 </head>
@@ -210,9 +245,24 @@
   <header>
     <a class="back" href="../../index.html">&larr; 全部演示</a>
     <div class="eyebrow">选择性必修一 · 解析几何 · 高二</div>
-    <h1>椭圆的第一定义</h1>
-    <p class="sub">一条定长细绳，两端都钉在<span class="hl">同一点</span>，套上铅笔拉紧绕一圈，画出的是圆。把绳子的两端<span class="hl">拉开一段距离</span>，分别钉在 $F_1,F_2$ 上，同样拉紧绳子移动笔尖 —— 画出来的是什么？拖动滑块把两枚图钉慢慢拉开，一直拉到 $2c=2a$，椭圆会被压成一条线段；再往外拉，绳子干脆够不着了。全程盯着右边那根「$2a$」的绳子：<b>不管笔尖走到哪里，两段绳长之和从来没变过。</b></p>
+
+    <div class="hero" id="hero1">
+      <h1>椭圆的第一定义</h1>
+      <p class="sub">一条定长细绳，两端都钉在<span class="hl">同一点</span>，套上铅笔拉紧绕一圈，画出的是圆。把绳子的两端<span class="hl">拉开一段距离</span>，分别钉在 $F_1,F_2$ 上，同样拉紧绳子移动笔尖 —— 画出来的是什么？拖动滑块把两枚图钉慢慢拉开，一直拉到 $2c=2a$，椭圆会被压成一条线段；再往外拉，绳子干脆够不着了。全程盯着右边那根「$2a$」的绳子：<b>不管笔尖走到哪里，两段绳长之和从来没变过。</b></p>
+    </div>
+
+    <div class="hero" id="hero2" hidden>
+      <h1>椭圆的第三定义</h1>
+      <p class="sub"><b>例 3</b>　在 $A,B$ 两点的坐标分别为 $(-5,0)$，$(5,0)$。直线 $AM$，$BM$ 相交于点 $M$，且它们的斜率之积是 $-\dfrac{4}{9}$，求点 $M$ 的轨迹方程。 —— 这里盯的不再是「距离之和」，而是<span class="hl">两条直线的斜率之积</span>：让 $M$ 绕一圈，看 $k_1$ 与 $k_2$ 一个涨一个落，乘积却始终是 $-\dfrac49$，轨迹同样是一个椭圆。</p>
+    </div>
+
+    <div class="tabs" role="tablist">
+      <button class="tab on" id="tab1" role="tab" aria-selected="true">① 第一定义 · 距离之和</button>
+      <button class="tab" id="tab2" role="tab" aria-selected="false">② 第三定义 · 斜率之积</button>
+    </div>
   </header>
+
+  <div id="view1">
 
   <div class="main">
     <section class="card stage">
@@ -337,7 +387,122 @@
 
     <p class="tip" style="margin-top:14px">动手做一遍最有效：两枚图钉、一段不打结的细绳（两端各留一小段打个环）、一支铅笔。绳长取 $30$ cm 左右，两钉间距先取 $0$ 再取 $18$ cm，两次画出的曲线放在一起对比，定义里的「距离之和为常数」就变成看得见的事了。</p>
   </section>
-</div>
+  </div><!-- /view1 -->
+
+  <div id="view2" hidden>
+  <div class="main">
+    <section class="card stage">
+      <div class="canvas-wrap">
+        <canvas id="cv2"></canvas>
+        <div class="math-layer" id="mlayer2"></div>
+        <div class="badge" id="badge2"><span class="dot"></span><span id="badgeTxt2">椭圆</span><span class="cond" id="badgeCond2">m = −4/9</span></div>
+        <div class="hint">&larr; &rarr; 微调 $m$</div>
+      </div>
+      <div class="legend">
+        <span><i style="border-color:#2563eb"></i>直线 $MA$（斜率 $k_1$）</span>
+        <span><i style="border-color:#d98a00"></i>直线 $MB$（斜率 $k_2$）</span>
+        <span><i style="border-color:#7c3aed" id="lgCurve2"></i>$M$ 画出的轨迹</span>
+        <span><i style="border-color:#22405f"></i>定点 $A,B$（要挖去）</span>
+      </div>
+      <div class="controls">
+        <div class="ctrl-row">
+          <button class="btn primary" id="play2">暂停</button>
+          <button class="btn" id="re2">重画</button>
+          <span class="sep"></span>
+          <button class="btn" id="q0">① 本题 $m=-\frac{4}{9}$</button>
+          <button class="btn" id="q1">② $m=-1$（圆）</button>
+          <button class="btn" id="q2">③ $m\to 0$（扁）</button>
+          <button class="btn" id="q3">④ $m=-1.2$（长轴转竖）</button>
+          <span class="sep"></span>
+          <button class="btn" id="qF">叠加第一定义的焦点</button>
+        </div>
+        <div class="ctrl-row">
+          <div class="slider-wrap">
+            <span class="lab">斜率之积 $m$</span>
+            <input type="range" id="slider2" min="-1.2" max="-0.12" step="0.005" value="-0.4444" />
+            <span class="val" id="mRead">−0.444</span>
+          </div>
+          <span class="chip">$a=5$（$A,B$ 固定）</span>
+        </div>
+      </div>
+    </section>
+
+    <aside class="card panel">
+      <h3>两个斜率都在变，乘积不动</h3>
+      <p class="cap">$M$ 绕椭圆走一圈，$k_1$ 与 $k_2$ 一涨一落，乘积永远是 $m$</p>
+      <div class="ks">
+        <div class="ksrow"><span class="ksl">$k_1$</span><span class="kstrack"><i id="ks1" style="left:50%;width:0;background:linear-gradient(180deg,#7fb0f2,#2563eb)"></i></span><span class="ksv" id="k1v">0.000</span></div>
+        <div class="ksrow"><span class="ksl">$k_2$</span><span class="kstrack"><i id="ks2" style="left:50%;width:0;background:linear-gradient(180deg,#f0c479,#d98a00)"></i></span><span class="ksv" id="k2v">0.000</span></div>
+      </div>
+      <div class="total" id="vTotal2"><span>$k_1\cdot k_2$</span><span class="num" id="kprod">−0.4444</span></div>
+      <div class="metric"><span class="m-label">短半轴 $b=\sqrt{-m\,a^{2}}$</span><span class="m-val" id="vb2">3.33</span></div>
+      <div class="metric"><span class="m-label">真实焦距 $2c$</span><span class="m-val" id="vc2">7.45</span></div>
+      <div class="metric"><span class="m-label">焦点（不是 $A,B$）</span><span class="m-val small" id="vf2">(±3.73, 0)</span></div>
+      <div class="eqbox" id="eq2"></div>
+      <p class="tip">$k_1$ 与 $k_2$ 永远<b>一正一负</b>：$M$ 在 $x$ 轴上方时 $MA$ 上升、$MB$ 下降，所以乘积恒为负。$m=-1$ 时两根线<b>互相垂直</b>，轨迹退化成<b>圆</b> —— 正是「直径所对的圆周角是直角」。</p>
+    </aside>
+  </div>
+
+  <section class="card solution">
+    <h2><span class="bar2"></span>从「距离之和」换到「斜率之积」</h2>
+    <p class="lead">例 3 只给了两个定点和一句话：$k_{AM}\cdot k_{BM}=-\frac49$。把两个斜率翻译成坐标，条件就变成了一个方程 —— 求出它，就知道轨迹是什么。</p>
+
+    <ol class="steps">
+      <li>
+        <p><b>设点、写斜率（先看分母）。</b>设 $M(x,y)$。$AM$、$BM$ 的斜率都要存在，所以 $x\ne-5$ 且 $x\ne5$，即 $M$ 不能落在 $A$、$B$ 两点上：</p>
+        <p class="fml">$k_{AM}=\dfrac{y}{x+5},\qquad k_{BM}=\dfrac{y}{x-5}$</p>
+      </li>
+      <li>
+        <p><b>套条件，变成一个方程。</b>两个斜率相乘得 $-\frac49$：</p>
+        <p class="fml">$\dfrac{y}{x+5}\cdot\dfrac{y}{x-5}=-\dfrac{4}{9}\;\Longrightarrow\;\dfrac{y^{2}}{x^{2}-25}=-\dfrac{4}{9}$</p>
+      </li>
+      <li>
+        <p><b>化简成标准式。</b>交叉相乘：$9y^{2}=-4(x^{2}-25)$，即 $4x^{2}+9y^{2}=100$，两边除以 $100$：</p>
+        <p class="fml">$9y^{2}=-4(x^{2}-25)\;\Longrightarrow\;4x^{2}+9y^{2}=100\;\Longrightarrow\;\dfrac{x^{2}}{25}+\dfrac{9y^{2}}{100}=1\quad(x\ne\pm5)$</p>
+        <p style="font-size:12.8px;color:#8c99ab">也就是 $\dfrac{x^{2}}{25}+\dfrac{y^{2}}{100/9}=1$：这里 $a^{2}=25$、$b^{2}=\frac{100}{9}$，所以 $a=5$，$b=\frac{10}{3}$。</p>
+      </li>
+      <li>
+        <p><b>结论：是椭圆，但要挖掉两个点。</b>轨迹是以 $A(-5,0)$、$B(5,0)$ 为<span class="hl">长轴端点</span>的椭圆，再加上 $x\ne\pm5$ 的限制 —— 也就是椭圆上去掉 $A$、$B$ 两点。因为 $M$ 与 $A$ 重合时「直线 $AM$」根本不存在，斜率无从谈起。</p>
+      </li>
+      <li>
+        <p><b>最容易错的一步：焦点不是 $A,B$。</b>由 $c=\sqrt{a^{2}-b^{2}}=\sqrt{25-\frac{100}{9}}=\frac{5\sqrt5}{3}\approx3.73$，真正的焦点是 $\left(\pm\frac{5\sqrt5}{3},\,0\right)$。$A$、$B$ 是长轴的<b>两个端点</b>，落在椭圆上；焦点却在椭圆<b>里面</b>。把两者混为一谈，后面算离心率 $e=\frac{c}{a}=\frac{\sqrt5}{3}\approx0.745$ 就会全错。</p>
+        <p style="font-size:12.8px;color:#8c99ab">点一下演示里的「叠加第一定义的焦点」，两条虚线会告诉你：这个椭圆的 $|MF_1|+|MF_2|$ 同样是定值 $2a=10$。</p>
+      </li>
+    </ol>
+
+    <div class="defbox">
+      <p class="tagline">椭 圆 的 第 三 定 义</p>
+      <p>设 $A(-a,0)$、$B(a,0)$ 是椭圆长轴的两个端点，$M$ 是椭圆上<b>异于 $A,B$</b> 的任意一点，则 $k_{AM}\cdot k_{BM}$ 恒为定值；反过来，若动点 $M$ 到 $A,B$ 连线的斜率之积为常数 $m$（$m&lt;0$ 且 $m\ne-1$），则 $M$ 的轨迹是椭圆</p>
+      <p class="big">$k_{AM}\cdot k_{BM}=-\dfrac{b^{2}}{a^{2}}=m\;\Longleftrightarrow\;\dfrac{x^{2}}{a^{2}}+\dfrac{y^{2}}{-ma^{2}}=1\;(x\ne\pm a)$</p>
+      <p style="text-align:center;font-size:12.6px;color:#8a6a33">$m=-1$ 时退化为圆（直径所对圆周角为直角）；$m&gt;0$ 时轨迹是双曲线 —— 那是双曲线的「第三定义」</p>
+    </div>
+
+    <table class="gtable">
+      <thead>
+        <tr><th>比一比</th><th>第一定义</th><th>第三定义</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="m">盯住什么</td><td>到两点的<b>距离之和</b></td><td>到两点的<b>斜率之积</b></td></tr>
+        <tr><td class="m">定值</td><td>$|PF_1|+|PF_2|=2a$</td><td>$k_1k_2=-\dfrac{b^{2}}{a^{2}}=m$</td></tr>
+        <tr><td class="m">那两个定点</td><td>焦点 $(\pm c,0)$，在椭圆内部</td><td>长轴端点 $(\pm a,0)$，在椭圆上</td></tr>
+        <tr><td class="m">几何味道</td><td>「到两点距离之和不变」</td><td>「到两点连线张角的大小不变」</td></tr>
+        <tr><td class="m">使用前提</td><td>没有额外限制</td><td>斜率必须存在 ⟹ 挖去 $A,B$ 两点</td></tr>
+      </tbody>
+    </table>
+
+    <div class="ask">
+      <p>课堂上可以接着追问：</p>
+      <ol>
+        <li>为什么最后一定要写 $x\ne\pm5$？（答：$A$、$B$ 处直线 $AM$ 或 $BM$ 退化成一条线，斜率不存在，条件本身没意义——演示里 $M$ 走到两端时，两条线和数值都会淡出）</li>
+        <li>$m=-1$ 是什么图形？（答：圆 $x^{2}+y^{2}=25$。$k_1k_2=-1\iff AM\perp BM$，这正是「直径所对的圆周角是直角」的逆命题 —— 按钮 ②）</li>
+        <li>若把条件改成 $k_{AM}\cdot k_{BM}=\frac49&gt;0$ 呢？（答：$\frac{x^{2}}{25}-\frac{y^{2}}{100/9}=1$，是双曲线，不是椭圆）</li>
+        <li>本题椭圆的焦点在哪里？为什么不是 $A,B$？（答：$\left(\pm\frac{5\sqrt5}{3},0\right)$；$A,B$ 是长轴端点，在这条椭圆上，而焦点在椭圆内部）</li>
+        <li>若 $A,B$ 改成 $(0,-5),(0,5)$ 呢？（答：只是把 $x,y$ 互换，得 $\frac{y^{2}}{25}+\frac{x^{2}}{100/9}=1$，同一个椭圆转了 $90^\circ$）</li>
+      </ol>
+    </div>
+  </section>
+  </div><!-- /view2 -->
+</div><!-- /page -->
 
 <script>
 (function () {
@@ -355,6 +520,7 @@
   var state = { k: 0.62, t: 0, prog: 0, playing: true };
 
   var W = 0, H = 0, S = 100, ox = 0, oy = 0;
+  var live = true;      /* 当前页签是否在显示，隐藏时不画，省电 */
 
   function CC() { return state.k * A; }
   function BB() { var c = CC(); return Math.sqrt(Math.max(0, A * A - c * c)); }
@@ -749,6 +915,7 @@
     if (!isFinite(dt) || dt < 0) dt = 0.016;
     if (dt > 0.05) dt = 0.05;
     last = now;
+    if (!live) { requestAnimationFrame(loop); return; }
 
     if (state.playing && typeOf() !== 'none') {
       state.t += OMEGA * dt;
@@ -799,6 +966,7 @@
   });
 
   window.addEventListener('keydown', function (e) {
+    if (!live) return;
     if (e.metaKey || e.ctrlKey || e.altKey) return;
     var tg = e.target;
     if (tg && /^(INPUT|TEXTAREA|SELECT)$/.test(tg.tagName)) return;
@@ -811,6 +979,15 @@
   if (window.ResizeObserver) new ResizeObserver(resize).observe(cv);
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { szCache = {}; });
 
+  /* 页签切换：隐藏时停画，重新显示时立即重排重绘一次 */
+  window.__ell = window.__ell || {};
+  window.__ell.first = {
+    setLive: function (v) {
+      live = v;
+      if (v) { resize(); lastType = ''; draw(); updateUI(); }
+    }
+  };
+
   if (window.renderMathInElement) {
     renderMathInElement(document.body, {
       delimiters: [ { left: '$$', right: '$$', display: true }, { left: '$', right: '$', display: false } ],
@@ -821,6 +998,439 @@
 
   resize();
   requestAnimationFrame(loop);
+})();
+</script>
+<script>
+/* =========================================================================
+   例 3（第三定义）：A(-5,0)、B(5,0)，k₁·k₂ = m = -b²/a² 恒成立
+   ========================================================================= */
+(function () {
+  "use strict";
+
+  var AA = 5;              /* A(-5,0)、B(5,0)，a = 5 */
+  var TAU = Math.PI * 2;
+
+  var cv = document.getElementById('cv2');
+  if (!cv) return;
+  var ctx = cv.getContext('2d');
+  var mlayer = document.getElementById('mlayer2');
+
+  /* m 是斜率之积；t 是 M 的参数角；prog 是已经画出的弧 */
+  var st = { m: -4 / 9, t: 0.9, prog: 0, playing: true, foci: false };
+  var MMIN = -1.2, MMAX = -0.12;
+  var W = 0, H = 0, S = 100, ox = 0, oy = 0, live = false, lastKind = '';
+
+  var COL = { circle: '#2563eb', ellipse: '#7c3aed', tall: '#0f8a5f' };
+  var NAME = { circle: '圆', ellipse: '椭圆', tall: '椭圆（长轴竖）' };
+
+  function BV() { return AA * Math.sqrt(-st.m); }   /* b = a√(-m) */
+  function TX(x) { return ox + x * S; }
+  function TY(y) { return oy - y * S; }
+
+  function kind() {
+    if (Math.abs(st.m + 1) < 0.008) return 'circle';
+    return st.m < -1 ? 'tall' : 'ellipse';
+  }
+  function Col() { return COL[kind()]; }
+
+  function rgba(hex, a) {
+    var n = parseInt(hex.slice(1), 16);
+    return 'rgba(' + (n >> 16 & 255) + ',' + (n >> 8 & 255) + ',' + (n & 255) + ',' + a.toFixed(3) + ')';
+  }
+
+  function resize() {
+    var r = cv.getBoundingClientRect();
+    if (r.width < 10 || r.height < 10) return;
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    cv.width = Math.round(r.width * dpr);
+    cv.height = Math.round(r.height * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    W = r.width; H = r.height;
+    /* 横向要放得下 x∈[-5,5]，纵向要放得下 |m| 最大时的 b≈5.5 */
+    S = Math.min(W / 12.4, H / 13.4);
+    ox = W * 0.5; oy = H * 0.5;
+  }
+
+  /* ---------- 浮层标签 ---------- */
+  var pool = [], used = 0, texCache = {}, szCache = {};
+
+  function texHTML(tex) {
+    var hit = texCache[tex];
+    if (hit) return hit;
+    var h;
+    try { h = katex.renderToString(tex, { output: 'html', throwOnError: false, displayMode: false, strict: false }); }
+    catch (e) { h = '<span>' + tex + '</span>'; }
+    texCache[tex] = h; return h;
+  }
+  function tag(px, py, tex, col) {
+    var el = pool[used];
+    if (!el) { el = document.createElement('div'); el.className = 'mlabel'; mlayer.appendChild(el); pool[used] = el; }
+    used++;
+    if (el.__tex !== tex) { el.innerHTML = texHTML(tex); el.__tex = tex; }
+    el.style.color = col; el.style.display = '';
+    var sz = szCache[tex];
+    if (!sz || !sz.w) { sz = { w: el.offsetWidth, h: el.offsetHeight }; if (sz.w) szCache[tex] = sz; }
+    var x = px - sz.w / 2, y = py - sz.h / 2;
+    x = Math.max(5, Math.min(W - sz.w - 5, x));
+    y = Math.max(5, Math.min(H - sz.h - 5, y));
+    el.style.left = x + 'px'; el.style.top = y + 'px';
+  }
+  function tagEnd() { for (var i = used; i < pool.length; i++) pool[i].style.display = 'none'; used = 0; }
+
+  /* ---------- 图板：单位网格 + 坐标轴 ---------- */
+  function board() {
+    ctx.clearRect(0, 0, W, H);
+    var g = ctx.createLinearGradient(0, 0, 0, H);
+    g.addColorStop(0, '#ffffff'); g.addColorStop(1, '#fbfdff');
+    ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+
+    var i, X, Y;
+    ctx.strokeStyle = '#e9f1fa'; ctx.lineWidth = 1;
+    for (i = -12; i <= 12; i++) {
+      if (!i) continue;
+      X = Math.round(TX(i)) + 0.5; Y = Math.round(TY(i)) + 0.5;
+      if (X > -1 && X < W + 1) { ctx.beginPath(); ctx.moveTo(X, 0); ctx.lineTo(X, H); ctx.stroke(); }
+      if (Y > -1 && Y < H + 1) { ctx.beginPath(); ctx.moveTo(0, Y); ctx.lineTo(W, Y); ctx.stroke(); }
+    }
+
+    var ax = Math.round(TX(0)) + 0.5, ay = Math.round(TY(0)) + 0.5;
+    ctx.strokeStyle = '#c2d2e6'; ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.moveTo(0, ay); ctx.lineTo(W - 4, ay); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(ax, H); ctx.lineTo(ax, 4); ctx.stroke();
+    ctx.fillStyle = '#c2d2e6';
+    ctx.beginPath(); ctx.moveTo(W - 1, ay); ctx.lineTo(W - 10, ay - 4.2); ctx.lineTo(W - 10, ay + 4.2); ctx.closePath(); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(ax, 1); ctx.lineTo(ax - 4.2, 10); ctx.lineTo(ax + 4.2, 10); ctx.closePath(); ctx.fill();
+  }
+
+  /* ---------- 已经画出的轨迹 ---------- */
+  function trace() {
+    var span = Math.min(st.prog, TAU);
+    if (span < 0.004) return;
+    var b = BV(), t0 = st.t - span;
+    var N = Math.max(40, Math.ceil(span / 0.025));
+    var i, a, x, y;
+
+    ctx.beginPath();
+    for (i = 0; i <= N; i++) {
+      a = t0 + span * i / N;
+      x = TX(AA * Math.cos(a)); y = TY(b * Math.sin(a));
+      if (i) ctx.lineTo(x, y); else ctx.moveTo(x, y);
+    }
+    var col = Col();
+    ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+    ctx.strokeStyle = rgba(col, 0.09); ctx.lineWidth = 12; ctx.stroke();
+    ctx.strokeStyle = rgba(col, 0.16); ctx.lineWidth = 6; ctx.stroke();
+    ctx.strokeStyle = col; ctx.lineWidth = 2.6; ctx.stroke();
+    ctx.lineCap = 'butt';
+  }
+
+  function seg(p, q, col, alpha) {
+    ctx.lineCap = 'round';
+    ctx.beginPath(); ctx.moveTo(p[0], p[1]); ctx.lineTo(q[0], q[1]);
+    ctx.strokeStyle = rgba(col, 0.13 * alpha); ctx.lineWidth = 9; ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(p[0], p[1]); ctx.lineTo(q[0], q[1]);
+    ctx.strokeStyle = rgba(col, alpha); ctx.lineWidth = 2.4; ctx.stroke();
+    ctx.lineCap = 'butt';
+  }
+
+  /* MA、MB：M 贴到 A 或 B 上时淡出（那时斜率不存在） */
+  function rays(x, y, alpha) {
+    if (alpha <= 0.03) return;
+    var M = [TX(x), TY(y)];
+    seg([TX(-AA), TY(0)], M, '#2563eb', alpha);   /* k1 */
+    seg([TX(AA), TY(0)], M, '#d98a00', alpha);    /* k2 */
+  }
+
+  function dot(x, y, r, col) {
+    ctx.beginPath(); ctx.arc(x, y, r + 2.4, 0, TAU);
+    ctx.fillStyle = rgba(col, 0.14); ctx.fill();
+    ctx.beginPath(); ctx.arc(x, y, r, 0, TAU);
+    ctx.fillStyle = col; ctx.fill();
+    ctx.lineWidth = 1.7; ctx.strokeStyle = '#fff'; ctx.stroke();
+  }
+
+  function drawFoci(x, y) {
+    var b = BV(), cE = Math.sqrt(Math.abs(AA * AA - b * b));
+    var up = b > AA;
+    var f1 = up ? [0, -cE] : [-cE, 0];
+    var f2 = up ? [0, cE] : [cE, 0];
+    var M = [TX(x), TY(y)];
+    var P1 = [TX(f1[0]), TY(f1[1])], P2 = [TX(f2[0]), TY(f2[1])];
+
+    ctx.save();
+    ctx.setLineDash([5, 5]);
+    ctx.strokeStyle = 'rgba(15,138,95,0.55)'; ctx.lineWidth = 1.6;
+    ctx.beginPath(); ctx.moveTo(M[0], M[1]); ctx.lineTo(P1[0], P1[1]); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(M[0], M[1]); ctx.lineTo(P2[0], P2[1]); ctx.stroke();
+    ctx.restore();
+
+    dot(P1[0], P1[1], 4, '#0f8a5f');
+    dot(P2[0], P2[1], 4, '#0f8a5f');
+    tag(P1[0], P1[1] - 19, 'F_1', '#0b6b4a');
+    tag(P2[0], P2[1] - 19, 'F_2', '#0b6b4a');
+
+    var maj = 2 * Math.max(AA, b);
+    tag(TX(0), TY(0) + 50, '|MF_1|+|MF_2|=' + maj.toFixed(0), '#0b6b4a');
+  }
+
+  function fmt(v) { return (Math.abs(v) < 100 ? v.toFixed(2) : '\\infty'); }
+
+  /* 把标签贴在线段上，并朝远离 x 轴的一侧错开，免得压住直线 */
+  function labOnLine(ax, ay, bx, by, tex, col) {
+    var dx = bx - ax, dy = by - ay, L = Math.hypot(dx, dy);
+    if (L < 70) return;
+    var ux = -dy / L, uy = dx / L;
+    if (uy * (by - TY(0)) < 0) { ux = -ux; uy = -uy; }
+    tag(ax + dx * 0.44 + ux * 15, ay + dy * 0.44 + uy * 15, tex, col);
+  }
+
+  function labels(x, y, b, fade) {
+    var dA = Math.hypot(x + AA, y), dB = Math.hypot(x - AA, y);
+    tag(TX(-AA) - 4, TY(0) - 25, 'A(-5,0)', '#22405f');
+    tag(TX(AA) + 4, TY(0) - 25, 'B(5,0)', '#22405f');
+    tag(TX(0) - 15, TY(0) + 13, 'O', '#9fb0c7');
+
+    if (fade < 1) {
+      tag(TX(dA < dB ? -AA : AA), TY(0) - 56, '\\text{斜率不存在}', '#dc2626');
+    }
+    if (fade <= 0.55) return;
+
+    var mx = TX(x), my = TY(y);
+    labOnLine(TX(-AA), TY(0), mx, my, 'k_1=' + fmt(y / (x + AA)), '#1f56b3');
+    labOnLine(TX(AA), TY(0), mx, my, 'k_2=' + fmt(y / (x - AA)), '#a86f0a');
+
+    /* M 的标签放在椭圆外法线方向；贴到顶点时让位给 A、B 的坐标 */
+    if (Math.min(dA, dB) > 1.3) {
+      var nx = x / (AA * AA), ny = y / (b * b);
+      var ln = Math.hypot(nx, ny) || 1;
+      tag(mx + nx / ln * 22, my - ny / ln * 22, 'M', '#5b2ec4');
+    }
+  }
+
+  function draw() {
+    if (W < 10) return;
+    board();
+    var b = BV(), x = AA * Math.cos(st.t), y = b * Math.sin(st.t);
+    var dA = Math.hypot(x + AA, y), dB = Math.hypot(x - AA, y);
+    var fade = Math.min(1, Math.min(dA, dB) / 0.55);
+
+    trace();
+    if (st.foci) drawFoci(x, y);
+    rays(x, y, fade);
+
+    dot(TX(-AA), TY(0), 4.6, '#22405f');
+    dot(TX(AA), TY(0), 4.6, '#22405f');
+
+    if (fade < 1) {
+      ctx.save();
+      ctx.setLineDash([3, 4]);
+      ctx.beginPath(); ctx.arc(TX(x), TY(y), 13, 0, TAU);
+      ctx.strokeStyle = 'rgba(220,38,38,' + (0.8 * (1 - fade) + 0.1).toFixed(3) + ')';
+      ctx.lineWidth = 1.6; ctx.stroke();
+      ctx.restore();
+    }
+    dot(TX(x), TY(y), 4.8, '#7c3aed');
+
+    labels(x, y, b, fade);
+    tagEnd();
+  }
+
+  /* ---------- 面板 ---------- */
+  var badge = document.getElementById('badge2');
+  var badgeTxt = document.getElementById('badgeTxt2');
+  var badgeCond = document.getElementById('badgeCond2');
+  var lgCurve = document.getElementById('lgCurve2');
+
+  var els = {
+    play: document.getElementById('play2'),
+    re: document.getElementById('re2'),
+    slider: document.getElementById('slider2'),
+    mRead: document.getElementById('mRead'),
+    k1v: document.getElementById('k1v'),
+    k2v: document.getElementById('k2v'),
+    ks1: document.getElementById('ks1'),
+    ks2: document.getElementById('ks2'),
+    kprod: document.getElementById('kprod'),
+    total: document.getElementById('vTotal2'),
+    vb: document.getElementById('vb2'),
+    vc: document.getElementById('vc2'),
+    vf: document.getElementById('vf2'),
+    eq: document.getElementById('eq2'),
+    foci: document.getElementById('qF')
+  };
+
+  function setBar(el, v) {
+    if (!isFinite(v)) v = 0;
+    var w = Math.min(48, Math.abs(v) / (Math.abs(v) + 2.2) * 48);
+    if (v >= 0) { el.style.left = '50%'; el.style.right = 'auto'; }
+    else { el.style.left = 'auto'; el.style.right = '50%'; }
+    el.style.width = w.toFixed(2) + '%';
+  }
+  function neg(s) { return String(s).replace('-', '\u2212'); }
+  function trim(s) { return String(s).replace(/\.?0+$/, ''); }
+
+  var eqLast = '';
+  function eqUpdate() {
+    var s;
+    if (Math.abs(st.m + 4 / 9) < 1e-6) s = '\\dfrac{x^{2}}{25}+\\dfrac{9y^{2}}{100}=1\\quad(x\\ne\\pm5)';
+    else if (Math.abs(st.m + 1) < 0.008) s = 'x^{2}+y^{2}=25\\quad(x\\ne\\pm5)';
+    else s = '\\dfrac{x^{2}}{25}+\\dfrac{y^{2}}{' + (-st.m * AA * AA).toFixed(2) + '}=1\\quad(x\\ne\\pm5)';
+    if (s === eqLast) return;
+    eqLast = s;
+    try {
+      els.eq.innerHTML = katex.renderToString(s, { throwOnError: false, strict: false });
+    } catch (e) { els.eq.textContent = s; }
+  }
+  function mText() {
+    if (Math.abs(st.m + 4 / 9) < 1e-6) return 'm = −4/9';
+    if (Math.abs(st.m + 1) < 0.008) return 'm = −1';
+    return 'm = ' + neg(st.m.toFixed(3));
+  }
+
+  function ui() {
+    var b = BV(), x = AA * Math.cos(st.t), y = b * Math.sin(st.t);
+    var dA = Math.hypot(x + AA, y), dB = Math.hypot(x - AA, y);
+    var ok = Math.min(dA, dB) > 0.32;
+    var k1 = y / (x + AA), k2 = y / (x - AA);
+
+    els.k1v.textContent = ok ? neg(k1.toFixed(3)) : '—';
+    els.k2v.textContent = ok ? neg(k2.toFixed(3)) : '—';
+    setBar(els.ks1, k1);
+    setBar(els.ks2, k2);
+
+    els.kprod.textContent = neg(trim(st.m.toFixed(4)));
+    els.vb.textContent = b.toFixed(2);
+    var cE = Math.sqrt(Math.abs(AA * AA - b * b));
+    els.vc.textContent = (2 * cE).toFixed(2);
+    els.vf.textContent = cE < 0.02 ? '重合于 O' : (b > AA ? '(0, ±' + cE.toFixed(2) + ')' : '(±' + cE.toFixed(2) + ', 0)');
+    els.mRead.textContent = neg(st.m.toFixed(3));
+    eqUpdate();
+
+    var kd = kind();
+    if (kd !== lastKind) {
+      lastKind = kd;
+      var col = COL[kd];
+      badge.style.color = col;
+      badge.style.borderColor = col;
+      badge.style.background = rgba(col, 0.06);
+      badgeTxt.textContent = NAME[kd];
+      lgCurve.style.borderColor = col;
+      els.total.style.background = rgba(col, 0.05);
+      els.total.style.borderColor = rgba(col, 0.22);
+    }
+    badgeCond.textContent = mText();
+    if (document.activeElement !== els.slider) els.slider.value = st.m;
+  }
+
+  /* ---------- 动画 ---------- */
+  var OMEGA = 1.0;
+  var last = performance.now();
+  function loop(now) {
+    var dt = (now - last) / 1000;
+    if (!isFinite(dt) || dt < 0) dt = 0.016;
+    if (dt > 0.05) dt = 0.05;
+    last = now;
+    if (!live) { requestAnimationFrame(loop); return; }
+
+    if (st.playing) {
+      st.t += OMEGA * dt;
+      if (st.t >= TAU) st.t -= TAU;
+      st.prog = Math.min(TAU, st.prog + OMEGA * dt);
+    }
+    draw();
+    ui();
+    requestAnimationFrame(loop);
+  }
+
+  /* ---------- 交互 ---------- */
+  function setPlaying(v) { st.playing = v; els.play.textContent = v ? '暂停' : '播放'; }
+
+  function preset(m) {
+    st.m = Math.max(MMIN, Math.min(MMAX, m));
+    st.t = 0.9;
+    st.prog = 0;
+    els.slider.value = st.m;
+    lastKind = '';
+    setPlaying(true);
+  }
+
+  els.play.addEventListener('click', function () { setPlaying(!st.playing); });
+  els.re.addEventListener('click', function () { st.prog = 0; st.t = 0.9; setPlaying(true); });
+  document.getElementById('q0').addEventListener('click', function () { preset(-4 / 9); });
+  document.getElementById('q1').addEventListener('click', function () { preset(-1); });
+  document.getElementById('q2').addEventListener('click', function () { preset(-0.13); });
+  document.getElementById('q3').addEventListener('click', function () { preset(-1.2); });
+
+  els.foci.addEventListener('click', function () {
+    st.foci = !st.foci;
+    els.foci.className = st.foci ? 'btn on' : 'btn';
+    els.foci.textContent = st.foci ? '已叠加焦点 · 点击隐藏' : '叠加第一定义的焦点';
+  });
+
+  els.slider.addEventListener('input', function () {
+    st.m = parseFloat(els.slider.value);
+    lastKind = '';
+  });
+
+  window.addEventListener('keydown', function (e) {
+    if (!live) return;
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    var tg = e.target;
+    if (tg && /^(INPUT|TEXTAREA|SELECT)$/.test(tg.tagName)) return;
+    if (e.key === 'ArrowLeft') { st.m = Math.max(MMIN, st.m - 0.01); els.slider.value = st.m; lastKind = ''; e.preventDefault(); }
+    if (e.key === 'ArrowRight') { st.m = Math.min(MMAX, st.m + 0.01); els.slider.value = st.m; lastKind = ''; e.preventDefault(); }
+    if (e.key === ' ') { setPlaying(!st.playing); e.preventDefault(); }
+  });
+
+  window.addEventListener('resize', resize);
+  if (window.ResizeObserver) new ResizeObserver(resize).observe(cv);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { szCache = {}; });
+
+  window.__ell = window.__ell || {};
+  window.__ell.third = {
+    setLive: function (v) {
+      live = v;
+      if (v) { resize(); lastKind = ''; draw(); ui(); }
+    }
+  };
+
+  resize();
+  requestAnimationFrame(loop);
+})();
+</script>
+<script>
+/* 两个定义之间的切换 */
+(function () {
+  "use strict";
+  var tabs = [document.getElementById('tab1'), document.getElementById('tab2')];
+  var views = [document.getElementById('view1'), document.getElementById('view2')];
+  var heroes = [document.getElementById('hero1'), document.getElementById('hero2')];
+  var names = ['first', 'third'];
+  var titles = ['椭圆的第一定义', '椭圆的第三定义'];
+
+  function go(i) {
+    for (var k = 0; k < 2; k++) {
+      tabs[k].classList.toggle('on', k === i);
+      tabs[k].setAttribute('aria-selected', k === i ? 'true' : 'false');
+      views[k].hidden = (k !== i);
+      heroes[k].hidden = (k !== i);
+    }
+    document.title = titles[i] + ' · 高中数学动态演示';
+    for (var j = 0; j < 2; j++) {
+      var d = window.__ell && window.__ell[names[j]];
+      if (d) d.setLive(j === i);
+    }
+    if (i === 1) {
+      /* 从讲解卡中间切过来时，把页签滚回视野 */
+      var y = tabs[0].getBoundingClientRect().top;
+      if (y < 0) window.scrollTo({ top: window.scrollY + y - 16, behavior: 'smooth' });
+    }
+  }
+
+  tabs[0].addEventListener('click', function () { go(0); });
+  tabs[1].addEventListener('click', function () { go(1); });
+  window.__ell = window.__ell || {};
+  window.__ell.first.setLive(true);
 })();
 </script>
 <script>
