@@ -134,6 +134,8 @@
     border:1px solid #e2ebf7;background:#f7fafd;
   }
   .bar span{display:block;height:100%}
+  .bar.off span{opacity:.28}
+  .bar.off{border-style:dashed;background:#fbfcfe}
   #seg1{background:linear-gradient(180deg,#dbe8fb,#b6d0f5);border-right:1px solid #fff}
   #seg2{background:linear-gradient(180deg,#fbe8c9,#f2d097)}
   .barlab{display:flex;justify-content:space-between;gap:8px;margin:6px 0 12px;font-size:11.6px;font-weight:700}
@@ -209,7 +211,7 @@
     <a class="back" href="../../index.html">&larr; 全部演示</a>
     <div class="eyebrow">选择性必修一 · 解析几何 · 高二</div>
     <h1>椭圆的第一定义</h1>
-    <p class="sub">一条定长细绳，两端都钉在<span class="hl">同一点</span>，套上铅笔拉紧绕一圈，画出的是圆。把绳子的两端<span class="hl">拉开一段距离</span>，分别钉在 $F_1,F_2$ 上，同样拉紧绳子移动笔尖 —— 画出来的是什么？拖动下面的滑块把两枚图钉慢慢拉开，注意右边那根「$2a$」的绳子：<b>不管笔尖走到哪里，两段绳长之和从来没变过。</b></p>
+    <p class="sub">一条定长细绳，两端都钉在<span class="hl">同一点</span>，套上铅笔拉紧绕一圈，画出的是圆。把绳子的两端<span class="hl">拉开一段距离</span>，分别钉在 $F_1,F_2$ 上，同样拉紧绳子移动笔尖 —— 画出来的是什么？拖动滑块把两枚图钉慢慢拉开，一直拉到 $2c=2a$，椭圆会被压成一条线段；再往外拉，绳子干脆够不着了。全程盯着右边那根「$2a$」的绳子：<b>不管笔尖走到哪里，两段绳长之和从来没变过。</b></p>
   </header>
 
   <div class="main">
@@ -229,17 +231,18 @@
       <div class="controls">
         <div class="ctrl-row">
           <button class="btn primary" id="play">暂停</button>
+          <button class="btn" id="re">重画</button>
           <span class="sep"></span>
-          <button class="btn" id="p0">① 两端钉在同一点</button>
-          <button class="btn" id="p1">② 拉开一段距离</button>
+          <button class="btn" id="p0">① 两端同一点</button>
+          <button class="btn" id="p1">② 拉开一段</button>
           <button class="btn" id="p2">③ 快拉到底</button>
-          <span class="sep"></span>
-          <button class="btn" id="re">重画一遍</button>
+          <button class="btn" id="p3">④ $2a=2c$</button>
+          <button class="btn" id="p4">⑤ $2a&lt;2c$</button>
         </div>
         <div class="ctrl-row">
           <div class="slider-wrap">
             <span class="lab">两钉间距 $2c$</span>
-            <input type="range" id="slider" min="0" max="0.99" step="0.005" value="0.62" />
+            <input type="range" id="slider" min="0" max="1.3" step="0.005" value="0.62" />
             <span class="val" id="cRead">2.48</span>
           </div>
           <span class="chip">绳长 $2a$ = 4.00（固定）</span>
@@ -262,7 +265,7 @@
       <div class="metric"><span class="m-label">短半轴 $b=\sqrt{a^{2}-c^{2}}$</span><span class="m-val" id="vB">1.57</span></div>
       <div class="metric"><span class="m-label">离心率 $e=\dfrac{c}{a}$</span><span class="m-val" id="vE">0.620</span></div>
       <div class="total" id="vTotal"><span>笔尖的轨迹</span><span class="num" id="vType">椭圆</span></div>
-      <p class="tip">把滑块推到最左，两枚钉子重合 —— 此时两段绳子永远等长，轨迹退化成<b>圆</b>；往右拉，$b$ 越来越小，椭圆越来越<b>扁</b>。</p>
+      <p class="tip">推到最左，两枚钉子重合，两段绳子永远等长，轨迹退化成<b>圆</b>；往右拉，$b$ 变小、椭圆变<b>扁</b>；拉到 $2c=2a$ 时 $b=0$，曲线被压成一条<b>线段</b>；再往外拉就<b>什么也画不出来</b>了 —— 两边之和最小只能是 $2c$，而绳长 $2a$ 已经不够。</p>
     </aside>
   </div>
 
@@ -310,7 +313,7 @@
         </tr>
         <tr>
           <td class="m">$2c=2a$</td>
-          <td class="ty" style="color:#d98a00"><span class="sw" style="background:#d98a00"></span>线段 $F_1F_2$</td>
+          <td class="ty" style="color:#c2410c"><span class="sw" style="background:#c2410c"></span>线段 $F_1F_2$</td>
           <td>三角形不等式取等，$b=0$，椭圆被压扁成线段（退化，不算椭圆）</td>
         </tr>
         <tr>
@@ -327,6 +330,8 @@
         <li>绳长不变，把钉子越拉越开，椭圆变「胖」还是变「扁」？为什么 $e$ 会跟着变大？（答：变扁。$c$ 变大而 $a$ 不变，$b=\sqrt{a^{2}-c^{2}}$ 变小，$e=\frac{c}{a}$ 变大）</li>
         <li>为什么强调「拉紧」？绳子松着的时候，笔尖到两枚钉子的实际路程之和仍是绳长，可两点间的距离之和 $|PF_1|+|PF_2|$ 却<b>小于</b>绳长（绳子弯了），笔尖就不在椭圆上了。</li>
         <li>把两个端点同时平移、绳长不变，笔尖画出的还是同一个椭圆吗？（答：不是，焦点换了，位置也换了）</li>
+        <li>一直拉到 $2c=2a$ 呢？（答：$b=0$，椭圆被压扁成线段 $F_1F_2$，笔尖只能在两钉之间来回滑，这已经不是椭圆；按钮 ④ 就是这个临界状态）</li>
+        <li>那 $2c&gt;2a$ 为什么一笔也画不出来？（答：两点间距离之和最小就是 $|F_1F_2|=2c$，比绳长 $2a$ 还大，一个点都找不到 —— 按钮 ⑤）</li>
       </ol>
     </div>
 
@@ -355,8 +360,19 @@
   function BB() { var c = CC(); return Math.sqrt(Math.max(0, A * A - c * c)); }
   function TX(x) { return ox + x * S; }
   function TY(y) { return oy - y * S; }
-  function isCircle() { return state.k < 0.015; }
-  function curveColor() { return isCircle() ? '#2563eb' : '#7c3aed'; }
+
+  /* 四种状态：圆（c=0）/ 椭圆 / 线段（2c=2a，退化）/ 无轨迹（2c>2a） */
+  var COL  = { circle: '#2563eb', ellipse: '#7c3aed', segment: '#c2410c', none: '#dc2626' };
+  var NAME = { circle: '圆', ellipse: '椭圆', segment: '线段', none: '无轨迹' };
+  var COND = { circle: '2c = 0', ellipse: '0 < 2c < 2a', segment: '2c = 2a', none: '2c > 2a' };
+
+  function typeOf() {
+    if (state.k > 1.0005) return 'none';
+    if (state.k > 0.9995) return 'segment';
+    if (state.k < 0.015) return 'circle';
+    return 'ellipse';
+  }
+  function curveColor() { return COL[typeOf()]; }
 
   function rgba(hex, a) {
     var n = parseInt(hex.slice(1), 16);
@@ -371,7 +387,8 @@
     cv.height = Math.round(r.height * dpr);
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     W = r.width; H = r.height;
-    S = Math.min(W / 5.0, H / 5.4);
+    /* 世界横向要留到 2c 最大时两枚钉子还在画布内（c 最大 1.3a） */
+    S = Math.min(W / 6.1, H / 5.4);
     ox = W * 0.5; oy = H * 0.5;
   }
 
@@ -420,8 +437,8 @@
   }
 
   /* 参考圆：半径 a，两端重合时笔尖正好画它 */
-  function drawGhost(c) {
-    if (isCircle()) return;
+  function drawGhost() {
+    if (state.k >= 0.995) return;
     ctx.save();
     ctx.setLineDash([5, 6]);
     ctx.beginPath();
@@ -458,9 +475,15 @@
       if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
     }
     ctx.lineCap = 'round'; ctx.lineJoin = 'round';
-    ctx.strokeStyle = rgba(col, 0.09); ctx.lineWidth = 12; ctx.stroke();
-    ctx.strokeStyle = rgba(col, 0.17); ctx.lineWidth = 6; ctx.stroke();
-    ctx.strokeStyle = col; ctx.lineWidth = 2.6; ctx.stroke();
+    if (typeOf() === 'segment') {
+      /* 退化：轨迹就是焦点连线本身，画成一条宽淡带，免得被上面的绳子完全盖住 */
+      ctx.strokeStyle = rgba(col, 0.13); ctx.lineWidth = 16; ctx.stroke();
+      ctx.strokeStyle = rgba(col, 0.30); ctx.lineWidth = 7; ctx.stroke();
+    } else {
+      ctx.strokeStyle = rgba(col, 0.09); ctx.lineWidth = 12; ctx.stroke();
+      ctx.strokeStyle = rgba(col, 0.17); ctx.lineWidth = 6; ctx.stroke();
+      ctx.strokeStyle = col; ctx.lineWidth = 2.6; ctx.stroke();
+    }
     ctx.lineCap = 'butt';
   }
 
@@ -521,13 +544,16 @@
     }
   }
 
-  /* 铅笔：笔尖落在 P 上，笔杆沿外法线方向 */
-  function drawPencil(px, py, wx, wy) {
-    var b = BB();
+  /* 铅笔朝向：沿椭圆外法线；曲线被压扁成线段时法线退化，改成立起来 */
+  function pencilAngle(wx, wy, b) {
+    if (b < 0.12) return -Math.PI / 2;
     var nx = wx / (A * A), ny = wy / (b * b);
     var len = Math.sqrt(nx * nx + ny * ny) || 1;
-    var ang = Math.atan2(-ny / len, nx / len);
+    return Math.atan2(-ny / len, nx / len);
+  }
 
+  /* 铅笔：笔尖落在 P 上，笔杆沿外法线方向 */
+  function drawPencil(px, py, ang) {
     ctx.save();
     ctx.translate(px, py);
     ctx.rotate(ang);
@@ -562,35 +588,97 @@
     if (c < 0.02) {
       tag(TX(0), TY(0) - 26, 'F_1,\\,F_2\\text{ 重合}', '#22405f');
     } else {
-      tag(TX(-c) - 2, TY(0) - 22, 'F_1', '#22405f');
-      tag(TX(c) + 2, TY(0) - 22, 'F_2', '#22405f');
+      tag(TX(-c) - 20, TY(0) - 16, 'F_1', '#22405f');
+      tag(TX(c) + 20, TY(0) - 16, 'F_2', '#22405f');
       /* 焦点间距 2c */
-      if (c * S > 74) tag(TX(0), TY(0) + 17, '2c', '#9fb0c7');
+      if (c * S > 74) tag(TX(0), TY(0) + 32, '2c', '#9fb0c7');
       /* 两段绳子的长度 */
       var mid1 = [(TX(-c) + px) / 2, (TY(0) + py) / 2];
       var mid2 = [(TX(c) + px) / 2, (TY(0) + py) / 2];
-      if (Math.sqrt(Math.pow(px - TX(-c), 2) + Math.pow(py - TY(0), 2)) > 90) tag(mid1[0], mid1[1], '|PF_1|', '#c07f04');
-      if (Math.sqrt(Math.pow(px - TX(c), 2) + Math.pow(py - TY(0), 2)) > 90) tag(mid2[0], mid2[1], '|PF_2|', '#c07f04');
+      /* 绳子几乎贴着焦点连线时不标，免得和「2c」挤在一起 */
+      var far = Math.abs(py - TY(0)) > 56;
+      if (far && Math.sqrt(Math.pow(px - TX(-c), 2) + Math.pow(py - TY(0), 2)) > 90) tag(mid1[0], mid1[1], '|PF_1|', '#c07f04');
+      if (far && Math.sqrt(Math.pow(px - TX(c), 2) + Math.pow(py - TY(0), 2)) > 90) tag(mid2[0], mid2[1], '|PF_2|', '#c07f04');
     }
 
     /* 笔尖 P：标在法线反方向，避开铅笔 */
-    var b2 = b;
-    var nnx = (A * Math.cos(state.t)) / (A * A), nny = (b2 * Math.sin(state.t)) / (b2 * b2);
-    var ln = Math.sqrt(nnx * nnx + nny * nny) || 1;
-    tag(px - nnx / ln * 17, py + nny / ln * 17, 'P', '#5b2ec4');
+    var ang = pencilAngle(A * Math.cos(state.t), b * Math.sin(state.t), b);
+    tag(px - Math.cos(ang) * 21, py - Math.sin(ang) * 21, 'P', '#5b2ec4');
+  }
+
+  /* 2a < 2c：没有轨迹，把「绳子不够长」直接画出来 */
+  function drawNoLocus(c) {
+    var y = TY(0), x1 = TX(-c), x2 = TX(c);
+    var L = TX(-c + A), R = TX(c - A);     /* 两段绳子各自能伸到的最远处 */
+
+    ctx.save();
+    ctx.setLineDash([4, 5]);
+    ctx.beginPath(); ctx.moveTo(x1, y); ctx.lineTo(x2, y);
+    ctx.strokeStyle = 'rgba(203,216,234,0.95)'; ctx.lineWidth = 1.4; ctx.stroke();
+    ctx.restore();
+
+    /* 两段绳子：各长 a，中间差一截，两头碰不到一起 */
+    ctx.lineCap = 'round';
+    ctx.beginPath(); ctx.moveTo(x1, y); ctx.lineTo(L, y);
+    ctx.strokeStyle = 'rgba(217,138,0,0.16)'; ctx.lineWidth = 9; ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x2, y); ctx.lineTo(R, y);
+    ctx.strokeStyle = 'rgba(217,138,0,0.16)'; ctx.lineWidth = 9; ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x1, y); ctx.lineTo(L, y);
+    ctx.strokeStyle = '#d98a00'; ctx.lineWidth = 2.7; ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x2, y); ctx.lineTo(R, y);
+    ctx.strokeStyle = '#d98a00'; ctx.lineWidth = 2.7; ctx.stroke();
+
+    /* 缺口：红色虚线 + 两端箭头 */
+    ctx.beginPath(); ctx.moveTo(L, y); ctx.lineTo(R, y);
+    ctx.strokeStyle = 'rgba(220,38,38,0.85)'; ctx.lineWidth = 1.8;
+    ctx.setLineDash([3, 3]); ctx.stroke();
+    ctx.setLineDash([]);
+    var i;
+    for (i = 0; i < 2; i++) {
+      var tipX = i === 0 ? R : L, dir = i === 0 ? 1 : -1;
+      ctx.beginPath();
+      ctx.moveTo(tipX, y); ctx.lineTo(tipX - dir * 6, y - 4);
+      ctx.moveTo(tipX, y); ctx.lineTo(tipX - dir * 6, y + 4);
+      ctx.strokeStyle = 'rgba(220,38,38,0.9)'; ctx.lineWidth = 1.8; ctx.stroke();
+    }
+    ctx.lineCap = 'butt';
+
+    /* 笔尖本该在这里，可两段绳子都够不着它 */
+    ctx.globalAlpha = 0.38;
+    drawPencil(TX(0), y, -Math.PI / 2);
+    ctx.globalAlpha = 1;
+    ctx.beginPath(); ctx.arc(TX(0), y, 2.6, 0, TAU);
+    ctx.fillStyle = 'rgba(220,38,38,0.9)'; ctx.fill();
+  }
+
+  function drawLabelsNone(c) {
+    var y = TY(0);
+    tag(TX(-c) - 20, y - 16, 'F_1', '#22405f');
+    tag(TX(c) + 20, y - 16, 'F_2', '#22405f');
+    tag(TX(0), y + 36, '2c>2a\\text{，够不着}', '#dc2626');
+    tag(TX(0), y + 66, '2c', '#9fb0c7');
   }
 
   function draw() {
     paintBoard();
-    var c = CC(), b = BB(), t = state.t;
+    var ty = typeOf(), c = CC(), b = BB(), t = state.t;
+
+    if (ty === 'none') {
+      drawNoLocus(c);
+      drawPins(c);
+      drawLabelsNone(c);
+      tagEnd();
+      return;
+    }
+
     var px = TX(A * Math.cos(t)), py = TY(b * Math.sin(t));
 
-    drawGhost(c);
+    drawGhost();
     drawFocal(c);
     drawTrace();
     drawString(px, py);
     drawPins(c);
-    drawPencil(px, py, A * Math.cos(t), b * Math.sin(t));
+    drawPencil(px, py, pencilAngle(A * Math.cos(t), b * Math.sin(t), b));
     drawLabels(c, b, px, py);
     tagEnd();
   }
@@ -606,6 +694,7 @@
     cRead: document.getElementById('cRead'),
     seg1: document.getElementById('seg1'),
     seg2: document.getElementById('seg2'),
+    bar: document.querySelector('.bar'),
     r1v: document.getElementById('r1v'),
     r2v: document.getElementById('r2v'),
     vSum: document.getElementById('vSum'),
@@ -618,36 +707,37 @@
 
   var lastType = '';
   function updateUI() {
-    var c = CC(), b = BB(), t = state.t;
+    var ty = typeOf(), c = CC(), b = BB(), t = state.t;
+    var none = (ty === 'none');
     var r1 = A + c * Math.cos(t);      /* |PF1| */
     var r2 = A - c * Math.cos(t);      /* |PF2| */
 
-    els.r1v.textContent = r1.toFixed(2);
-    els.r2v.textContent = r2.toFixed(2);
-    els.seg1.style.width = (r1 / (2 * A) * 100).toFixed(2) + '%';
-    els.seg2.style.width = (r2 / (2 * A) * 100).toFixed(2) + '%';
+    els.r1v.textContent = none ? '—' : r1.toFixed(2);
+    els.r2v.textContent = none ? '—' : r2.toFixed(2);
+    els.seg1.style.width = none ? '50%' : (r1 / (2 * A) * 100).toFixed(2) + '%';
+    els.seg2.style.width = none ? '50%' : (r2 / (2 * A) * 100).toFixed(2) + '%';
+    els.bar.className = none ? 'bar off' : 'bar';
 
-    els.vSum.textContent = (r1 + r2).toFixed(2);
+    els.vSum.textContent = none ? '—' : (r1 + r2).toFixed(2);
     els.v2c.textContent = (2 * c).toFixed(2);
-    els.vB.textContent = b.toFixed(2);
+    els.vB.textContent = none ? '不存在' : b.toFixed(2);
     els.vE.textContent = (c / A).toFixed(3);
     els.cRead.textContent = (2 * c).toFixed(2);
 
-    var ty = isCircle() ? '圆' : '椭圆';
     if (ty !== lastType) {
       lastType = ty;
-      var col = curveColor();
+      var col = COL[ty];
       badge.style.color = col;
       badge.style.borderColor = col;
       badge.style.background = rgba(col, 0.06);
-      badgeTxt.textContent = ty;
+      badgeTxt.textContent = NAME[ty];
       lgCurve.style.borderColor = col;
-      els.vType.textContent = ty;
+      els.vType.textContent = NAME[ty];
       els.vType.style.color = col;
       els.vTotal.style.background = rgba(col, 0.05);
       els.vTotal.style.borderColor = rgba(col, 0.22);
     }
-    badgeCond.textContent = isCircle() ? '2c = 0' : '0 < 2c < 2a';
+    badgeCond.textContent = COND[ty];
     if (document.activeElement !== els.slider) els.slider.value = state.k;
   }
 
@@ -660,7 +750,7 @@
     if (dt > 0.05) dt = 0.05;
     last = now;
 
-    if (state.playing) {
+    if (state.playing && typeOf() !== 'none') {
       state.t += OMEGA * dt;
       if (state.t >= TAU) state.t -= TAU;
       state.prog = Math.min(TAU, state.prog + OMEGA * dt);
@@ -674,8 +764,10 @@
   /* ---------- 交互 ---------- */
   function setPlaying(v) { state.playing = v; els.play.textContent = v ? '暂停' : '播放'; }
 
+  var KMAX = 1.3;
+
   function preset(k) {
-    state.k = Math.max(0, Math.min(0.99, k));
+    state.k = Math.max(0, Math.min(KMAX, k));
     state.prog = 0;
     state.t = 0;
     els.slider.value = state.k;
@@ -687,10 +779,22 @@
   document.getElementById('p0').addEventListener('click', function () { preset(0); });
   document.getElementById('p1').addEventListener('click', function () { preset(0.62); });
   document.getElementById('p2').addEventListener('click', function () { preset(0.965); });
+  document.getElementById('p3').addEventListener('click', function () { preset(1); });
+  document.getElementById('p4').addEventListener('click', function () { preset(1.18); });
   document.getElementById('re').addEventListener('click', function () { state.prog = 0; setPlaying(true); });
+
+  /* 拖到 2c=2a 附近时吸住，免得学生总是差一点点错过临界 */
+  function snap(k) {
+    return (Math.abs(k - 1) < 0.018) ? 1 : k;
+  }
 
   els.slider.addEventListener('input', function () {
     state.k = parseFloat(els.slider.value);
+    lastType = '';
+  });
+  els.slider.addEventListener('change', function () {
+    state.k = snap(state.k);
+    els.slider.value = state.k;
     lastType = '';
   });
 
@@ -698,8 +802,8 @@
     if (e.metaKey || e.ctrlKey || e.altKey) return;
     var tg = e.target;
     if (tg && /^(INPUT|TEXTAREA|SELECT)$/.test(tg.tagName)) return;
-    if (e.key === 'ArrowLeft') { state.k = Math.max(0, state.k - 0.01); els.slider.value = state.k; lastType = ''; e.preventDefault(); }
-    if (e.key === 'ArrowRight') { state.k = Math.min(0.99, state.k + 0.01); els.slider.value = state.k; lastType = ''; e.preventDefault(); }
+    if (e.key === 'ArrowLeft') { state.k = snap(Math.max(0, state.k - 0.01)); els.slider.value = state.k; lastType = ''; e.preventDefault(); }
+    if (e.key === 'ArrowRight') { state.k = snap(Math.min(KMAX, state.k + 0.01)); els.slider.value = state.k; lastType = ''; e.preventDefault(); }
     if (e.key === ' ') { setPlaying(!state.playing); e.preventDefault(); }
   });
 
