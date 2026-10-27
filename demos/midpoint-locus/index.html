@@ -317,46 +317,46 @@
 
   <section class="card solution">
     <h2><span class="bar"></span>解题过程</h2>
-    <p class="lead">两种写法都要会：参数法（设角）快而直观，相关点法（代入法）通用性更强。</p>
+    <p class="lead">先讲通杀的代入法（相关点法），再补一个算起来更快的参数写法。</p>
 
     <div class="steps">
       <div class="step">
         <div class="num">1</div>
         <div class="body">
-          <p><b>方法一 · 参数法</b>　设 $P$ 的辐角为 $\theta$，由 $r=2$ 得</p>
-          <p class="eqline">$$P(2\cos\theta,\ 2\sin\theta)$$</p>
-          <p>$PD\perp x$ 轴，垂足 $D$ 与 $P$ 横坐标相同，纵坐标为 $0$：</p>
-          <p class="eqline">$$D(2\cos\theta,\ 0)$$</p>
+          <p><b>方法一 · 相关点法（代入法）</b>　设所求轨迹上的点 $M(x,\,y)$，圆上的动点 $P(x_0,\,y_0)$，则 $P$ 满足</p>
+          <p class="eqline">$$x_0^{2}+y_0^{2}=4$$</p>
+          <p>又 $PD\perp x$ 轴、$D$ 为垂足，所以 $D$ 与 $P$ 横坐标相同、纵坐标为 $0$：</p>
+          <p class="eqline">$$D(x_0,\ 0)$$</p>
         </div>
       </div>
 
       <div class="step">
         <div class="num">2</div>
         <div class="body">
-          <p>$M$ 是 $PD$ 的中点，横坐标取两者共同的 $2\cos\theta$，纵坐标取平均值：</p>
-          <p class="eqline">$$M\left(2\cos\theta,\ \frac{2\sin\theta+0}{2}\right)=(2\cos\theta,\ \sin\theta)$$</p>
-          <p>这一步是整题的<span class="hl">命门</span>：<b>$M$ 与 $P$ 同横坐标，纵坐标只剩一半。</b></p>
+          <p>$M$ 是线段 $PD$ 的中点，由中点坐标公式得 $x,\,y$ 与 $x_0,\,y_0$ 的关系：</p>
+          <p class="eqline">$$x=\frac{x_0+x_0}{2}=x_0,\qquad y=\frac{y_0+0}{2}=\frac{y_0}{2}$$</p>
+          <p>这一步是整题的<span class="hl">命门</span>：<b>$M$ 与 $P$ 横坐标相同，纵坐标只剩一半。</b>把它反解出来，$P$ 的坐标就用 $M$ 的坐标表示了：</p>
+          <p class="eqline">$$x_0=x,\qquad y_0=2y$$</p>
         </div>
       </div>
 
       <div class="step">
         <div class="num">3</div>
         <div class="body">
-          <p>设 $M(x,\,y)$，得参数方程</p>
-          <p class="eqline">$$\begin{cases}x=2\cos\theta\\[2pt] y=\sin\theta\end{cases}\quad\Longrightarrow\quad \cos\theta=\frac{x}{2},\ \ \sin\theta=y$$</p>
-          <p>用 $\cos^{2}\theta+\sin^{2}\theta=1$ 消去 $\theta$：</p>
-          <p class="eqline">$$\frac{x^{2}}{4}+y^{2}=1$$</p>
+          <p>把上式代回 $P$ 所满足的圆方程——「相关点法」这个名字就是这么来的：<span class="hl">动点坐标用已知曲线上的点表示，再代回已知方程</span>：</p>
+          <p class="eqline">$$x^{2}+(2y)^{2}=4\ \Longrightarrow\ \frac{x^{2}}{4}+y^{2}=1$$</p>
+          <p>这就是 $M$ 的轨迹方程，轨迹是一条椭圆。凡是「一个点跟着另一个点跑」的题，这套流程都通用。</p>
         </div>
       </div>
 
       <div class="step">
         <div class="num">4</div>
         <div class="body">
-          <p><b>方法二 · 相关点法（代入法）</b>　设 $M(x,y)$，$P(x_0,y_0)$ 在圆上，故 $x_0^{2}+y_0^{2}=4$；$D(x_0,0)$。中点条件给出</p>
-          <p class="eqline">$$x=\frac{x_0+x_0}{2}=x_0,\qquad y=\frac{y_0+0}{2}=\frac{y_0}{2}$$</p>
-          <p>反解得 $x_0=x,\ y_0=2y$，代回圆的方程：</p>
-          <p class="eqline">$$x^{2}+(2y)^{2}=4\ \Longrightarrow\ \frac{x^{2}}{4}+y^{2}=1$$</p>
-          <p>两种方法殊途同归，而「代入法」正是求轨迹的通杀套路：<span class="hl">把动点坐标用已知曲线上的点表示，再代回已知方程</span>。</p>
+          <p><b>方法二 · 参数法</b>　设 $P$ 的辐角为 $\theta$，由 $r=2$ 得 $P(2\cos\theta,\,2\sin\theta)$，于是 $D(2\cos\theta,\,0)$，$PD$ 的中点</p>
+          <p class="eqline">$$M\left(2\cos\theta,\ \frac{2\sin\theta+0}{2}\right)=(2\cos\theta,\ \sin\theta)$$</p>
+          <p>设 $M(x,\,y)$ 得参数方程，再用 $\cos^{2}\theta+\sin^{2}\theta=1$ 消去 $\theta$：</p>
+          <p class="eqline">$$\begin{cases}x=2\cos\theta\\[2pt] y=\sin\theta\end{cases}\quad\Longrightarrow\quad \frac{x^{2}}{4}+y^{2}=1$$</p>
+          <p>两种写法殊途同归。顺带一句：$x=2\cos\theta,\ y=\sin\theta$ 正是这条椭圆的<b>参数方程</b>，参数法快就快在不必反解。</p>
         </div>
       </div>
     </div>
