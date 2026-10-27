@@ -74,6 +74,18 @@ window.DEMOS = {
       date: "2026-10-21"
     },
     {
+      slug: "midpoint-locus",
+      path: "demos/midpoint-locus/",
+      title: "圆上动点引垂线，垂足弦中点 $M$ 的轨迹",
+      subtitle: "让 $P$ 绕圆跑一圈，看 $PD$ 的中点 $M$ 描出椭圆 $\\dfrac{x^{2}}{4}+y^{2}=1$——为什么是椭圆？",
+      topic: "解析几何",
+      grade: "高二",
+      book: "选择性必修二",
+      level: 2,
+      tags: ["圆锥曲线", "求轨迹方程", "椭圆", "相关点法", "参数法", "伸缩变换"],
+      date: "2026-10-27"
+    },
+    {
       slug: "chord-min",
       path: "demos/chord-min/",
       title: "过圆内一定点的直线被圆截得弦长的最小值",

@@ -1,0 +1,991 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>垂足中点 M 的轨迹 · 动态演示</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%232563eb'/%3E%3Ctext x='16' y='23' font-size='19' font-family='Georgia,serif' font-style='italic' fill='%23fff' text-anchor='middle'%3Ef%3C/text%3E%3C/svg%3E" />
+<meta name="description" content="圆 x²+y²=4 上任取一点 P，过 P 作 x 轴的垂线段 PD，D 为垂足，M 为 PD 中点。让 P 绕圆运动，看 M 画出椭圆 x²/4+y²=1。" />
+<!-- KaTeX：本地共享副本（相对站点根） -->
+<link rel="stylesheet" href="../../assets/katex/katex.min.css" />
+<script src="../../assets/katex/katex.min.js"></script>
+<script src="../../assets/katex/auto-render.min.js"></script>
+<style>
+  :root{
+    --bg:#f1f5fa;
+    --card:#ffffff;
+    --ink:#16202f;
+    --ink2:#5c6a7e;
+    --ink3:#8c99ab;
+    --line:#e1e9f3;
+    --blue:#2563eb;
+    --amber:#d98a00;
+    --red:#dc2626;
+    --green:#0f8a5f;
+    --violet:#7c3aed;
+    --serif:"Cambria Math","Times New Roman",Georgia,serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:
+      radial-gradient(1100px 480px at 12% -10%, #e4efff 0%, rgba(228,239,255,0) 62%),
+      radial-gradient(900px 460px at 95% 0%, #fdf1e2 0%, rgba(253,241,226,0) 55%),
+      var(--bg);
+    color:var(--ink);
+    font-family:"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,-apple-system,sans-serif;
+    -webkit-font-smoothing:antialiased;
+    line-height:1.65;
+  }
+  .page{max-width:1200px;margin:0 auto;padding:26px 20px 64px}
+
+  header{margin-bottom:18px}
+  .back{
+    display:inline-flex;align-items:center;gap:5px;margin-bottom:11px;
+    font-size:12.5px;font-weight:600;color:var(--ink2);text-decoration:none;
+    background:#fff;border:1px solid var(--line);border-radius:999px;padding:4px 12px;
+    transition:.16s ease;
+  }
+  .back:hover{color:var(--blue);border-color:#a8c2e8;background:#f4f9ff;transform:translateY(-1px)}
+  .eyebrow{
+    display:inline-flex;align-items:center;gap:7px;
+    font-size:12px;letter-spacing:.14em;color:var(--blue);
+    background:#e8f1ff;border:1px solid #cfe0fb;border-radius:999px;
+    padding:3px 11px;margin-bottom:10px;font-weight:600;
+  }
+  h1{font-size:23px;line-height:1.4;margin:0 0 8px;letter-spacing:.2px}
+  .sub{margin:0;color:var(--ink2);font-size:14px}
+  .katex{font-size:1.02em}
+  p .katex, li .katex, td .katex, th .katex, .problem .katex{font-size:1.06em}
+
+  .problem{
+    margin:14px 0 0;padding:13px 18px 14px;border-radius:14px;
+    background:linear-gradient(180deg,#fffdf8,#fff9ef);
+    border:1px solid #f3e2c3;color:#4a3a20;font-size:14px;line-height:1.9;
+  }
+  .problem .tag{
+    display:inline-block;font-size:11.5px;font-weight:800;letter-spacing:.1em;
+    color:#a26200;background:#ffeccc;border-radius:999px;padding:1px 8px;margin-right:8px;
+    vertical-align:1.5px;
+  }
+
+  .math-layer{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+  .mlabel{
+    position:absolute;left:0;top:0;
+    padding:2px 7px 1px;border-radius:7px;
+    background:rgba(255,255,255,.95);
+    border:1px solid currentColor;
+    font-size:12.4px;line-height:1.15;white-space:nowrap;
+    box-shadow:0 1px 2px rgba(22,32,47,.06);
+  }
+  .mlabel .katex{font-size:1em}
+
+  .main{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:18px;margin-top:18px;align-items:start}
+
+  .card{
+    background:var(--card);border:1px solid var(--line);border-radius:16px;
+    box-shadow:0 1px 2px rgba(22,32,47,.04), 0 12px 28px -18px rgba(22,32,47,.28);
+  }
+
+  .stage{position:relative;overflow:hidden}
+  .canvas-wrap{position:relative}
+  #cv{display:block;width:100%;height:530px;touch-action:none;cursor:grab}
+  #cv:active{cursor:grabbing}
+
+  .banner{
+    position:absolute;left:14px;bottom:12px;
+    transform:translateY(10px);
+    padding:8px 16px;border-radius:999px;
+    background:linear-gradient(180deg,#f6f2ff,#efe8ff);
+    border:1px solid #d7c8f8;color:#5b21b6;
+    font-size:13.5px;font-weight:700;letter-spacing:.2px;
+    box-shadow:0 10px 22px -12px rgba(91,33,182,.55);
+    opacity:0;pointer-events:none;transition:opacity .22s ease, transform .22s ease;
+    display:flex;align-items:center;gap:8px;white-space:nowrap;max-width:calc(100% - 28px);
+  }
+  .banner.show{opacity:1;transform:translateY(0)}
+  .banner .spark{flex:none;width:8px;height:8px;border-radius:50%;background:var(--violet);box-shadow:0 0 0 4px rgba(124,58,237,.16)}
+  .banner.cool{background:linear-gradient(180deg,#f2f7ff,#e7f0ff);border-color:#bcd3f6;color:#1d4ed8;box-shadow:0 10px 22px -12px rgba(29,78,216,.5)}
+  .banner.cool .spark{background:#2563eb;box-shadow:0 0 0 4px rgba(37,99,235,.16)}
+
+  .controls{
+    display:flex;flex-direction:column;gap:9px;
+    padding:12px 15px 13px;border-top:1px solid var(--line);
+    background:linear-gradient(180deg,#fafcff,#f5f9ff);
+  }
+  .ctrl-row{display:flex;flex-wrap:wrap;align-items:center;gap:9px}
+  .btn{
+    font-family:inherit;font-size:13px;font-weight:600;color:var(--ink);
+    background:#fff;border:1px solid #d5e0ee;border-radius:10px;
+    padding:7px 13px;cursor:pointer;transition:.16s ease;white-space:nowrap;
+  }
+  .btn:hover{border-color:#a8c2e8;background:#f4f9ff;transform:translateY(-1px)}
+  .btn:active{transform:translateY(0)}
+  .btn.primary{background:var(--blue);border-color:var(--blue);color:#fff;box-shadow:0 6px 14px -8px rgba(37,99,235,.9)}
+  .btn.primary:hover{background:#1d4ed8;border-color:#1d4ed8}
+  .btn.switch{display:inline-flex;align-items:center;gap:8px;padding:6px 12px 6px 9px}
+  .btn.switch .sw{
+    position:relative;flex:none;width:27px;height:16px;border-radius:999px;
+    background:#d3dded;transition:background .18s ease;
+  }
+  .btn.switch .sw::after{
+    content:"";position:absolute;left:2px;top:2px;width:12px;height:12px;border-radius:50%;
+    background:#fff;box-shadow:0 1px 2px rgba(15,30,60,.3);transition:transform .18s ease;
+  }
+  .btn.switch.on{border-color:#c4b1f0;background:#f8f5ff;color:var(--violet)}
+  .btn.switch.on .sw{background:var(--violet)}
+  .btn.switch.on .sw::after{transform:translateX(11px)}
+  .slider-wrap{display:flex;align-items:center;gap:9px;flex:1 1 240px;min-width:200px}
+  .slider-wrap .lab{font-size:12.5px;color:var(--ink3);font-weight:600;white-space:nowrap}
+  .slider-wrap .val{font-family:var(--serif);font-size:14.5px;font-weight:700;color:var(--blue);min-width:66px;text-align:right}
+  input[type=range]{
+    -webkit-appearance:none;appearance:none;flex:1;height:4px;border-radius:3px;
+    background:linear-gradient(90deg,#dbe6f5,#dbe6f5);outline:none;cursor:pointer;
+  }
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none;width:16px;height:16px;border-radius:50%;
+    background:var(--blue);border:3px solid #fff;
+    box-shadow:0 1px 6px rgba(37,99,235,.55);cursor:grab;
+  }
+  input[type=range]::-moz-range-thumb{
+    width:14px;height:14px;border-radius:50%;background:var(--blue);
+    border:3px solid #fff;box-shadow:0 1px 6px rgba(37,99,235,.55);cursor:grab;
+  }
+
+  .legend{display:flex;flex-wrap:wrap;gap:13px;padding:10px 15px 0;font-size:12px;color:var(--ink3)}
+  .legend i{display:inline-block;width:16px;height:0;border-top-width:3px;border-top-style:solid;vertical-align:middle;margin-right:6px;border-radius:2px}
+  .legend .lgdot{display:inline-block;width:8px;height:8px;border-radius:50%;vertical-align:middle;margin-right:6px}
+
+  .panel{padding:16px 18px 18px}
+  .panel h3{margin:0 0 12px;font-size:13px;letter-spacing:.12em;color:var(--ink3);font-weight:700}
+  .metric{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:7px 0;border-bottom:1px dashed #edf2f9}
+  .metric:last-of-type{border-bottom:none}
+  .m-label{font-size:13px;color:var(--ink2)}
+  .m-val{font-family:var(--serif);font-size:15.5px;font-weight:700;color:var(--ink);white-space:nowrap}
+  .m-val.side-val{font-family:"Consolas","SFMono-Regular",monospace;font-size:12.6px;color:#3b62a8}
+
+  .total{
+    margin-top:12px;padding:12px 14px;border-radius:12px;
+    background:#f3f7fd;border:1px solid #e2ebf7;
+    font-size:13px;font-weight:700;color:#1d3a6b;
+    display:flex;justify-content:space-between;align-items:center;gap:8px;
+    transition:.22s ease;
+  }
+  .total .num{font-family:var(--serif);font-size:19px;color:var(--green)}
+  .total.hot{
+    background:linear-gradient(135deg,#eefaf4,#e2f7ee);
+    border-color:#b6e6d1;
+    box-shadow:0 8px 20px -14px rgba(15,138,95,.8);
+  }
+
+  .tip{margin:12px 0 0;font-size:12.5px;line-height:1.7;color:var(--ink3)}
+  .tip b{color:var(--ink2)}
+
+  .solution{margin-top:18px;padding:22px 24px 24px}
+  .solution h2{font-size:16px;margin:0 0 4px;display:flex;align-items:center;gap:9px}
+  .solution h2 .bar{width:3px;height:16px;border-radius:2px;background:var(--blue)}
+  .solution .lead{margin:6px 0 16px;font-size:13.5px;color:var(--ink2)}
+
+  .steps{display:grid;gap:11px}
+  .step{display:flex;gap:12px;padding:12px 14px;border-radius:12px;background:#fafcff;border:1px solid #edf2f9}
+  .step .num{
+    flex:none;width:22px;height:22px;border-radius:50%;background:#e8f1ff;color:#1d4ed8;
+    font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;margin-top:2px;
+  }
+  .step .body{font-size:13.8px;line-height:1.85;color:#28374d;min-width:0}
+  .step .body p{margin:0}
+  .step .body p + p{margin-top:5px}
+  .step .body p.eqline,.eqline{text-align:center;margin:4px 0 2px}
+  .katex-display{margin:.25em 0}
+  .katex-display>.katex{font-size:1.12em}
+  .hl{background:linear-gradient(180deg,transparent 62%,#ffe9a8 62%);font-weight:600;padding:0 1px}
+  .hl-red{background:linear-gradient(180deg,transparent 62%,#ffd3d3 62%);font-weight:700;padding:0 1px;color:#b91c1c}
+  .hl-v{background:linear-gradient(180deg,transparent 62%,#e3d8ff 62%);font-weight:600;padding:0 1px}
+
+  .gtable{
+    width:100%;border-collapse:separate;border-spacing:0;
+    font-size:13.2px;color:#28374d;margin:4px 0 14px;
+    border:1px solid #e7eef8;border-radius:12px;overflow:hidden;
+  }
+  .gtable th,.gtable td{padding:9px 12px;text-align:left;border-bottom:1px solid #f0f5fc;vertical-align:middle}
+  .gtable th{background:#f7fafd;font-size:12.2px;font-weight:700;color:#5b6b82;letter-spacing:.02em;white-space:nowrap}
+  .gtable tbody tr:last-child td{border-bottom:none}
+  .gtable tbody tr:hover td{background:#fbfdff}
+  .gtable td.m{font-family:var(--serif);font-size:13.6px;white-space:nowrap}
+  .gtable tr.key td{background:#faf7ff}
+  .gtable tr.key:hover td{background:#f5f0ff}
+
+  .genbox{
+    display:block;padding:12px 14px;border-radius:12px;
+    background:#fafcff;border:1px solid #edf2f9;margin:0 0 12px;
+  }
+  .genbox p{margin:0;font-size:13.5px;line-height:1.85;color:#28374d}
+  .genbox p + p{margin-top:6px}
+  .genkey{
+    padding:14px 16px;border-radius:12px;margin:0 0 12px;
+    background:linear-gradient(180deg,#fffdf7,#fff8ec);border:1px solid #f3e2c3;
+  }
+  .genkey p{margin:0;font-size:13.5px;line-height:1.85;color:#4a3a20}
+  .genkey p + p{margin-top:6px}
+  .genkey .gform{
+    font-family:var(--serif);font-size:16.5px;font-weight:700;color:#a26200;
+    text-align:center;padding:4px 0 6px;letter-spacing:.02em;
+  }
+
+  .answer{
+    margin-top:16px;padding:16px 20px;border-radius:14px;
+    background:linear-gradient(120deg,#eef5ff,#f7fbff 45%,#fff6ea);
+    border:1px solid #dbe8fb;
+    display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;
+  }
+  .answer .tagline{font-size:12px;font-weight:800;letter-spacing:.14em;color:#5c6a7e}
+  .answer .eq{font-family:var(--serif);font-size:21px;font-weight:700;color:#14306b;letter-spacing:.02em}
+  .answer .eq b{color:#b91c1c}
+
+  @media (max-width: 940px){
+    .main{grid-template-columns:1fr}
+    #cv{height:430px}
+    h1{font-size:19.5px}
+    .page{padding:20px 14px 48px}
+    .answer .eq{font-size:17px}
+    .banner{white-space:normal}
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header>
+    <a class="back" href="../../index.html">&larr; 全部演示</a>
+    <div class="eyebrow">高中解析几何 · 圆锥曲线 · 求轨迹方程</div>
+    <h1>圆上动点向 $x$ 轴引垂线，中点 $M$ 的轨迹是什么？</h1>
+    <p class="sub">让 $P$ 绕圆跑一圈，$M$ 会一路留下痕迹。先让学生猜是圆、是线段、还是别的什么，再点播放验证。真正的关键只有一处：<span class="hl-v">$P$ 与 $M$ 横坐标相同，而 $M$ 的纵坐标始终是 $P$ 的一半</span>——把圆沿竖直方向压扁一半，就是答案。</p>
+
+    <div class="problem">
+      <span class="tag">题目</span>在圆 $x^{2}+y^{2}=4$ 上任取一点 $P$，过点 $P$ 作 $x$ 轴的垂线段 $PD$，$D$ 为垂足。当点 $P$ 在圆上运动时，线段 $PD$ 的中点 $M$ 的轨迹是什么？为什么？（当点 $P$ 经过圆与 $x$ 轴的交点时，规定点 $M$ 与点 $P$ 重合。）
+    </div>
+  </header>
+
+  <div class="main">
+    <section class="card stage">
+      <div class="canvas-wrap">
+        <canvas id="cv"></canvas>
+        <div class="math-layer" id="mlayer"></div>
+        <div class="banner" id="banner"><span class="spark"></span><span id="bannerText"></span></div>
+      </div>
+      <div class="legend">
+        <span><i style="border-color:#1e3a8a"></i>圆 $x^{2}+y^{2}=4$</span>
+        <span><i style="border-color:#94a3b8;border-top-style:dashed"></i>垂线段 $PD$</span>
+        <span><i style="border-color:#7c3aed"></i>中点 $M$ 的轨迹</span>
+        <span><span class="lgdot" style="background:#2563eb"></span>动点 $P$</span>
+        <span><span class="lgdot" style="background:#ea580c"></span>中点 $M$</span>
+        <span><span class="lgdot" style="background:#0f8a5f"></span>垂足 $D$</span>
+      </div>
+      <div class="controls">
+        <div class="ctrl-row">
+          <button class="btn primary" id="play">暂停</button>
+          <button class="btn" id="axisBtn">$P$ 落在 $x$ 轴上</button>
+          <button class="btn" id="resetBtn">重走一遍</button>
+          <button class="btn switch" id="togFull" aria-pressed="false" title="显示 / 隐藏整条轨迹（椭圆）">
+            <span class="sw"></span>
+            <span class="sw-txt">整条轨迹</span>
+          </button>
+        </div>
+        <div class="ctrl-row">
+          <div class="slider-wrap">
+            <span class="lab">$\theta$（$P$ 的辐角）</span>
+            <input type="range" id="slider" min="0" max="360" step="0.5" value="90" />
+            <span class="val" id="thRead">90.0&deg;</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <aside class="card panel">
+      <h3>实时数据</h3>
+      <div class="metric"><span class="m-label">$P$ 的坐标</span><span class="m-val side-val" id="vP">(0.00, 2.00)</span></div>
+      <div class="metric"><span class="m-label">$D$ 的坐标（垂足）</span><span class="m-val side-val" id="vD">(0.00, 0)</span></div>
+      <div class="metric"><span class="m-label">$M$ 的坐标（中点）</span><span class="m-val side-val" id="vM">(0.00, 1.00)</span></div>
+      <div class="metric"><span class="m-label">$|PM|=|MD|$</span><span class="m-val" id="vHalf">1.000</span></div>
+      <div class="metric"><span class="m-label">已走过的弧（占整圆）</span><span class="m-val" id="vCover">0%</span></div>
+
+      <div class="total hot" id="vtot"><span>$x_M^{\,2}/4+y_M^{\,2}$ =</span><span class="num" id="vinv">1.0000</span></div>
+
+      <p class="tip">上面那个数<b>一直是 1</b>，不管 $P$ 转到哪里——这就是「轨迹方程」的全部秘密：$M$ 的坐标永远满足 $x^{2}/4+y^{2}=1$。左图的紫色曲线，正是 $M$ 把所有可能位置都走一遍的结果。</p>
+    </aside>
+  </div>
+
+  <section class="card solution">
+    <h2><span class="bar"></span>解题过程</h2>
+    <p class="lead">两种写法都要会：参数法（设角）快而直观，相关点法（代入法）通用性更强。</p>
+
+    <div class="steps">
+      <div class="step">
+        <div class="num">1</div>
+        <div class="body">
+          <p><b>方法一 · 参数法</b>　设 $P$ 的辐角为 $\theta$，由 $r=2$ 得</p>
+          <p class="eqline">$$P(2\cos\theta,\ 2\sin\theta)$$</p>
+          <p>$PD\perp x$ 轴，垂足 $D$ 与 $P$ 横坐标相同，纵坐标为 $0$：</p>
+          <p class="eqline">$$D(2\cos\theta,\ 0)$$</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="num">2</div>
+        <div class="body">
+          <p>$M$ 是 $PD$ 的中点，横坐标取两者共同的 $2\cos\theta$，纵坐标取平均值：</p>
+          <p class="eqline">$$M\left(2\cos\theta,\ \frac{2\sin\theta+0}{2}\right)=(2\cos\theta,\ \sin\theta)$$</p>
+          <p>这一步是整题的<span class="hl">命门</span>：<b>$M$ 与 $P$ 同横坐标，纵坐标只剩一半。</b></p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="num">3</div>
+        <div class="body">
+          <p>设 $M(x,\,y)$，得参数方程</p>
+          <p class="eqline">$$\begin{cases}x=2\cos\theta\\[2pt] y=\sin\theta\end{cases}\quad\Longrightarrow\quad \cos\theta=\frac{x}{2},\ \ \sin\theta=y$$</p>
+          <p>用 $\cos^{2}\theta+\sin^{2}\theta=1$ 消去 $\theta$：</p>
+          <p class="eqline">$$\frac{x^{2}}{4}+y^{2}=1$$</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="num">4</div>
+        <div class="body">
+          <p><b>方法二 · 相关点法（代入法）</b>　设 $M(x,y)$，$P(x_0,y_0)$ 在圆上，故 $x_0^{2}+y_0^{2}=4$；$D(x_0,0)$。中点条件给出</p>
+          <p class="eqline">$$x=\frac{x_0+x_0}{2}=x_0,\qquad y=\frac{y_0+0}{2}=\frac{y_0}{2}$$</p>
+          <p>反解得 $x_0=x,\ y_0=2y$，代回圆的方程：</p>
+          <p class="eqline">$$x^{2}+(2y)^{2}=4\ \Longrightarrow\ \frac{x^{2}}{4}+y^{2}=1$$</p>
+          <p>两种方法殊途同归，而「代入法」正是求轨迹的通杀套路：<span class="hl">把动点坐标用已知曲线上的点表示，再代回已知方程</span>。</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="answer">
+      <span class="tagline">答案</span>
+      <span class="eq">$M$ 的轨迹是椭圆 $\textcolor{#b91c1c}{\dfrac{x^{2}}{4}+y^{2}=1}$</span>
+      <span class="eq">长轴长 $4$，短轴长 $2$</span>
+    </div>
+  </section>
+
+  <section class="card solution">
+    <h2><span class="bar"></span>另一种眼光：把圆压扁一半</h2>
+    <p class="lead">不解方程也能一眼看出答案——这正是这题最值得讲的地方。</p>
+
+    <div class="genbox">
+      <p>看 $P$ 与 $M$ 的关系：两者<b>在同一条竖直线上</b>（横坐标相同），而 $M$ 恰好在 $P$ 与 $x$ 轴的正中间，所以 $M$ 就是把 $P$ <span class="hl-v">沿着竖直方向朝 $x$ 轴压缩到原来的一半</span>。</p>
+      <p>于是「$P$ 跑遍圆」就等价于「把整个圆上每一点都这样压一半」——圆被压成了一个扁的闭曲线，也就是椭圆。对应关系写成式子就是变换 $(x,y)\mapsto\left(x,\dfrac{y}{2}\right)$，把它代进圆方程 $x^{2}+y^{2}=4$：</p>
+    </div>
+
+    <div class="genkey">
+      <p class="gform">$x^{2}+4y^{2}=4\iff \dfrac{x^{2}}{4}+y^{2}=1$</p>
+      <p><b>一般结论</b>　圆 $x^{2}+y^{2}=r^{2}$ 上的点 $P$ 向 $x$ 轴引垂线，垂足 $D$，$PD$ 中点 $M$ 的轨迹是</p>
+      <p class="gform">$\dfrac{x^{2}}{r^{2}}+\dfrac{y^{2}}{(r/2)^{2}}=1$</p>
+      <p>长半轴仍是 $r$（横坐标没变），短半轴缩成 $r/2$。本题 $r=2$，即 $\dfrac{x^{2}}{4}+y^{2}=1$。</p>
+    </div>
+
+    <table class="gtable">
+      <thead>
+        <tr>
+          <th>$\theta$</th>
+          <th>$P$</th>
+          <th>$D$</th>
+          <th>$M$</th>
+          <th>说明</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="key">
+          <td class="m">$0^{\circ}$</td>
+          <td class="m">$(2,0)$</td>
+          <td class="m">$(2,0)$</td>
+          <td class="m">$(2,0)$</td>
+          <td>三点重合，题目专门「规定」的就是这里</td>
+        </tr>
+        <tr>
+          <td class="m">$30^{\circ}$</td>
+          <td class="m">$(\sqrt3,1)$</td>
+          <td class="m">$(\sqrt3,0)$</td>
+          <td class="m">$(\sqrt3,\tfrac12)$</td>
+          <td>$|PM|=|MD|=\tfrac12$</td>
+        </tr>
+        <tr>
+          <td class="m">$45^{\circ}$</td>
+          <td class="m">$(\sqrt2,\sqrt2)$</td>
+          <td class="m">$(\sqrt2,0)$</td>
+          <td class="m">$(\sqrt2,\tfrac{\sqrt2}{2})$</td>
+          <td>$|PM|=|MD|=\tfrac{\sqrt2}{2}$</td>
+        </tr>
+        <tr class="key">
+          <td class="m">$90^{\circ}$</td>
+          <td class="m">$(0,2)$</td>
+          <td class="m">$(0,0)=O$</td>
+          <td class="m">$(0,1)$</td>
+          <td>短轴端点，$PD$ 恰是半径</td>
+        </tr>
+        <tr>
+          <td class="m">$120^{\circ}$</td>
+          <td class="m">$(-1,\sqrt3)$</td>
+          <td class="m">$(-1,0)$</td>
+          <td class="m">$(-1,\tfrac{\sqrt3}{2})$</td>
+          <td>第二象限，$y$ 仍为正</td>
+        </tr>
+        <tr class="key">
+          <td class="m">$180^{\circ}$</td>
+          <td class="m">$(-2,0)$</td>
+          <td class="m">$(-2,0)$</td>
+          <td class="m">$(-2,0)$</td>
+          <td>长轴另一端点，轨迹在这里闭合</td>
+        </tr>
+        <tr>
+          <td class="m">$270^{\circ}$</td>
+          <td class="m">$(0,-2)$</td>
+          <td class="m">$(0,0)=O$</td>
+          <td class="m">$(0,-1)$</td>
+          <td>下半支：$P$ 在下、$M$ 也翻到下方</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="genbox">
+      <p><b>三个容易踩的坑</b></p>
+      <p>① <b>只写方程、不写轨迹</b>。题目问「轨迹是什么」，答案要落到图形上：整条椭圆 $\dfrac{x^{2}}{4}+y^{2}=1$（长轴在 $x$ 轴上，长 $4$，短轴长 $2$）。</p>
+      <p>② <b>自作多情加限制</b>。因为 $P$ 走遍<b>整个圆</b>，$\cos\theta$ 取遍 $[-1,1]$、$\sin\theta$ 也取遍 $[-1,1]$，所以整条椭圆都被取到，不需要额外剔除点。反过来，若题目改成「$P$ 只在上半圆弧上运动」，$M$ 就只画出上半支，这时候才必须补上 $y\ge 0$。</p>
+      <p>③ <b>看不懂教材那句话</b>。当 $P$ 落在 $x$ 轴上（$P=(\pm2,0)$）时，$D$ 与 $P$ 重合，「线段 $PD$」退化为一个点，谈不上「中点」。题目说「规定 $M$ 与 $P$ 重合」，只是把这种退化情形讲清楚——按中点坐标公式算，结果本来就是 $M=P=(\pm2,0)$，与规定完全一致，所以轨迹是一条完整的、不断开的椭圆。</p>
+    </div>
+  </section>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var TAU = Math.PI * 2;
+  var DEG = Math.PI / 180;
+  var R   = 2;                       // 圆半径（圆 x²+y²=4）
+  var NB  = 720;                     // 轨迹覆盖度分桶数（每桶 0.5°）
+
+  var cv  = document.getElementById('cv');
+  var ctx = cv.getContext('2d');
+
+  if (window.renderMathInElement){
+    renderMathInElement(document.body, {
+      delimiters: [
+        { left: '$$', right: '$$', display: true },
+        { left: '$',  right: '$',  display: false }
+      ],
+      ignoredTags: ['script','noscript','style','textarea','pre','code','option'],
+      throwOnError: false,
+      strict: false
+    });
+  }
+
+  var els = {
+    banner: document.getElementById('banner'),
+    bannerText: document.getElementById('bannerText'),
+    play: document.getElementById('play'),
+    axisBtn: document.getElementById('axisBtn'),
+    resetBtn: document.getElementById('resetBtn'),
+    togFull: document.getElementById('togFull'),
+    slider: document.getElementById('slider'),
+    thRead: document.getElementById('thRead'),
+    vP: document.getElementById('vP'),
+    vD: document.getElementById('vD'),
+    vM: document.getElementById('vM'),
+    vHalf: document.getElementById('vHalf'),
+    vCover: document.getElementById('vCover'),
+    vtot: document.getElementById('vtot'),
+    vinv: document.getElementById('vinv')
+  };
+
+  var state = { u: Math.PI / 2, playing: true, dwell: 1.0, speed: 60 * DEG, full: false };
+
+  /* ---------- 画布 ---------- */
+  var W = 0, H = 0, s = 60, ox = 0, oy = 0;
+  var VR = 2.62;                     // 视野半径（世界单位）
+
+  function X(x){ return ox + x * s; }
+  function Y(y){ return oy - y * s; }
+
+  function resize(){
+    var r = cv.getBoundingClientRect();
+    if (r.width < 10 || r.height < 10) return;
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    cv.width  = Math.round(r.width  * dpr);
+    cv.height = Math.round(r.height * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    W = r.width; H = r.height;
+    s  = Math.min(H / (2 * VR), W / (2 * VR * 1.36));
+    ox = W * 0.5;
+    oy = H * 0.5;
+  }
+
+  /* ---------- 轨迹覆盖度（记录 M 走过哪些位置） ---------- */
+  var cov = new Uint8Array(NB);
+  var lastTh = null;
+
+  function bucket(th){
+    var t = th % TAU; if (t < 0) t += TAU;
+    return Math.floor(t / TAU * NB) % NB;
+  }
+  function markCover(th){
+    cov[bucket(th)] = 1;
+    if (lastTh === null){ lastTh = th; return; }
+    var d = th - lastTh;
+    while (d >  Math.PI) d -= TAU;
+    while (d < -Math.PI) d += TAU;
+    var n = Math.ceil(Math.abs(d) / TAU * NB);
+    for (var k = 1; k <= n; k++) cov[bucket(lastTh + d * k / n)] = 1;
+    lastTh = th;
+  }
+  function coverRatio(){
+    var c = 0;
+    for (var i = 0; i < NB; i++) if (cov[i]) c++;
+    return c / NB;
+  }
+  function clearCover(){ cov = new Uint8Array(NB); lastTh = null; }
+
+  /* ---------- 几何 ---------- */
+  function geom(th){
+    var t = th % TAU; if (t < 0) t += TAU;
+    var c = Math.cos(t), sn = Math.sin(t);
+    return {
+      th: t, c: c, sn: sn,
+      P: [2 * c, 2 * sn],
+      D: [2 * c, 0],
+      M: [2 * c, sn]
+    };
+  }
+
+  /* ---------- 画布标签（HTML 浮层 + KaTeX） ---------- */
+  var mlayer  = document.getElementById('mlayer');
+  var tagPool = [], tagUsed = 0, texCache = {}, sizeCache = {};
+
+  function texHTML(tex){
+    var c = texCache[tex];
+    if (c) return c;
+    var html;
+    try {
+      html = katex.renderToString(tex, { output:'html', throwOnError:false, displayMode:false, strict:false });
+    } catch (e){
+      html = '<span>' + tex + '</span>';
+    }
+    texCache[tex] = html;
+    return html;
+  }
+
+  function tag(px, py, tex, color, place){
+    var el = tagPool[tagUsed];
+    if (!el){
+      el = document.createElement('div');
+      el.className = 'mlabel';
+      mlayer.appendChild(el);
+      tagPool[tagUsed] = el;
+    }
+    tagUsed++;
+    if (el.__tex !== tex){ el.innerHTML = texHTML(tex); el.__tex = tex; }
+    el.style.color   = color;
+    el.style.display = '';
+
+    var sz = sizeCache[tex];
+    if (!sz || !sz.w){ sz = { w: el.offsetWidth, h: el.offsetHeight }; if (sz.w) sizeCache[tex] = sz; }
+
+    var x = px, y = py - sz.h / 2;
+    if (place === 'right')      x = px;
+    else if (place === 'left')  x = px - sz.w;
+    else                        x = px - sz.w / 2;
+    x = Math.max(6, Math.min(W - sz.w - 6, x));
+    y = Math.max(6, Math.min(H - sz.h - 6, y));
+    el.style.left = x + 'px';
+    el.style.top  = y + 'px';
+  }
+
+  function tagEnd(){
+    for (var i = tagUsed; i < tagPool.length; i++) tagPool[i].style.display = 'none';
+    tagUsed = 0;
+  }
+
+  function fmt(v, dg){
+    var t = (Math.abs(v) < 5e-4 ? 0 : v).toFixed(dg);
+    return t.replace('-', '−');
+  }
+
+  /* ---------- 主图 ---------- */
+  function draw(now){
+    var t = now || performance.now();
+    var g = geom(state.u);
+    var onAxis = Math.abs(g.sn) < 0.02;          // P 落在 x 轴上
+    var pulse  = 0.5 + 0.5 * Math.sin(t / 300);
+
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, W, H);
+
+    /* 网格 */
+    var N = Math.ceil(Math.max(W, H) / s) + 2;
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = '#eaf0fa';
+    ctx.beginPath();
+    for (var i = -N; i <= N; i++){
+      ctx.moveTo(X(i), 0); ctx.lineTo(X(i), H);
+      ctx.moveTo(0, Y(i)); ctx.lineTo(W, Y(i));
+    }
+    ctx.stroke();
+
+    /* 坐标轴 + 刻度 */
+    ctx.strokeStyle = '#cbd6e6';
+    ctx.lineWidth = 1.4;
+    ctx.beginPath();
+    ctx.moveTo(0, Y(0)); ctx.lineTo(W, Y(0));
+    ctx.moveTo(X(0), 0); ctx.lineTo(X(0), H);
+    ctx.stroke();
+
+    var fs = Math.max(9, Math.min(11.5, s * 0.19));
+    ctx.fillStyle = '#a3aebf';
+    ctx.font = fs.toFixed(1) + 'px "Segoe UI","Microsoft YaHei",sans-serif';
+    ctx.textAlign = 'center';
+    var K = Math.ceil(VR) + 1;
+    for (var k = -K; k <= K; k++){
+      if (k === 0) continue;
+      var pk = X(k);
+      if (pk > 14 && pk < W - 14){
+        ctx.beginPath();
+        ctx.moveTo(pk, Y(0) - 3); ctx.lineTo(pk, Y(0) + 3);
+        ctx.strokeStyle = '#cbd6e6'; ctx.lineWidth = 1; ctx.stroke();
+        ctx.textBaseline = 'top';
+        ctx.fillText(k, pk, Y(0) + 5);
+      }
+      var py = Y(k);
+      if (py > 14 && py < H - 14 && k >= -2 && k <= 2){
+        ctx.beginPath();
+        ctx.moveTo(X(0) - 3, py); ctx.lineTo(X(0) + 3, py);
+        ctx.strokeStyle = '#cbd6e6'; ctx.lineWidth = 1; ctx.stroke();
+        ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+        ctx.fillText(k, X(0) - 6, py);
+        ctx.textAlign = 'center';
+      }
+    }
+
+    /* 整条轨迹（椭圆），开关打开时显示 */
+    if (state.full){
+      ctx.save();
+      ctx.beginPath();
+      ctx.ellipse(X(0), Y(0), R * s, (R / 2) * s, 0, 0, TAU);
+      ctx.fillStyle = 'rgba(124,58,237,0.045)';
+      ctx.fill();
+      ctx.setLineDash([7, 6]);
+      ctx.strokeStyle = 'rgba(124,58,237,0.45)';
+      ctx.lineWidth = 1.8;
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    /* 圆 */
+    ctx.beginPath();
+    ctx.arc(X(0), Y(0), R * s, 0, TAU);
+    ctx.fillStyle = 'rgba(37,99,235,0.04)';
+    ctx.fill();
+    ctx.strokeStyle = '#1e3a8a';
+    ctx.lineWidth = Math.max(1.8, Math.min(2.4, s * 0.045));
+    ctx.stroke();
+
+    /* 已走过的轨迹：只连相邻的桶，保证是「一段一段长出来」 */
+    ctx.save();
+    ctx.beginPath();
+    var started = false;
+    for (var b = 0; b < NB; b++){
+      var b2 = (b + 1) % NB;
+      if (!cov[b] && !cov[b2]){ started = false; continue; }
+      var t1 = b / NB * TAU, t2 = (b + 1) / NB * TAU;
+      var p1x = X(2 * Math.cos(t1)), p1y = Y(Math.sin(t1));
+      var p2x = X(2 * Math.cos(t2)), p2y = Y(Math.sin(t2));
+      if (!started){ ctx.moveTo(p1x, p1y); started = true; }
+      ctx.lineTo(p2x, p2y);
+    }
+    ctx.strokeStyle = '#7c3aed';
+    ctx.lineWidth = Math.max(2.6, Math.min(3.6, s * 0.055));
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.stroke();
+    ctx.restore();
+
+    /* 垂线段 PD */
+    ctx.save();
+    ctx.setLineDash([6, 5]);
+    ctx.beginPath();
+    ctx.moveTo(X(g.P[0]), Y(g.P[1]));
+    ctx.lineTo(X(g.D[0]), Y(g.D[1]));
+    ctx.strokeStyle = '#94a3b8';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    ctx.restore();
+
+    /* 直角符（垂足 D 处） */
+    if (!onAxis){
+      var sgn = g.sn > 0 ? 1 : -1;
+      var L = Math.max(9, Math.min(13, s * 0.19));
+      var dx = (g.c >= 0 ? -1 : 1);
+      ctx.beginPath();
+      ctx.moveTo(X(g.D[0]) + dx * L, Y(g.D[1]));
+      ctx.lineTo(X(g.D[0]) + dx * L, Y(g.D[1] - sgn * L));
+      ctx.lineTo(X(g.D[0]), Y(g.D[1] - sgn * L));
+      ctx.strokeStyle = '#b6c2d2';
+      ctx.lineWidth = 1.4;
+      ctx.stroke();
+    }
+
+    /* 等分标注：PM 与 MD 的中点各画一小横杠 */
+    if (!onAxis){
+      [[(g.P[1] + g.M[1]) / 2, '#2563eb'], [(g.M[1] + 0) / 2, '#0f8a5f']].forEach(function(q){
+        var yy = q[0], cx = X(g.P[0]), cy = Y(yy);
+        var w = Math.max(5, Math.min(8, s * 0.09));
+        ctx.beginPath();
+        ctx.moveTo(cx - w, cy); ctx.lineTo(cx + w, cy);
+        ctx.strokeStyle = q[1]; ctx.lineWidth = 2.2; ctx.stroke();
+      });
+    }
+
+    /* 点：O、D、M、P */
+    ctx.beginPath();
+    ctx.arc(X(0), Y(0), 3.6, 0, TAU);
+    ctx.fillStyle = '#1e3a8a';
+    ctx.fill();
+
+    ctx.beginPath();
+    ctx.arc(X(g.D[0]), Y(g.D[1]), onAxis ? 5.4 : 5, 0, TAU);
+    ctx.fillStyle = '#0f8a5f';
+    ctx.fill();
+    ctx.lineWidth = 2.2; ctx.strokeStyle = '#fff'; ctx.stroke();
+
+    /* M：带脉冲光环 */
+    ctx.beginPath();
+    ctx.arc(X(g.M[0]), Y(g.M[1]), 12 + 6 * pulse, 0, TAU);
+    ctx.fillStyle = 'rgba(234,88,12,' + (0.10 + 0.10 * (1 - pulse)).toFixed(3) + ')';
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(X(g.M[0]), Y(g.M[1]), 6.2, 0, TAU);
+    ctx.fillStyle = '#ea580c';
+    ctx.fill();
+    ctx.lineWidth = 2.4; ctx.strokeStyle = '#fff'; ctx.stroke();
+
+    ctx.beginPath();
+    ctx.arc(X(g.P[0]), Y(g.P[1]), 6.4, 0, TAU);
+    ctx.fillStyle = '#2563eb';
+    ctx.fill();
+    ctx.lineWidth = 2.4; ctx.strokeStyle = '#fff'; ctx.stroke();
+
+    /* 辐角弧 */
+    if (g.th > 0.05 && g.th < TAU - 0.05){
+      ctx.beginPath();
+      ctx.arc(X(0), Y(0), 30, 0, -g.th, true);
+      ctx.strokeStyle = 'rgba(37,99,235,0.35)';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+    }
+
+    /* ---- 标签 ---- */
+    tag(X(0) - 13, Y(0) + 16, 'O', '#1e3a8a', 'center');
+
+    /* 圆的方程：放在圆的左上外侧 */
+    tag(X(-2.62), Y(1.72), 'x^{2}+y^{2}=4', '#1e3a8a', 'center');
+
+    /* 椭圆的方程：放在右上方外侧（只有轨迹接近闭合或开关打开时才提示） */
+    if (state.full || coverRatio() > 0.985){
+      tag(X(0.95), Y(-1.42), '\\dfrac{x^{2}}{4}+y^{2}=1', '#7c3aed', 'center');
+    }
+
+    /* P：沿半径向外推 */
+    (function(){
+      var la = Math.sqrt(g.P[0]*g.P[0] + g.P[1]*g.P[1]) || 1;
+      var k = 0.36 / la;
+      tag(X(g.P[0] * (1 + k)) + (g.P[0] >= 0 ? 4 : -4), Y(g.P[1] * (1 + k)), 'P', '#2563eb', 'center');
+    })();
+
+    /* M：放在竖直线右侧，靠右边缘时换到左侧 */
+    var mx = X(g.M[0]);
+    if (mx > W - 60) tag(mx - 14, Y(g.M[1]), 'M', '#ea580c', 'left');
+    else             tag(mx + 14, Y(g.M[1]), 'M', '#ea580c', 'right');
+
+    /* D：标在轴下方（P 在轴上时与 P 重合，改标合并写法） */
+    if (onAxis){
+      tag(X(g.P[0]), Y(0) + 32, 'P=D=M', '#0f8a5f', 'center');
+    } else {
+      tag(X(g.D[0]) + (g.c >= 0 ? 6 : -6), Y(0) + 32, 'D', '#0f8a5f', g.c >= 0 ? 'right' : 'left');
+      if (g.th > 0.35 && g.th < TAU - 0.35){
+        var mid = -g.th / 2;
+        tag(X(0) + Math.cos(mid) * 52, Y(0) + Math.sin(mid) * 52, '\\theta', '#3b62a8', 'center');
+      }
+    }
+
+    tagEnd();
+  }
+
+  /* ---------- 面板 ---------- */
+  var bannerKey = '';
+  function setBanner(html){
+    if (html === bannerKey) return;
+    bannerKey = html;
+    els.bannerText.innerHTML = html;
+    if (window.renderMathInElement){
+      renderMathInElement(els.bannerText, {
+        delimiters: [{ left: '$', right: '$', display: false }],
+        throwOnError: false, strict: false
+      });
+    }
+  }
+
+  function updateUI(){
+    var g = geom(state.u);
+    var onAxis = Math.abs(g.sn) < 0.02;
+    var ratio  = coverRatio();
+
+    els.thRead.innerHTML = fmt(g.th / DEG, 1) + '&deg;';
+    els.vP.textContent = '(' + fmt(g.P[0], 2) + ', ' + fmt(g.P[1], 2) + ')';
+    els.vD.textContent = onAxis ? '(' + fmt(g.D[0], 2) + ', 0) = P' : '(' + fmt(g.D[0], 2) + ', 0)';
+    els.vM.textContent = '(' + fmt(g.M[0], 2) + ', ' + fmt(g.M[1], 2) + ')';
+    els.vHalf.textContent = fmt(Math.abs(g.sn), 3);
+    els.vCover.textContent = Math.round(ratio * 100) + '%';
+    els.vinv.textContent = (g.M[0]*g.M[0] / 4 + g.M[1]*g.M[1]).toFixed(4);
+    els.vinv.style.color = onAxis ? '#b91c1c' : '#0f8a5f';
+
+    els.togFull.classList.toggle('on', state.full);
+    els.togFull.setAttribute('aria-pressed', state.full ? 'true' : 'false');
+
+    if (onAxis){
+      els.banner.classList.add('show', 'cool');
+      setBanner('$P$ 落在 $x$ 轴上：$D$ 与 $P$ 重合，$M$ 也随之重合 —— 这正是题目要「规定」的那一处');
+    } else if (ratio > 0.985){
+      els.banner.classList.add('show');
+      els.banner.classList.remove('cool');
+      setBanner('一圈走完：$M$ 描出的是一条完整椭圆 $\\dfrac{x^{2}}{4}+y^{2}=1$');
+    } else {
+      els.banner.classList.remove('show');
+    }
+
+    if (document.activeElement !== els.slider){
+      els.slider.value = (g.th / DEG).toFixed(1);
+    }
+  }
+
+  /* ---------- 动画 ---------- */
+  var last = performance.now();
+  var STEP = Math.PI / 2;            // 每 90° 停一下
+
+  function loop(now){
+    var dt = Math.min(0.05, (now - last) / 1000);
+    if (!isFinite(dt) || dt < 0) dt = 0.016;
+    last = now;
+
+    if (state.playing){
+      if (state.dwell > 0){
+        state.dwell = Math.max(0, state.dwell - dt);
+      } else {
+        var prev = state.u;
+        var next = prev + state.speed * dt;
+        var nxt = (Math.floor(prev / STEP + 1e-6) + 1) * STEP;
+        if (next >= nxt){ next = nxt; state.dwell = 1.1; }
+        state.u = next;
+      }
+    }
+
+    markCover(state.u);
+    draw(now);
+    updateUI();
+    requestAnimationFrame(loop);
+  }
+
+  /* ---------- 交互 ---------- */
+  function setPlaying(v){
+    state.playing = v;
+    els.play.textContent = v ? '暂停' : '播放';
+  }
+
+  function jumpTo(th, playing){
+    state.u = th;
+    state.dwell = 0;
+    setPlaying(!!playing);
+    lastTh = th;
+    els.slider.value = ((th / DEG) % 360).toFixed(1);
+    updateUI();
+  }
+
+  els.play.addEventListener('click', function(){ setPlaying(!state.playing); });
+  els.axisBtn.addEventListener('click', function(){ jumpTo(0, false); });
+  els.resetBtn.addEventListener('click', function(){
+    clearCover();
+    jumpTo(0, false);
+  });
+  els.togFull.addEventListener('click', function(){
+    state.full = !state.full;
+    updateUI();
+  });
+
+  els.slider.addEventListener('input', function(){
+    state.u = parseFloat(els.slider.value) * DEG;
+    state.dwell = 0;
+    setPlaying(false);
+    updateUI();
+  });
+
+  /* 直接拖动 P */
+  var dragging = false;
+  function pointerAngle(e){
+    var r = cv.getBoundingClientRect();
+    var px = e.clientX - r.left, py = e.clientY - r.top;
+    return Math.atan2(oy - py, px - ox);
+  }
+  cv.addEventListener('pointerdown', function(e){
+    dragging = true;
+    if (cv.setPointerCapture) { try { cv.setPointerCapture(e.pointerId); } catch (err){} }
+    setPlaying(false);
+    state.dwell = 0;
+    state.u = pointerAngle(e);
+    updateUI();
+    e.preventDefault();
+  });
+  cv.addEventListener('pointermove', function(e){
+    if (!dragging) return;
+    state.u = pointerAngle(e);
+    updateUI();
+  });
+  function endDrag(){ dragging = false; }
+  cv.addEventListener('pointerup', endDrag);
+  cv.addEventListener('pointercancel', endDrag);
+  cv.addEventListener('pointerleave', endDrag);
+
+  window.addEventListener('keydown', function(e){
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    var tg = e.target;
+    if (tg && /^(INPUT|TEXTAREA|SELECT)$/.test(tg.tagName)) return;
+    if (e.key === ' '){ e.preventDefault(); setPlaying(!state.playing); }
+    if (e.key === 'r' || e.key === 'R'){ clearCover(); jumpTo(0, false); }
+    if (e.key === 'e' || e.key === 'E'){ state.full = !state.full; updateUI(); }
+  });
+
+  window.addEventListener('resize', function(){ resize(); });
+  if (window.ResizeObserver){
+    new ResizeObserver(function(){ resize(); }).observe(cv);
+  }
+  if (document.fonts && document.fonts.ready){
+    document.fonts.ready.then(function(){ sizeCache = {}; });
+  }
+
+  resize();
+  els.slider.value = 90;
+  requestAnimationFrame(loop);
+})();
+</script>
+<script>
+  window.addEventListener('load', function(){
+    if (window.katex && window.renderMathInElement) return;
+    var w = document.createElement('div');
+    w.textContent = '公式渲染库未能加载：请确认 assets/katex/ 目录下的文件完整（尤其是 fonts 文件夹）。';
+    w.style.cssText = 'position:fixed;left:50%;top:12px;transform:translateX(-50%);z-index:99;' +
+      'background:#fff5f5;border:1px solid #f6b9b9;color:#b91c1c;padding:8px 16px;border-radius:999px;' +
+      'font:600 13px/1.4 "Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;' +
+      'box-shadow:0 8px 20px -10px rgba(185,28,28,.5)';
+    document.body.appendChild(w);
+  });
+</script>
+</body>
+</html>
