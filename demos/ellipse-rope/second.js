@@ -13,8 +13,9 @@
   var ctx = cv.getContext('2d');
   var mlayer = document.getElementById('mlayer2');
 
-  /* t：M 的参数角；prog：已经画出的弧；other：是否叠加另一个焦点 F' */
-  var st = { t: 0, prog: 0, playing: true, other: false };
+  /* t：M 的参数角；prog：已经画出的弧；other：是否叠加另一个焦点；
+     side：当前对照的是哪一对（+1 右焦点↔右准线，-1 左焦点↔左准线） */
+  var st = { t: 0, prog: 0, playing: true, other: false, side: 1 };
   var W = 0, H = 0, S = 90, ox = 0, oy = 0, live = false;
 
   var UP = '#2563eb', DIR = '#d98a00', RED = '#dc2626', VIO = '#7c3aed', INK = '#22405f', GRN = '#0f8a5f';
@@ -35,9 +36,9 @@
     cv.height = Math.round(r.height * dpr);
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     W = r.width; H = r.height;
-    /* 横向要放得下 x ∈ [-5.6, 6.9]（左顶点到准线外的标签），纵向 |y| ≤ 4.2 */
-    S = Math.min(W / 14.4, H / 9.0);
-    ox = W * 0.5 - 0.35 * S;
+    /* 左右两条准线（±6.25）都要进画面：横向留给 x ∈ [-7.6, 7.6]，纵向 |y| ≤ 4.2 */
+    S = Math.min(W / 15.2, H / 9.0);
+    ox = W * 0.5;
     oy = H * 0.5;
   }
 
@@ -92,15 +93,23 @@
     ctx.beginPath(); ctx.moveTo(ax, 1); ctx.lineTo(ax - 4.2, 10); ctx.lineTo(ax + 4.2, 10); ctx.closePath(); ctx.fill();
   }
 
-  /* ---------- 准线 l ---------- */
-  function directrix() {
-    var px = Math.round(TX(DL)) + 0.5;
+  /* ---------- 两条准线：当前对照的那条高亮，另一条淡显 ---------- */
+  function directrixLine(side) {
+    var on = side === st.side;
+    var px = Math.round(TX(side * DL)) + 0.5;
+
     ctx.save();
     ctx.setLineDash([7, 6]);
-    ctx.strokeStyle = 'rgba(220,38,38,.72)'; ctx.lineWidth = 1.9;
+    ctx.strokeStyle = on ? 'rgba(220,38,38,.72)' : 'rgba(150,166,186,.5)';
+    ctx.lineWidth = on ? 1.9 : 1.3;
     ctx.beginPath(); ctx.moveTo(px, 8); ctx.lineTo(px, H - 8); ctx.stroke();
     ctx.restore();
-    tag(px + 2, 26, 'l:\\;x=\\dfrac{25}{4}', RED);
+
+    if (on) {
+      tag(px + (side > 0 ? 6 : -6), 26, 'l:\\;x=' + (side > 0 ? '' : '-') + '\\dfrac{25}{4}', RED);
+    } else {
+      tag(px, 26, side > 0 ? 'l' : "l'", '#b3bfcf');
+    }
   }
 
   /* ---------- 已经画出的轨迹 ---------- */
@@ -148,13 +157,13 @@
     ctx.lineWidth = 1.7; ctx.strokeStyle = '#fff'; ctx.stroke();
   }
 
-  /* H 处的直角记号，朝 x 轴那一侧画 */
-  function rightAngle(hx, hy, y) {
+  /* H 处的直角记号：dx 指向 M 所在的那一侧，记号朝 x 轴画 */
+  function rightAngle(hx, hy, y, dx) {
     var s = y > 0 ? 1 : -1;
     ctx.strokeStyle = 'rgba(217,138,0,.9)'; ctx.lineWidth = 1.5;
     ctx.beginPath();
-    ctx.moveTo(hx - 9, hy);
-    ctx.lineTo(hx - 9, hy + s * 9);
+    ctx.moveTo(hx + dx * 9, hy);
+    ctx.lineTo(hx + dx * 9, hy + s * 9);
     ctx.lineTo(hx, hy + s * 9);
     ctx.stroke();
   }
@@ -162,32 +171,38 @@
   function draw() {
     if (W < 10) return;
     board();
-    directrix();
+    directrixLine(1);
+    directrixLine(-1);
 
+    var side = st.side;
     var t = st.t, x = A * Math.cos(t), y = B * Math.sin(t);
-    var d = DL - x;                       /* 椭圆上 x ≤ 5 < 6.25，水平距离即到 l 的距离 */
-    var mf = Math.hypot(x - C, y);
+    var Fx = side * C;                     /* 当前对照的焦点坐标 */
+    var d = DL - side * x;                 /* 到当前准线的距离：M 夹在两条准线之间，恒为正 */
+    var mf = Math.hypot(x - Fx, y);
 
     var M = [TX(x), TY(y)];
-    var F = [TX(C), TY(0)];
-    var H = [TX(DL), TY(y)];
+    var F = [TX(Fx), TY(0)];
+    var H = [TX(side * DL), TY(y)];
 
     trace();
 
+    /* 另一侧：平时只点一个小灰点；开启「叠加另一个焦点」时变绿并连到 M */
+    var F2 = [TX(-Fx), TY(0)];
     if (st.other) {
-      var F2 = [TX(-C), TY(0)];
       dash(F2, M, GRN, 0.85);
       dot(F2[0], F2[1], 4, GRN);
-      tag(F2[0] - 4, F2[1] - 21, "F'(-4,0)", '#0b6b4a');
-      tag((F2[0] + M[0]) / 2, (F2[1] + M[1]) / 2 + 17, '|MF\'|=' + Math.hypot(x + C, y).toFixed(2), '#0b6b4a');
+      tag(F2[0], F2[1] - 21, side > 0 ? "F'(-4,0)" : 'F(4,0)', '#0b6b4a');
+      tag((F2[0] + M[0]) / 2, (F2[1] + M[1]) / 2 + 17, "|MF'|=" + Math.hypot(x + Fx, y).toFixed(2), '#0b6b4a');
+    } else {
+      dot(F2[0], F2[1], 3, '#b9c6da');
     }
 
     dash(M, H, DIR, 0.95);
-    rightAngle(H[0], H[1], y);
+    rightAngle(H[0], H[1], y, -side);
     seg(F, M, UP, 1);
 
     dot(F[0], F[1], 4.6, INK);
-    tag(F[0], F[1] + 22, 'F(4,0)', INK);
+    tag(F[0], F[1] + 22, side > 0 ? 'F(4,0)' : "F'(-4,0)", INK);
     dot(H[0], H[1], 3.2, DIR);
 
     dot(M[0], M[1], 4.8, VIO);
@@ -219,9 +234,11 @@
     vD: document.getElementById('vD'),
     vRatio: document.getElementById('vRatio'),
     vConst: document.getElementById('vConst'),
+    vPair: document.getElementById('vPair'),
     total: document.getElementById('vTotal2'),
     track: document.getElementById('rtrack'),
     eq: document.getElementById('eq2'),
+    side: document.getElementById('sSide'),
     other: document.getElementById('sF')
   };
 
@@ -229,14 +246,20 @@
   var DMAX = A + DL;
 
   function ui() {
+    var side = st.side;
     var t = st.t, x = A * Math.cos(t), y = B * Math.sin(t);
-    var d = DL - x, mf = Math.hypot(x - C, y), r = mf / d;
+    var d = DL - side * x, mf = Math.hypot(x - side * C, y), r = mf / d;
 
     els.vMF.textContent = mf.toFixed(2);
     els.vD.textContent = d.toFixed(2);
     els.vRatio.textContent = r.toFixed(3);
     els.thRead.textContent = (t * 180 / Math.PI).toFixed(0) + '°';
     els.vConst.textContent = '恒为 4/5';
+
+    els.vPair.textContent = side > 0
+      ? '右焦点 F(4,0) ↔ 右准线 x = 25/4'
+      : "左焦点 F'(-4,0) ↔ 左准线 x = −25/4";
+    badgeCond.textContent = side > 0 ? '|MF| : d = 4 : 5' : "|MF'| : d' = 4 : 5";
 
     /* 整条的长度跟着 d 伸缩，蓝色段恒占 4/5 */
     els.track.style.width = Math.max(3, Math.min(100, d / DMAX * 100)).toFixed(2) + '%';
@@ -289,7 +312,14 @@
   els.other.addEventListener('click', function () {
     st.other = !st.other;
     els.other.className = st.other ? 'btn on' : 'btn';
-    els.other.textContent = st.other ? '已叠加 F′ · 点击隐藏' : '叠加另一个焦点 F′';
+    els.other.textContent = st.other ? '已叠加 · 点击隐藏' : '叠加另一个焦点';
+  });
+
+  /* 左右两条准线各配一个焦点，比值一样是 4/5 */
+  els.side.addEventListener('click', function () {
+    st.side = -st.side;
+    els.side.textContent = st.side > 0 ? '⇄ 换到左准线' : '⇄ 换回右准线';
+    ui();
   });
 
   els.slider.addEventListener('input', function () {
