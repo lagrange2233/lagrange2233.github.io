@@ -40,6 +40,9 @@ tools/extract-katex.py  从离线单文件版里重抽 KaTeX（升级时用）
 5. **KaTeX 只有一份**，在 `assets/katex/`。页面里写 `$...$`（行内）或 `$$...$$`（独立成行），
    由 `auto-render.min.js` 自动排版。不要引 CDN。
 6. **单页控制在 80KB 以内**（目标 ~50KB）。大图、GIF、视频一律不进站点，只放 README 做预览。
+   单页超过 60KB 时，把绘图脚本外置成同目录的 `.js`（`<script src="second.js"></script>`，
+   仍是相对路径、无构建、无依赖，`check.mjs` 会查断链）。示例：`demos/ellipse-rope/` 的
+   `first.js` / `second.js` / `third.js`。CSS 暂不外置。
 7. **中文排版用「」和全角标点**，公式交给 KaTeX。
 8. 演示页顶部必须有返回首页的链接：`<a href="../../index.html">`（`../../` 也行）。
 9. `.nojekyll` 不能删。删了之后 Pages 会用 Jekyll 构建，下划线开头的目录直接消失。
