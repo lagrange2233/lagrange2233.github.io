@@ -26,6 +26,18 @@ window.DEMOS = {
      索引页的三行筛选就是按这三个字段做的，漏了这条演示在筛选里会失踪。 */
   demos: [
     {
+      slug: "ellipse-eccentricity",
+      path: "demos/ellipse-eccentricity/",
+      title: "椭圆的离心率：形状到底由谁决定",
+      subtitle: "课本图 3.1-10 的三组操作：锁住 $a$ 改 $c$、锁住 $c$ 改 $a$、$a,c$ 同倍缩放。$c$ 越接近 $a$ 椭圆越扁，同倍缩放却形状不变——右侧「形状指纹」只画比例，一眼看出 $e=\\frac{c}{a}$ 才是决定形状的那个数",
+      topic: "解析几何",
+      grade: "高二",
+      book: "选择性必修一",
+      level: 1,
+      tags: ["椭圆", "离心率", "半焦距", "长半轴", "短半轴", "扁平", "相似", "形状不变", "同倍缩放", "e=c/a", "图3.1-10"],
+      date: "2026-10-30"
+    },
+    {
       slug: "circle-extrema",
       path: "demos/circle-extrema/",
       title: "借助式子的几何意义解决与圆有关的最值问题",
