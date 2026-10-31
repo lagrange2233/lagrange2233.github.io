@@ -26,6 +26,30 @@ window.DEMOS = {
      索引页的三行筛选就是按这三个字段做的，漏了这条演示在筛选里会失踪。 */
   demos: [
     {
+      slug: "fold-pyramid",
+      path: "demos/fold-pyramid/",
+      title: "2025临沂期中T18——折叠问题",
+      subtitle: "把 $\\triangle ADE$ 沿折痕 $DE$ 折起，平面图形就变成四棱锥 $A_1\\text{-}BCDE$：拖动折叠角，二面角 $A_1\\text{-}DE\\text{-}C$、$A_1D$ 与平面 $A_1BC$ 的线面角、平面 $CND$ 与平面 $A_1BE$ 的夹角余弦一起实时变化",
+      topic: "立体几何",
+      grade: "高二",
+      book: "选择性必修一",
+      level: 3,
+      tags: ["折叠", "平面图形的折叠", "二面角", "线面角", "面面角", "四棱锥", "空间向量", "折痕", "直角梯形", "临沂期中", "T18"],
+      date: "2026-10-31"
+    },
+    {
+      slug: "chord-of-contact",
+      path: "demos/chord-of-contact/",
+      title: "动点引切线，切点弦扫出的区域是什么",
+      subtitle: "圆 $C_1$ 上的动点 $M$ 向圆 $C_2$ 引切线：切点弦 $AB$ 到圆心的距离恒为 $\\frac43$、长度恒为 $\\frac{4\\sqrt5}{3}$，拖动 $M$ 看它把圆环 $\\frac43\\le\\rho\\le 2$ 一点点涂满",
+      topic: "解析几何",
+      grade: "高二",
+      book: "选择性必修一",
+      level: 3,
+      tags: ["直线与圆", "切点弦", "切点弦方程", "切线方程", "轨迹", "区域", "圆环", "面积", "内切圆", "切线", "动点", "参数法"],
+      date: "2026-10-31"
+    },
+    {
       slug: "ellipse-eccentricity",
       path: "demos/ellipse-eccentricity/",
       title: "椭圆的离心率：形状到底由谁决定",
