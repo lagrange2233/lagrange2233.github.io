@@ -26,6 +26,18 @@ window.DEMOS = {
      索引页的三行筛选就是按这三个字段做的，漏了这条演示在筛选里会失踪。 */
   demos: [
     {
+      slug: "parabola-focus-sum",
+      path: "demos/parabola-focus-sum/",
+      title: "抛物线上 $|MF|+|MA|$ 的最小值",
+      subtitle: "焦点到准线距离为 4，于是 $y^{2}=8x$。把 $|MF|$ 换成 $M$ 到准线的水平距离后，$|MF|+|MA|$ 就是折线 $A\\to M\\to M'$ 的长度：拖动 $M$，看它只在 $y=3$ 处被拉直成 $|AA'|=4$，其余位置都更长",
+      topic: "解析几何",
+      grade: "高二",
+      book: "选择性必修一",
+      level: 2,
+      tags: ["抛物线", "抛物线的定义", "焦点", "准线", "距离之和", "最值", "折线拉直", "三角不等式", "转化", "点的位置", "例4-2"],
+      date: "2026-11-23"
+    },
+    {
       slug: "fold-pyramid",
       path: "demos/fold-pyramid/",
       title: "2025临沂期中T18——折叠问题",
