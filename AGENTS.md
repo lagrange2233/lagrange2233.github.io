@@ -106,3 +106,9 @@ chmod +x .git/hooks/pre-commit
 - **`github.com` 偶尔连不上**，但 `api.github.com` 和站点本身通常正常。等几分钟再 push，
   不要为此改用 force push 或重建仓库。
 - **新设备首次 push** 会弹一次浏览器授权，凭据存进 Windows 凭据管理器，之后静默。凭据不要写进仓库。
+- **长公式在窄屏会把网格撑破。** `.steps{display:grid}` 的子项默认 `min-width:auto`，而 KaTeX 的独立公式
+  （`span.katex-display`）不会换行，一旦宽过容器就把整页顶出横向滚动条、右侧文字被裁。修法三件套：
+  `.steps{grid-template-columns:minmax(0,1fr)}`、`.step{min-width:0}`、`.katex-display{overflow-x:auto;overflow-y:hidden}`。
+  照 `demos/parabola-focus-sum/` 的样式抄即可；旧的 `chord-of-contact` 还没加，窄屏下大概率也有同样问题。
+- **判断窄屏别用无头 Edge 量。** Windows 上它的最小视口约 481px，给 `--window-size=430` 会按 481 排版再裁图，
+  看起来像页面溢出，其实是截图工具的锅。要验窄屏就截 560 宽，并顺手看一眼 `document.documentElement.scrollWidth` 是否等于 `clientWidth`。
