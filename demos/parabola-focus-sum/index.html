@@ -3,9 +3,9 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>抛物线 |MF|+|MA| 的最小值 · 高中数学动态演示</title>
+<title>抛物线上 |MF|+|MA| 最小值探究 · 高中数学动态演示</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%232563eb'/%3E%3Ctext x='16' y='23' font-size='19' font-family='Georgia,serif' font-style='italic' fill='%23fff' text-anchor='middle'%3Ef%3C/text%3E%3C/svg%3E" />
-<meta name="description" content="例4-2：抛物线 y²=8x 上一点 M，A(2,3)，求 |MF|+|MA| 的最小值。拖动 M，看 |MF| 换成到准线的水平距离后，折线 A→M→M′ 何时被拉直成 |AA′|=4。" />
+<meta name="description" content="例4-2 的探究：抛物线 y²=8x 上一点 M，A 取 (2,3) 时 |MF|+|MA| 最小为 4（折线 A→M→M′ 拉直）；A 换成 (2,5) 落到抛物线外侧，折线拉不直，改让 A、M、F 共线，最小值变成 |AF|=5。" />
 <link rel="stylesheet" href="../../assets/katex/katex.min.css" />
 <script src="../../assets/katex/katex.min.js"></script>
 <script src="../../assets/katex/auto-render.min.js"></script>
@@ -40,6 +40,17 @@
   }
   h1{font-size:23px;line-height:1.35;margin:0 0 8px;letter-spacing:.2px}
   .sub{margin:0;color:var(--ink2);font-size:14px}
+
+  .cases{display:inline-flex;gap:6px;margin-top:14px;padding:4px;background:#e8eef8;border:1px solid #dbe6f5;border-radius:13px}
+  .case{
+    font-family:inherit;font-size:13.5px;font-weight:600;color:var(--ink2);
+    background:transparent;border:none;border-radius:10px;padding:6px 14px;cursor:pointer;
+    display:inline-flex;align-items:baseline;gap:8px;transition:.16s ease;
+  }
+  .case small{font-size:11.5px;font-weight:600;color:var(--ink3)}
+  .case:hover{color:var(--blue)}
+  .case.on{background:#fff;color:var(--blue);box-shadow:0 1px 3px rgba(22,32,47,.14)}
+  .case.on small{color:#5b89d6}
   .katex{font-size:1.02em}
   p .katex, li .katex, td .katex, .m-label .katex{font-size:1.04em}
 
@@ -149,6 +160,15 @@
   .answer .eq b{color:#b91c1c}
   .warnbox{margin-top:14px;padding:13px 16px;border-radius:12px;background:#fffaf2;border:1px solid #f3e2c3;font-size:13.4px;line-height:1.85;color:#4a3a20}
   .warnbox b{color:#a26200}
+
+  .table-wrap{overflow-x:auto;margin:9px 0 4px}
+  .gtable{width:100%;min-width:540px;border-collapse:separate;border-spacing:0;font-size:12.8px;color:#28374d;border:1px solid #e7eef8;border-radius:12px;overflow:hidden}
+  .gtable th,.gtable td{padding:8px 10px;text-align:left;border-bottom:1px solid #f0f5fc;vertical-align:middle}
+  .gtable th{background:#f7fafd;font-size:11.8px;font-weight:700;color:#5b6b82;white-space:nowrap}
+  .gtable tbody tr:last-child td{border-bottom:none}
+  .gtable td.m{font-family:var(--serif);white-space:nowrap}
+  .gtable .ncell{text-align:center;font-family:var(--serif);font-size:14.5px;font-weight:700;color:#1d3a6b}
+  .gtable .yes{color:#0b7a53;font-weight:700}
   @media (max-width:940px){
     .main{grid-template-columns:1fr}
     #cv{height:420px}
@@ -165,8 +185,13 @@
   <header>
     <a class="back" href="../../index.html">&larr; 全部演示</a>
     <div class="eyebrow">高中解析几何 · 圆锥曲线</div>
-    <h1>抛物线上的 $|MF|+|MA|$：最小值为什么是 4</h1>
-    <p class="sub">已知抛物线 $C:y^{2}=2px\ (p&gt;0)$ 的焦点 $F$ 到其准线的距离为 4，$M$ 是 $C$ 上一点，$A(2,3)$，求 $|MF|+|MA|$ 的最小值。<b>拖动抛物线上的 $M$</b>，看 $|MF|$ 如何被换成「$M$ 到准线的水平距离」，再看折线 $A\to M\to M'$ 什么时候被拉直。</p>
+    <h1>抛物线上 $|MF|+|MA|$ 最小值探究</h1>
+    <p class="sub">已知抛物线 $C:y^{2}=2px\ (p&gt;0)$ 的焦点 $F$ 到其准线的距离为 4，$M$ 是 $C$ 上一点。把 $A$ 放在 <b>$(2,3)$</b> 或 <b>$(2,5)$</b> 试试：前者在焦点这一侧，折线 $A\to M\to M'$ 能拉直成 $|AA'|=4$；后者落到抛物线外侧，折线怎么也拉不到 4，得改让 $A,M,F$ 共线，最小值变成 $|AF|=5$。拖动 $M$ 自己验证。</p>
+
+    <div class="cases" id="cases">
+      <button class="case on" data-ay="3">$A(2,3)$<small>焦点这一侧</small></button>
+      <button class="case" data-ay="5">$A(2,5)$<small>抛物线外侧</small></button>
+    </div>
   </header>
 
   <div class="main">
@@ -183,7 +208,7 @@
         <span><i style="border-color:#d98a00"></i>$|MF|$</span>
         <span><i style="border-color:#d98a00;border-top-style:dashed"></i>$|MM'|$（与 $|MF|$ 等长）</span>
         <span><i style="border-color:#dc2626"></i>$|MA|$</span>
-        <span><i style="border-color:#0f8a5f;border-top-style:dashed"></i>$y=3$：折线拉直的方向</span>
+        <span><i style="border-color:#0f8a5f;border-top-style:dashed"></i><span id="lgTarget"></span></span>
       </div>
       <div class="controls">
         <button class="btn primary" id="play">暂停</button>
@@ -193,7 +218,7 @@
           <input type="range" id="slider" min="-2" max="5.2" step="0.01" value="0.8" />
           <span class="val" id="tRead">0.80</span>
         </div>
-        <button class="btn switch on" id="tFold"><span class="sw"></span>折线 $A\to M\to M'$</button>
+        <button class="btn switch on" id="tFold"><span class="sw"></span>折线高亮</button>
       </div>
     </section>
 
@@ -205,9 +230,9 @@
       <div class="metric"><span class="m-label">$|MF|+|MA|$</span><span class="m-val" id="vSum">4.91</span></div>
 
       <div class="bars">
-        <div class="bar-head"><span>折线 $A\to M\to M'$ 的长度</span><b id="barVal">4.91</b></div>
+        <div class="bar-head"><span id="barSumLabel"></span><b id="barVal">4.91</b></div>
         <div class="track"><i class="seg seg-a" id="segMA"></i><i class="seg seg-b" id="segMM"></i></div>
-        <div class="bar-head"><span>直线 $A\to A'$ 的长度</span><b>4.00</b></div>
+        <div class="bar-head"><span id="barTargetLabel"></span><b id="barTargetVal">4.00</b></div>
         <div class="track"><i class="seg seg-ref" id="segRef"></i></div>
         <div class="gap" id="vGap">比 4 多 <b>0.91</b></div>
       </div>
@@ -220,12 +245,12 @@
         <div class="vv" id="vv">折线还折着，比 4 长</div>
       </div>
 
-      <p class="tip">$|MF|$ 是「两点间距离」，$|MM'|$ 是「到一条直线的距离」——抛物线定义说它们永远相等。所以求 $|MF|+|MA|$ 的最小值，等于求折线 $A\to M\to M'$ 的最短长度。</p>
+      <p class="tip">$|MF|$ 是「两点间距离」，$|MM'|$ 是「到一条直线的距离」——抛物线定义说它们永远相等，所以 $|MF|+|MA|$ 就是折线 $A\to M\to M'$ 的长度。这条折线能不能拉直，却要看 $A$ 站在哪一侧：在内侧能，在外侧不能，那时得改让 $A,M,F$ 共线。</p>
     </aside>
   </div>
 
   <section class="card solution">
-    <h2><span class="bar"></span>解题过程</h2>
+    <h2><span class="bar"></span>先解原题：$A(2,3)$ 时最小值是 4</h2>
     <p class="lead">关键是第一步的翻译：把「到焦点的距离」换成「到准线的距离」。换完之后，两段线段首尾相接，能不能拉直一眼就能看出来。</p>
 
     <div class="steps">
@@ -285,6 +310,63 @@
 
     <div class="warnbox">
       <b>易错点。</b>看到 $A(2,3)$、$F(2,0)$ 就顺手写 $|AF|=3$ 是不对的：$A$ 不在抛物线上，动点 $M$ 只能沿抛物线走，$M$ 越靠近 $A$，$|MA|$ 确实变小，但此时 $|MF|$ 会同时变大。图上把 $M$ 拖到 $A$ 附近就能看到：两段一增一减，和始终大于 4，只有 $M$ 落在 $y=3$ 的那一点才恰好取到 4。
+      <br><br>
+      <b>换成 $A(2,5)$ 就别再套 4 了。</b>$y=5$ 这条横线根本不经过抛物线，折线拉不直，4 取不到。判断办法很简单：看 $A$ 与焦点在不在抛物线同侧——同侧才往准线拉，异侧就往焦点拉。
+    </div>
+  </section>
+
+  <section class="card solution">
+    <h2><span class="bar"></span>若 $A(2,5)$：折线拉不直了，改往焦点拉</h2>
+    <p class="lead">横坐标不动，只把 $A$ 抬到 $(2,5)$，答案就从 4 变成 5。差别不在计算，而在 $A$ 站到了抛物线的另一侧。</p>
+
+    <div class="steps">
+      <div class="step">
+        <div class="num">1</div>
+        <div class="body">
+          <p>先给 $A$ 定位。抛物线上横坐标为 $2$ 的点只有 $(2,\pm4)$，而 $A(2,5)$ 在 $(2,4)$ 上方，落在<b>抛物线外侧</b>——与焦点分居曲线的两侧。</p>
+          <p>后果很直接：线段 $AA'$（即 $y=5,\ -2\le x\le 2$）上<b>一个抛物线上的点也没有</b>。折线 $A\to M\to M'$ 想拉直，就得让 $M$ 落在这条线段上，而它做不到。所以上一节算出的 $4$ 只是个够不着的下界。</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="num">2</div>
+        <div class="body">
+          <p>换一条路：不管准线了，直接对 $A,M,F$ 用三角不等式，</p>
+          <p class="eqline">$$|MA|+|MF|\ \ge\ |AF|=\sqrt{(2-2)^{2}+(5-0)^{2}}=5$$</p>
+          <p>这个下界只用到 $A$ 与焦点 $F$ 的位置，与 $M$ 在不在抛物线上无关，所以它对曲线上的每一点都成立。</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="num">3</div>
+        <div class="body">
+          <p>取等条件：$M$ 落在线段 $AF$ 上。线段 $AF$ 就是 $x=2,\ 0\le y\le 5$，代入 $y^{2}=8x$ 得 $y=\pm4$，其中 $y=4$ 落在线段内（$y=-4$ 舍去）。于是</p>
+          <p class="eqline">$$M_0(2,4)\ \text{在抛物线上},\qquad |MF|=4,\quad |MA|=1,\quad 4+1=5$$</p>
+          <p>并且 $A,M_0,F$ 三点共线、$M_0$ 夹在 $A$ 与 $F$ 之间，等号确实取得到。</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="num">4</div>
+        <div class="body">
+          <p>两个位置摆在一起，规律就清楚了：$x=2$ 时抛物线只到 $y=\pm4$，这条界线把 $A$ 分成两种命运——</p>
+          <div class="table-wrap">
+            <table class="gtable">
+              <thead>
+                <tr><th>$A$ 的位置</th><th>在哪一侧</th><th>拉直哪条线</th><th>最小值</th><th>取等点 $M_0$</th></tr>
+              </thead>
+              <tbody>
+                <tr><td class="m">$(2,3)$</td><td>焦点这一侧</td><td class="m">$AA'$（到准线）</td><td class="ncell">4</td><td class="m">$\left(\dfrac98,3\right)$</td></tr>
+                <tr><td class="m">$(2,4)$</td><td>正好在抛物线上</td><td>两种都行</td><td class="ncell">4</td><td class="m">$(2,4)$</td></tr>
+                <tr><td class="m">$(2,5)$</td><td>抛物线外侧</td><td class="m">$AF$（到焦点）</td><td class="ncell">5</td><td class="m">$(2,4)$</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p>中间那行 $A(2,4)$ 有点意思：它本身就在抛物线上，$M$ 取 $A$ 自己即可，$|MF|+|MA|=4+0=4$，两个答案在这里接上。</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="answer">
+      <span class="tagline">对比</span>
+      <span class="eq">$A(2,3)$：最小 <b>4</b>　·　$A(2,5)$：最小 <b>5</b></span>
     </div>
   </section>
 </div>
@@ -296,15 +378,20 @@
   /* ============ 数学设定：p=4，y²=8x，F(2,0)，准线 x=-2 ============ */
   var DIR = -2;                    // 准线 x = -2
   var PX  = 2;                     // 焦点横坐标（也是 A 的横坐标）
-  var AY  = 3;                     // A 的纵坐标
-  var TMIN = -2.0, TMAX = 5.2, TOPT = 3;   // M 的参数 y 的取值范围
-  var FMIN = 3.5, FMAX = 8.3;      // 小函数图的纵轴范围
+  var CRIT = 4;                    // 抛物线在 x=2 处的纵坐标，A 在内侧 / 外侧的分界
+  var AY  = 3;                     // A 的纵坐标：3（焦点这一侧）或 5（抛物线外侧）
+  var TMIN = -2.0, TMAX = 5.2;     // M 的参数 y 的取值范围
+  var FMIN = 3.4, FMAX = 8.4;      // 小函数图的纵轴范围（随 A 重新计算）
   var MAXBAR = 8.3;
 
   function xOf(t){ return t * t / 8; }
   function mfOf(t){ return xOf(t) + 2; }
   function maOf(t){ return Math.hypot(xOf(t) - PX, t - AY); }
   function sumOf(t){ return mfOf(t) + maOf(t); }
+  /* A 在焦点侧：拉直 AA′，最小值 4；A 在外侧：拉直 AF，最小值 |AF| = AY */
+  function isInner(){ return AY <= CRIT; }
+  function tOptOf(){ return isInner() ? AY : CRIT; }
+  function minOf(){ return isInner() ? CRIT : AY; }
 
   var cv = document.getElementById('cv');
   var ctx = cv.getContext('2d');
@@ -332,14 +419,19 @@
     tFold: document.getElementById('tFold'),
     hint: document.getElementById('hint'),
     banner: document.getElementById('banner'),
+    cases: document.getElementById('cases'),
+    lgTarget: document.getElementById('lgTarget'),
     vM: document.getElementById('vM'),
     vMF: document.getElementById('vMF'),
     vMA: document.getElementById('vMA'),
     vSum: document.getElementById('vSum'),
+    barSumLabel: document.getElementById('barSumLabel'),
     barVal: document.getElementById('barVal'),
     segMA: document.getElementById('segMA'),
     segMM: document.getElementById('segMM'),
     segRef: document.getElementById('segRef'),
+    barTargetLabel: document.getElementById('barTargetLabel'),
+    barTargetVal: document.getElementById('barTargetVal'),
     vGap: document.getElementById('vGap'),
     verdict: document.getElementById('verdict'),
     vv: document.getElementById('vv')
@@ -486,11 +578,16 @@
     ctx.restore();
   }
 
+  /* 折线要拉直成的那条直线：内侧是 A→A′（水平），外侧是 A→F（竖直） */
   function drawTargetLine(){
     ctx.save();
     ctx.setLineDash([5, 6]);
     ctx.beginPath();
-    ctx.moveTo(X(DIR), Y(AY)); ctx.lineTo(X(PX), Y(AY));
+    if (isInner()){
+      ctx.moveTo(X(DIR), Y(AY)); ctx.lineTo(X(PX), Y(AY));
+    } else {
+      ctx.moveTo(X(PX), Y(0)); ctx.lineTo(X(PX), Y(AY));
+    }
     ctx.strokeStyle = 'rgba(15,138,95,.55)';
     ctx.lineWidth = 1.6;
     ctx.stroke();
@@ -538,29 +635,34 @@
     var F  = [PX, 0];
     var A  = [PX, AY];
     var Ap = [DIR, AY];
-    var nearOpt = Math.abs(t - TOPT) < 0.045;
+    var nearOpt = Math.abs(t - tOptOf()) < 0.045;
     var pulse = 0.5 + 0.5 * Math.sin((now || 0) / 400);
 
-    /* 折线底衬：像一根绳子 */
+    /* 折线底衬：内侧走准线 A→M→M′，外侧走焦点 A→M→F */
     if (state.fold){
       ctx.save();
       ctx.lineJoin = 'round'; ctx.lineCap = 'round';
       ctx.beginPath();
       ctx.moveTo(X(A[0]), Y(A[1]));
       ctx.lineTo(X(M[0]), Y(M[1]));
-      ctx.lineTo(X(Mp[0]), Y(Mp[1]));
+      if (isInner()) ctx.lineTo(X(Mp[0]), Y(Mp[1]));
+      else ctx.lineTo(X(F[0]), Y(F[1]));
       ctx.strokeStyle = nearOpt ? 'rgba(15,138,95,.16)' : 'rgba(220,38,38,.10)';
       ctx.lineWidth = 11;
       ctx.stroke();
       ctx.restore();
     }
 
-    /* 最优时的 AA' 加粗高亮 */
+    /* 最优时把目标线段加粗高亮 */
     if (nearOpt){
       ctx.save();
       ctx.lineCap = 'round';
       ctx.beginPath();
-      ctx.moveTo(X(DIR), Y(AY)); ctx.lineTo(X(PX), Y(AY));
+      if (isInner()){
+        ctx.moveTo(X(DIR), Y(AY)); ctx.lineTo(X(PX), Y(AY));
+      } else {
+        ctx.moveTo(X(PX), Y(0)); ctx.lineTo(X(PX), Y(AY));
+      }
       ctx.strokeStyle = 'rgba(15,138,95,.28)';
       ctx.lineWidth = 8;
       ctx.stroke();
@@ -599,7 +701,7 @@
 
     /* 点 */
     dot(Mp, 4.2, '#fff', '#d98a00');
-    dot(Ap, 4.2, '#fff', '#0f8a5f');
+    if (isInner()) dot(Ap, 4.2, '#fff', '#0f8a5f');
     dot(A, 5.5, '#dc2626', '#fff');
     dot(F, 5, '#0f8a5f', '#fff');
 
@@ -613,15 +715,24 @@
     tag(X(DIR), Y(VY1) + 20, 'l:\ x=-2', '#8494a8', 'center');
     var lx = xOf(3.55), ly = 3.55;
     tag(X(lx) + 10, Y(ly) - 2, 'C:\ y^{2}=8x', '#1e3a8a', 'left');
-    tag(X(A[0]) + 13, Y(A[1]) + 14, 'A(2,3)', '#dc2626', 'left');
+    tag(X(A[0]) + 13, Y(A[1]) + 14, 'A(2,' + AY + ')', '#dc2626', 'left');
     tag(X(F[0]) + 12, Y(F[1]) + 12, 'F(2,0)', '#0f8a5f', 'left');
 
-    var merged = Math.abs(t - AY) < 0.18;
-    tag(X(DIR) - 9, Y(AY) - 18, merged ? "A'\\!=\\!M'" : "A'", '#0f8a5f', 'left');
+    var merged = isInner() && Math.abs(t - AY) < 0.18;
+    if (isInner()){
+      tag(X(DIR) - 9, Y(AY) - 18, merged ? "A'\\!=\\!M'" : "A'", '#0f8a5f', 'left');
+    }
     if (!merged){
       tag(X(DIR) + 9, Y(t) - 18, "M'", '#b8770a', 'left');
     }
     tag(X(M[0]) - 15, Y(M[1]) - 26, 'M', '#2563eb', 'left');
+
+    /* 目标线段的名字 */
+    if (isInner()){
+      tag(X((DIR + PX) / 2), Y(AY) + 17, "|AA'|", '#0f8a5f', 'center');
+    } else {
+      tag(X(PX) + 11, Y(AY / 2), '|AF|', '#0f8a5f', 'left');
+    }
 
     /* 线段符号标签：沿法向推开，避免都挤在 M 附近；画布小时省略，数值看面板 */
     function segLabel(p1, p2, tex, color, side){
@@ -654,6 +765,19 @@
     return true;
   }
 
+  /* 随 A 的位置重算 f 的纵轴范围，保证曲线总在框里 */
+  function computeRange(){
+    var lo = Infinity, hi = -Infinity, i, t, f;
+    for (i = 0; i <= 160; i++){
+      t = TMIN + (TMAX - TMIN) * i / 160;
+      f = sumOf(t);
+      if (f < lo) lo = f;
+      if (f > hi) hi = f;
+    }
+    FMIN = lo - 0.55;
+    FMAX = hi + 0.4;
+  }
+
   function drawMini(){
     if (!miniLayout()) return;
     var w = miniW, h = miniH;
@@ -670,9 +794,9 @@
     mctx.strokeStyle = '#eef3fa';
     mctx.lineWidth = 1;
     mctx.beginPath();
-    [4, 5, 6, 7, 8].forEach(function(f){
-      mctx.moveTo(x0, my(f)); mctx.lineTo(x1, my(f));
-    });
+    for (var g = Math.ceil(FMIN); g <= Math.floor(FMAX); g++){
+      mctx.moveTo(x0, my(g)); mctx.lineTo(x1, my(g));
+    }
     mctx.stroke();
 
     /* 最小值参考线 */
@@ -680,7 +804,7 @@
     mctx.setLineDash([4, 4]);
     mctx.strokeStyle = '#bfe4d2';
     mctx.beginPath();
-    mctx.moveTo(x0, my(4)); mctx.lineTo(x1, my(4));
+    mctx.moveTo(x0, my(minOf())); mctx.lineTo(x1, my(minOf()));
     mctx.stroke();
     mctx.restore();
 
@@ -697,13 +821,13 @@
 
     /* 最优位置 */
     mctx.beginPath();
-    mctx.arc(mx(TOPT), my(4), 4, 0, Math.PI * 2);
+    mctx.arc(mx(tOptOf()), my(minOf()), 4, 0, Math.PI * 2);
     mctx.fillStyle = '#0f8a5f';
     mctx.fill();
     mctx.fillStyle = '#0b7a53';
     mctx.font = '600 10.5px "Segoe UI","Microsoft YaHei",sans-serif';
     mctx.textAlign = 'left'; mctx.textBaseline = 'bottom';
-    mctx.fillText('min 4', mx(TOPT) + 7, my(4) - 1);
+    mctx.fillText('min ' + minOf(), mx(tOptOf()) + 7, my(minOf()) - 1);
 
     /* 当前点 */
     var f = sumOf(state.t);
@@ -725,10 +849,10 @@
     mctx.fillStyle = '#a3aebf';
     mctx.font = '10px "Segoe UI","Microsoft YaHei",sans-serif';
     mctx.textAlign = 'center'; mctx.textBaseline = 'top';
-    mctx.fillText('3', mx(3), y1 + 4);
+    mctx.fillText(String(tOptOf()), mx(tOptOf()), y1 + 4);
     mctx.fillText('0', mx(0) + 1, y1 + 4);
     mctx.textAlign = 'right'; mctx.textBaseline = 'middle';
-    mctx.fillText('4', x0 - 5, my(4));
+    mctx.fillText(String(minOf()), x0 - 5, my(minOf()));
   }
 
   /* ============ 面板 ============ */
@@ -740,7 +864,8 @@
 
   function updateUI(){
     var t = state.t, x = xOf(t);
-    var mf = mfOf(t), ma = maOf(t), sum = mf + ma, gap = sum - 4;
+    var mf = mfOf(t), ma = maOf(t), sum = mf + ma;
+    var mn = minOf(), gap = sum - mn;
     var best = Math.abs(gap) < 0.005;
 
     setText(els.vM, '(' + fmt(x, 2) + ', ' + fmt(t, 2) + ')');
@@ -749,24 +874,27 @@
     setText(els.vSum, fmt(sum, 2));
     setText(els.barVal, fmt(sum, 2));
     setText(els.tRead, fmt(t, 2));
+    setText(els.barTargetVal, fmt(mn, 2));
 
     els.vSum.className = 'm-val' + (best ? ' best' : '');
 
     els.segMA.style.width = (ma / MAXBAR * 100).toFixed(2) + '%';
     els.segMM.style.width = (mf / MAXBAR * 100).toFixed(2) + '%';
-    els.segRef.style.width = (4 / MAXBAR * 100).toFixed(2) + '%';
+    els.segRef.style.width = (mn / MAXBAR * 100).toFixed(2) + '%';
 
     if (best){
-      els.vGap.textContent = '正好等于 4 —— 折线被拉直了';
+      els.vGap.textContent = '正好等于 ' + mn + ' —— 折线被拉直了';
       els.verdict.className = 'verdict ok';
-      setText(els.vv, '折线拉直：|MF|+|MA| = 4');
+      setText(els.vv, isInner()
+        ? '折线拉直：|MF|+|MA| = 4'
+        : '三点共线：|MF|+|MA| = |AF| = 5');
     } else {
-      els.vGap.innerHTML = '比 4 多 <b>' + fmt(gap, 2) + '</b>';
+      els.vGap.innerHTML = '比 ' + mn + ' 多 <b>' + fmt(gap, 2) + '</b>';
       els.verdict.className = 'verdict';
-      setText(els.vv, '折线还折着，比 4 长 ' + fmt(gap, 2));
+      setText(els.vv, '折线还折着，比 ' + mn + ' 长 ' + fmt(gap, 2));
     }
 
-    els.banner.classList.toggle('show', Math.abs(t - TOPT) < 0.045);
+    els.banner.classList.toggle('show', Math.abs(t - tOptOf()) < 0.045);
 
     if (document.activeElement !== els.slider){
       els.slider.value = String(t);
@@ -788,7 +916,8 @@
       state.t += state.dir * SPEED * dt;
       if (state.t > TMAX){ state.t = TMAX; state.dir = -1; }
       if (state.t < TMIN){ state.t = TMIN; state.dir = 1; }
-      if ((prev - TOPT) * (state.t - TOPT) < 0) state.pauseUntil = now + 650;
+      var to = tOptOf();
+      if ((prev - to) * (state.t - to) < 0) state.pauseUntil = now + 650;
     }
 
     draw(now);
@@ -842,7 +971,41 @@
   });
 
   els.best.addEventListener('click', function(){
-    state.t = TOPT;
+    state.t = tOptOf();
+    setPlaying(false);
+    els.hint.classList.add('off');
+  });
+
+  /* 切换 A 的位置：内侧走准线，外侧走焦点 */
+  function texOf(s){
+    try { return katex.renderToString(s, { throwOnError: false, strict: false }); }
+    catch (e){ return s; }
+  }
+
+  function applyCase(ay){
+    AY = ay;
+    var inner = isInner();
+    els.barSumLabel.innerHTML = '折线 ' + texOf(inner ? "A\\to M\\to M'" : "A\\to M\\to F") + ' 的长度';
+    els.barTargetLabel.innerHTML = '直线 ' + texOf(inner ? "A\\to A'" : "A\\to F") + ' 的长度';
+    els.lgTarget.innerHTML = texOf(inner ? 'y=3' : 'x=2') + '：折线拉直的方向';
+    els.banner.innerHTML = inner
+      ? '折线被拉直：' + texOf("|MF|+|MA|=|AA'|=4")
+      : '三点共线：' + texOf("|MF|+|MA|=|AF|=5");
+    sizeCache = {};
+    computeRange();
+    var btns = els.cases.querySelectorAll('.case');
+    for (var i = 0; i < btns.length; i++){
+      btns[i].classList.toggle('on', parseFloat(btns[i].getAttribute('data-ay')) === ay);
+    }
+  }
+
+  els.cases.addEventListener('click', function(e){
+    var b = e.target.closest ? e.target.closest('.case') : null;
+    if (!b) return;
+    var ay = parseFloat(b.getAttribute('data-ay'));
+    if (ay === AY) return;
+    applyCase(ay);
+    state.t = tOptOf();
     setPlaying(false);
     els.hint.classList.add('off');
   });
@@ -864,6 +1027,7 @@
     new ResizeObserver(function(){ resize(); }).observe(cv);
   }
 
+  applyCase(3);
   resize();
   requestAnimationFrame(loop);
 })();
