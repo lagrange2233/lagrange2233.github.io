@@ -26,6 +26,18 @@ window.DEMOS = {
      索引页的三行筛选就是按这三个字段做的，漏了这条演示在筛选里会失踪。 */
   demos: [
     {
+      slug: "parabola-fixed-point",
+      path: "demos/parabola-fixed-point/",
+      title: "抛物线中 $OA\\perp OB$ 时，直线 $AB$ 恒过定点 $(2p,0)$",
+      subtitle: "拖动倾斜角 $\\theta$ 让弦 $AB$ 转动：$A$、$B$ 一路在动，而 $\\angle AOB$ 始终是 $90^\\circ$、$AB$ 始终穿过 $x$ 轴上的同一点。再拖 $p$，看定点为什么只由 $p$ 决定",
+      topic: "解析几何",
+      grade: "高二",
+      book: "选择性必修一",
+      level: 3,
+      tags: ["抛物线", "定点", "垂直", "参数法", "t1t2=-1", "联立", "弦", "圆锥曲线", "斜率之积"],
+      date: "2026-11-25"
+    },
+    {
       slug: "parabola-focus-sum",
       path: "demos/parabola-focus-sum/",
       title: "抛物线上 $|MF|+|MA|$ 最小值探究",

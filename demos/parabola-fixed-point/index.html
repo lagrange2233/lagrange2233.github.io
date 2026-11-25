@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>抛物线中 OA⊥OB 时的定点问题 · 动态演示</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%232563eb'/%3E%3Ctext x='16' y='23' font-size='19' font-family='Georgia,serif' font-style='italic' fill='%23fff' text-anchor='middle'%3Ef%3C/text%3E%3C/svg%3E" />
+<meta name="description" content="A、B 是抛物线 y²=2px 上两点且 OA⊥OB，拖动倾斜角让弦 AB 转动，看它为什么始终穿过 x 轴上的定点 (2p,0)。" />
+<!-- KaTeX：本地共享副本，全站只下载并缓存一次（相对站点根） -->
+<link rel="stylesheet" href="../../assets/katex/katex.min.css" />
+<script src="../../assets/katex/katex.min.js"></script>
+<script src="../../assets/katex/auto-render.min.js"></script>
+<style>
+  :root{
+    --bg:#f1f5fa; --card:#ffffff; --ink:#16202f; --ink2:#5c6a7e; --ink3:#8c99ab;
+    --line:#e1e9f3; --blue:#2563eb; --amber:#d98a00; --orange:#ea580c;
+    --teal:#0d9488; --red:#dc2626; --green:#0f8a5f;
+    --serif:"Cambria Math","Times New Roman",Georgia,serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:
+      radial-gradient(1100px 480px at 12% -10%, #e4efff 0%, rgba(228,239,255,0) 62%),
+      radial-gradient(900px 460px at 95% 0%, #fdf1e2 0%, rgba(253,241,226,0) 55%),
+      var(--bg);
+    color:var(--ink);
+    font-family:"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,-apple-system,sans-serif;
+    -webkit-font-smoothing:antialiased;
+    line-height:1.65;
+  }
+  .page{max-width:1200px;margin:0 auto;padding:26px 20px 64px}
+  .back{
+    display:inline-flex;align-items:center;gap:5px;margin-bottom:11px;
+    font-size:12.5px;font-weight:600;color:var(--ink2);text-decoration:none;
+    background:#fff;border:1px solid var(--line);border-radius:999px;padding:4px 12px;
+    transition:.16s ease;
+  }
+  .back:hover{color:var(--blue);border-color:#a8c2e8;background:#f4f9ff;transform:translateY(-1px)}
+  .eyebrow{
+    display:inline-flex;align-items:center;gap:7px;
+    font-size:12px;letter-spacing:.14em;color:var(--blue);
+    background:#e8f1ff;border:1px solid #cfe0fb;border-radius:999px;
+    padding:3px 11px;margin-bottom:10px;font-weight:600;
+  }
+  h1{font-size:23px;line-height:1.4;margin:0 0 8px;letter-spacing:.2px}
+  .sub{margin:0;color:var(--ink2);font-size:14px}
+  .katex{font-size:1.02em}
+  p .katex,li .katex,td .katex,th .katex{font-size:1.04em}
+
+  .main{display:grid;grid-template-columns:minmax(0,1fr) 336px;gap:18px;margin-top:18px;align-items:start}
+  .card{
+    background:var(--card);border:1px solid var(--line);border-radius:16px;
+    box-shadow:0 1px 2px rgba(22,32,47,.04), 0 12px 28px -18px rgba(22,32,47,.28);
+  }
+  .stage{overflow:hidden}
+  .cvbox{position:relative;background:#fff}
+  #cv{display:block;width:100%;height:552px;touch-action:none}
+
+  .legend{display:flex;flex-wrap:wrap;gap:6px 15px;padding:9px 15px 0;font-size:12px;color:var(--ink3)}
+  .legend span{display:inline-flex;align-items:center;white-space:nowrap}
+  .legend i{display:inline-block;width:15px;height:3px;border-radius:2px;margin-right:6px;vertical-align:middle}
+  .legend .lgdot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--red);vertical-align:middle;margin-right:6px}
+
+  .controls{
+    display:flex;flex-direction:column;gap:9px;
+    padding:11px 15px 13px;margin-top:9px;border-top:1px solid var(--line);
+    background:linear-gradient(180deg,#fafcff,#f5f9ff);
+  }
+  .ctrl-row{display:flex;flex-wrap:wrap;align-items:center;gap:9px}
+  .btn{
+    font-family:inherit;font-size:13px;font-weight:600;color:var(--ink);
+    background:#fff;border:1px solid #d5e0ee;border-radius:10px;
+    padding:7px 13px;cursor:pointer;transition:.16s ease;white-space:nowrap;
+  }
+  .btn:hover{border-color:#a8c2e8;background:#f4f9ff;transform:translateY(-1px)}
+  .btn:active{transform:translateY(0)}
+  .btn.primary{background:var(--blue);border-color:var(--blue);color:#fff;box-shadow:0 6px 14px -8px rgba(37,99,235,.9)}
+  .btn.primary:hover{background:#1d4ed8;border-color:#1d4ed8}
+
+  .slider-wrap{display:flex;align-items:center;gap:9px;flex:1 1 210px;min-width:170px}
+  .slider-wrap .lab{font-size:12.5px;color:var(--ink3);font-weight:600;white-space:nowrap}
+  .slider-wrap .val{font-family:var(--serif);font-size:14px;font-weight:700;color:var(--blue);min-width:56px;text-align:right;font-variant-numeric:tabular-nums}
+  #pSlider{--c:#0d9488}
+  #pSlider::-webkit-slider-thumb{background:var(--teal);box-shadow:0 1px 6px rgba(13,148,136,.55)}
+  input[type=range]{
+    -webkit-appearance:none;appearance:none;flex:1;height:4px;border-radius:3px;
+    background:linear-gradient(90deg,#dbe6f5,#dbe6f5);outline:none;cursor:pointer;
+  }
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none;width:16px;height:16px;border-radius:50%;
+    background:var(--blue);border:3px solid #fff;
+    box-shadow:0 1px 6px rgba(37,99,235,.55);cursor:grab;
+  }
+  input[type=range]::-moz-range-thumb{
+    width:14px;height:14px;border-radius:50%;background:var(--blue);
+    border:3px solid #fff;box-shadow:0 1px 6px rgba(37,99,235,.55);cursor:grab;
+  }
+
+  .quick{display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding-top:8px;border-top:1px dashed #e6eefa}
+  .quick .lab{font-size:12px;color:var(--ink3);font-weight:700;letter-spacing:.04em;margin-right:1px}
+  .qbtn{
+    font-family:var(--serif);font-size:12.5px;font-weight:700;color:var(--ink2);
+    background:#fff;border:1px solid #dde6f2;border-radius:8px;
+    padding:4px 10px;cursor:pointer;transition:.15s ease;white-space:nowrap;
+  }
+  .qbtn:hover{border-color:#a8c2e8;background:#f4f9ff;color:var(--blue)}
+  .qbtn.on{background:#14306b;border-color:#14306b;color:#fff;box-shadow:0 6px 14px -9px rgba(20,48,107,.9)}
+
+  .panel{padding:16px 18px 18px}
+  .panel h3{margin:0 0 12px;font-size:13px;letter-spacing:.12em;color:var(--ink3);font-weight:700}
+  .metric{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:7px 0;border-bottom:1px dashed #edf2f9}
+  .metric:last-of-type{border-bottom:none}
+  .m-label{font-size:13px;color:var(--ink2)}
+  .m-val{font-family:var(--serif);font-size:15.5px;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums;white-space:nowrap}
+  .m-val.fixed{color:var(--red)}
+  .m-val.ok{color:var(--teal)}
+  .divider{height:10px}
+  .chips{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px}
+  .chipbox{background:#f8fafd;border:1px solid #ecf1f8;border-radius:10px;padding:7px 10px}
+  .chipbox .k{display:block;font-size:11px;color:#8794a7;margin-bottom:2px}
+  .chipbox .v{display:block;font-family:var(--serif);font-size:14px;font-weight:700;color:#0f172a;font-variant-numeric:tabular-nums}
+  .chipbox.ok .v{color:var(--teal)}
+  .tip{margin:13px 0 0;font-size:12.5px;line-height:1.7;color:var(--ink3)}
+  .tip b{color:var(--ink2)}
+
+  .solution{margin-top:18px;padding:22px 24px 24px}
+  .solution h2{font-size:16px;margin:0 0 4px;display:flex;align-items:center;gap:9px}
+  .solution h2 .bar{width:3px;height:16px;border-radius:2px;background:var(--blue)}
+  .solution .lead{margin:6px 0 16px;font-size:13.5px;color:var(--ink2)}
+  .steps{display:grid;gap:11px}
+  .step{display:flex;gap:12px;padding:12px 14px;border-radius:12px;background:#fafcff;border:1px solid #edf2f9}
+  .step .num{
+    flex:none;width:22px;height:22px;border-radius:50%;background:#e8f1ff;color:#1d4ed8;
+    font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;margin-top:2px;
+  }
+  .step .body{flex:1 1 auto;min-width:0;font-size:13.8px;line-height:1.85;color:#28374d}
+  .step .body p{margin:0}
+  .step .body p + p{margin-top:5px}
+  .eqline{text-align:center;margin:4px 0 2px !important}
+  .katex-display{margin:.2em 0}
+  .katex-display>.katex{font-size:1.1em}
+  .hl{background:linear-gradient(180deg,transparent 62%,#ffe9a8 62%);font-weight:600;padding:0 1px}
+  .hl-red{background:linear-gradient(180deg,transparent 62%,#ffd3d3 62%);font-weight:700;padding:0 1px;color:#b91c1c}
+
+  .genbox{display:block;padding:12px 14px;border-radius:12px;background:#fafcff;border:1px solid #edf2f9;margin:0 0 12px}
+  .genbox p{margin:0;font-size:13.5px;line-height:1.85;color:#28374d}
+  .genbox p + p{margin-top:6px}
+  .genbox .glab{
+    display:inline-block;margin-bottom:6px;padding:2px 9px;border-radius:999px;
+    background:#eef4ff;color:#2f5fc4;font-size:11.5px;font-weight:700;letter-spacing:.04em;
+  }
+  .genkey{padding:14px 16px;border-radius:12px;margin:0 0 12px;background:linear-gradient(180deg,#fffdf7,#fff8ec);border:1px solid #f3e2c3}
+  .genkey p{margin:0;font-size:13.5px;line-height:1.85;color:#4a3a20}
+  .genkey p + p{margin-top:6px}
+  .answer{
+    margin-top:16px;padding:16px 20px;border-radius:14px;
+    background:linear-gradient(120deg,#eef5ff,#f7fbff 45%,#fff6ea);
+    border:1px solid #dbe8fb;display:flex;flex-wrap:wrap;align-items:center;gap:12px;
+  }
+  .answer .tagline{font-size:12px;font-weight:800;letter-spacing:.14em;color:#5c6a7e}
+  .answer .eq{font-family:var(--serif);font-size:19px;font-weight:700;color:#14306b}
+  .answer .eq b{color:#b91c1c}
+
+  @media (max-width:940px){
+    .main{grid-template-columns:1fr}
+    #cv{height:420px}
+    h1{font-size:20px}
+    .page{padding:20px 14px 48px}
+    .qbtn{padding:4px 8px;font-size:12px}
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <a class="back" href="../../index.html">&larr; 全部演示</a>
+  <div class="eyebrow">高中解析几何 · 抛物线与定点</div>
+  <h1>抛物线中 $OA\perp OB$ 时，直线 $AB$ 恒过定点</h1>
+  <p class="sub">$A$、$B$ 是抛物线 $y^{2}=2px$ 上的两点，且 $OA\perp OB$。拖动倾斜角 $\theta$ 让弦 $AB$ 绕定点转动：$A$、$B$ 的位置一直在变，但 $\angle AOB$ 始终是 $90^\circ$，直线 $AB$ 也始终穿过 $x$ 轴上的同一个点。再拖 $p$，看这个定点如何随 $p$ 左右移动。</p>
+
+  <div class="main">
+    <section class="card stage">
+      <div class="cvbox"><canvas id="cv"></canvas></div>
+      <div class="legend">
+        <span><i style="background:#2563eb"></i>抛物线 $y^{2}=2px$</span>
+        <span><i style="background:#ea580c"></i>直线 $AB$</span>
+        <span><i style="background:#0d9488"></i>$OA$、$OB$</span>
+        <span><span class="lgdot"></span>定点 $(2p,\,0)$</span>
+      </div>
+      <div class="controls">
+        <div class="ctrl-row">
+          <button class="btn primary" id="play">自动旋转</button>
+          <button class="btn" id="reset">重置</button>
+          <div class="slider-wrap">
+            <span class="lab">$\theta$</span>
+            <input type="range" id="thSlider" min="30" max="150" step="0.5" value="65" />
+            <span class="val" id="thVal">65.0°</span>
+          </div>
+          <div class="slider-wrap">
+            <span class="lab">$p$</span>
+            <input type="range" id="pSlider" min="0.4" max="2.4" step="0.02" value="1" />
+            <span class="val" id="pVal">1.00</span>
+          </div>
+        </div>
+        <div class="quick">
+          <span class="lab">情形直达</span>
+          <button class="qbtn" data-th="30">$\theta=30^\circ$</button>
+          <button class="qbtn" data-th="60">$\theta=60^\circ$</button>
+          <button class="qbtn" data-th="90">$\theta=90^\circ$</button>
+          <button class="qbtn" data-th="120">$\theta=120^\circ$</button>
+          <button class="qbtn" data-th="150">$\theta=150^\circ$</button>
+        </div>
+      </div>
+    </section>
+
+    <aside class="card panel">
+      <h3>实时数据</h3>
+      <div class="metric"><span class="m-label">倾斜角 $\theta$</span><span class="m-val" id="vTh">65.0°</span></div>
+      <div class="metric"><span class="m-label">定点 $(2p,\,0)$</span><span class="m-val fixed" id="vF">(2.00, 0)</span></div>
+      <div class="metric"><span class="m-label">$A$ 坐标</span><span class="m-val" id="vA">—</span></div>
+      <div class="metric"><span class="m-label">$B$ 坐标</span><span class="m-val" id="vB">—</span></div>
+
+      <div class="divider"></div>
+      <div class="chips">
+        <div class="chipbox ok"><span class="k">$\angle AOB$</span><span class="v" id="vAng">90.00°</span></div>
+        <div class="chipbox ok"><span class="k">$\vec{OA}\cdot\vec{OB}$</span><span class="v" id="vDot">0.000</span></div>
+        <div class="chipbox ok"><span class="k">$t_{1}t_{2}$</span><span class="v" id="vT">−1.000</span></div>
+        <div class="chipbox"><span class="k">$|AB|$</span><span class="v" id="vAB">—</span></div>
+      </div>
+
+      <p class="tip">三个量 $t_{1}t_{2}=-1$、$\vec{OA}\cdot\vec{OB}=0$、$\angle AOB=90^\circ$ 在拖动时<b>始终不变</b>，这正是「$AB$ 过定点」的另一面：定点由 $p$ 唯一确定，与 $\theta$ 无关。</p>
+    </aside>
+  </div>
+
+  <section class="card solution">
+    <h2><span class="bar"></span>参数法证明</h2>
+    <p class="lead">设 $A\left(2pt_{1}^{2},\,2pt_{1}\right)$，$B\left(2pt_{2}^{2},\,2pt_{2}\right)$，其中 $t_{1}\neq t_{2}$（两点都在 $y^{2}=2px$ 上，这是抛物线最省事的设法）。</p>
+
+    <div class="steps">
+      <div class="step">
+        <div class="num">1</div>
+        <div class="body">
+          <p>把「$OA\perp OB$」翻译成坐标运算：</p>
+          <p class="eqline">$$\vec{OA}\cdot\vec{OB}=4p^{2}t_{1}^{2}t_{2}^{2}+4p^{2}t_{1}t_{2}=4p^{2}t_{1}t_{2}\left(t_{1}t_{2}+1\right)=0$$</p>
+          <p>因 $t_{1}t_{2}\neq 0$（否则 $O$ 与 $A$ 或 $B$ 重合），故 <span class="hl">$t_{1}t_{2}=-1$</span>。</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="num">2</div>
+        <div class="body">
+          <p>求弦 $AB$ 的方程。斜率 $k=\dfrac{2pt_{2}-2pt_{1}}{2pt_{2}^{2}-2pt_{1}^{2}}=\dfrac{1}{t_{1}+t_{2}}$，点斜式整理得：</p>
+          <p class="eqline">$$x=\left(t_{1}+t_{2}\right)y-2pt_{1}t_{2}$$</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="num">3</div>
+        <div class="body">
+          <p>代入 $t_{1}t_{2}=-1$，得到与 $t_{1},t_{2}$ 的具体取值无关的形式：</p>
+          <p class="eqline">$$x=\left(t_{1}+t_{2}\right)y+2p$$</p>
+          <p>令 $y=0$，得 <span class="hl-red">$x=2p$</span>——不论 $t_{1}+t_{2}$ 取什么值，直线 $AB$ 都过点 $(2p,\,0)$。</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="num">4</div>
+        <div class="body">
+          <p>补上 $AB\perp x$ 轴的情形：此时 $x=2p$，取 $y=\pm 2p$，即 $A(2p,2p)$、$B(2p,-2p)$，仍有 $\vec{OA}\cdot\vec{OB}=4p^{2}-4p^{2}=0$，结论统一成立。</p>
+          <p>换句话说，斜率不存在的那种「漏网情形」也自动被包含，不需要单独排除。</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="answer">
+      <span class="tagline">结论</span>
+      <span class="eq">直线 $AB$ 恒过定点 $(2p,\,0)$</span>
+    </div>
+  </section>
+
+  <section class="card solution">
+    <h2><span class="bar"></span>反过来也成立，并且可以推广</h2>
+    <p class="lead">上面的推理只用了「过 $y$ 轴上的点、再看 $x$ 截距」，所以可以做两件事：验逆命题、换成一般的斜率之积。</p>
+
+    <div class="genbox">
+      <span class="glab">逆命题 · 联立法</span>
+      <p>设直线过 $(2p,\,0)$，写成 $x=my+2p$，代入 $y^{2}=2px$：</p>
+      <p class="eqline">$$y^{2}-2pmy-4p^{2}=0\;\Longrightarrow\;y_{1}y_{2}=-4p^{2}$$</p>
+      <p>于是 $t_{1}t_{2}=\dfrac{y_{1}y_{2}}{4p^{2}}=-1$，从而 $\vec{OA}\cdot\vec{OB}=0$。所以「$OA\perp OB$」与「$AB$ 过 $(2p,0)$」互为充要条件。</p>
+    </div>
+
+    <div class="genkey">
+      <p><b>推广：</b>若把垂直换成斜率之积为定值 $\lambda$（即 $k_{OA}\cdot k_{OB}=\lambda$），因为 $k_{OA}=\dfrac{1}{t_{1}}$、$k_{OB}=\dfrac{1}{t_{2}}$，得 $t_{1}t_{2}=\dfrac{1}{\lambda}$。代回 $x=(t_{1}+t_{2})y-2pt_{1}t_{2}$，令 $y=0$：</p>
+      <p class="eqline">$$x=-2pt_{1}t_{2}=-\frac{2p}{\lambda}$$</p>
+      <p>即 $AB$ 恒过 $\left(-\dfrac{2p}{\lambda},\,0\right)$。取 $\lambda=-1$ 正是本题的 $(2p,\,0)$；$\lambda<0$ 时定点落在 $y$ 轴右侧，$\lambda>0$ 时落在左侧，而 $|\lambda|$ 越大定点越靠近原点。</p>
+    </div>
+
+    <div class="answer">
+      <span class="tagline">一句话</span>
+      <span class="eq" style="font-size:15px;font-weight:600;color:#28374d">定点在 $x$ 轴上的位置只由「两点参数之积」$t_{1}t_{2}$ 决定，而 $t_{1}t_{2}$ 又只由 $OA$、$OB$ 的夹角（斜率之积）决定——与弦的具体位置无关。</span>
+    </div>
+  </section>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  var cv = document.getElementById('cv');
+  var ctx = cv.getContext('2d');
+  var thSlider = document.getElementById('thSlider');
+  var pSlider = document.getElementById('pSlider');
+  var playBtn = document.getElementById('play');
+  var resetBtn = document.getElementById('reset');
+  var qbtns = Array.prototype.slice.call(document.querySelectorAll('.qbtn'));
+
+  /* 页面里的 $...$ 统一交给 KaTeX 排版（画布外的公式） */
+  if (window.renderMathInElement) {
+    window.renderMathInElement(document.body, {
+      delimiters: [
+        { left: '$$', right: '$$', display: true },
+        { left: '$', right: '$', display: false }
+      ],
+      ignoredTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code', 'option'],
+      throwOnError: false,
+      strict: false
+    });
+  }
+
+  var S = { p: 1, theta: 65, playing: false, dir: 1, view: null };
+  var W = 640, H = 540, DPR = 1;
+
+  var C = {
+    grid: '#eff3f9', axis: '#cbd6e6', tick: '#aeb9c9',
+    parabola: '#2563eb', chord: '#ea580c', radius: '#0d9488',
+    fixed: '#dc2626', point: '#1d4ed8', label: '#334155'
+  };
+
+  /* ---------- 画布尺寸：取容器自身尺寸，避免边框把右侧算进去 ---------- */
+  function resize() {
+    DPR = Math.min(window.devicePixelRatio || 1, 2);
+    W = Math.max(300, Math.round(cv.clientWidth));
+    H = Math.max(280, Math.round(cv.clientHeight));
+    cv.width = Math.round(W * DPR);
+    cv.height = Math.round(H * DPR);
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  }
+
+  /* ---------- 几何：直线过 F(2p,0)，方向向量 (cosθ, sinθ) ---------- */
+  function geo() {
+    var p = S.p, th = S.theta * Math.PI / 180;
+    var ct = Math.cos(th), st = Math.sin(th), s2 = st * st;
+    var disc = Math.sqrt(ct * ct + 4 * s2);
+    var u = p * (ct + disc) / s2;   // 由 s²sin²θ − 2p cosθ·s − 4p² = 0 解出
+    var v = p * (ct - disc) / s2;
+    return {
+      p: p, ct: ct, st: st,
+      F: { x: 2 * p, y: 0 },
+      A: { x: 2 * p + u * ct, y: u * st },
+      B: { x: 2 * p + v * ct, y: v * st }
+    };
+  }
+
+  function targetView(g) {
+    var p = g.p;
+    var xs = [0, g.F.x, g.A.x, g.B.x], ys = [0, g.F.y, g.A.y, g.B.y];
+    var x0 = Math.min.apply(null, xs), x1 = Math.max.apply(null, xs);
+    var y0 = Math.min.apply(null, ys), y1 = Math.max.apply(null, ys);
+    var w = Math.max(x1 - x0, 6.6 * p) * 1.14;
+    var h = Math.max(y1 - y0, 5.2 * p) * 1.14;
+    return { cx: (x0 + x1) / 2, cy: (y0 + y1) / 2, s: Math.min(W / w, H / h) };
+  }
+
+  function niceStep(raw) {
+    var e = Math.pow(10, Math.floor(Math.log(raw) / Math.LN10));
+    var f = raw / e;
+    return (f < 1.5 ? 1 : f < 3.5 ? 2 : f < 7 ? 5 : 10) * e;
+  }
+
+  function fmt(v, d) {
+    if (Math.abs(v) < Math.pow(10, -(d + 1))) v = 0;
+    return v.toFixed(d).replace('-', '−');
+  }
+  function fmtTick(v, step) {
+    var d = step < 0.1 ? 2 : step < 1 ? 1 : 0;
+    return Math.abs(v) < 1e-9 ? '0' : fmt(v, d);
+  }
+
+  /* ---------- 绘图 ---------- */
+  function draw() {
+    var g = geo();
+    var tv = targetView(g);
+    if (!S.view) S.view = { cx: tv.cx, cy: tv.cy, s: tv.s };
+    else {
+      var k = 0.13;
+      S.view.cx += (tv.cx - S.view.cx) * k;
+      S.view.cy += (tv.cy - S.view.cy) * k;
+      S.view.s += (tv.s - S.view.s) * k;
+    }
+    var vw = S.view;
+    var X = function (x) { return W / 2 + (x - vw.cx) * vw.s; };
+    var Y = function (y) { return H / 2 - (y - vw.cy) * vw.s; };
+
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, W, H);
+
+    var wx0 = vw.cx - W / (2 * vw.s), wx1 = vw.cx + W / (2 * vw.s);
+    var wy0 = vw.cy - H / (2 * vw.s), wy1 = vw.cy + H / (2 * vw.s);
+
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(0, 0, W, H);
+    ctx.clip();
+
+    drawGrid(X, Y, wx0, wx1, wy0, wy1, vw.s);
+    drawParabola(X, Y, g.p, wy0, wy1);
+    drawChord(X, Y, g);
+    drawRadii(X, Y, g);
+    drawPoints(X, Y, g);
+
+    ctx.restore();
+  }
+
+  function drawGrid(X, Y, wx0, wx1, wy0, wy1, s) {
+    var step = niceStep(74 / s), i, v;
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = C.grid;
+    for (i = Math.ceil(wx0 / step); i <= Math.floor(wx1 / step); i++) {
+      v = i * step;
+      ctx.beginPath(); ctx.moveTo(X(v), 0); ctx.lineTo(X(v), H); ctx.stroke();
+    }
+    for (i = Math.ceil(wy0 / step); i <= Math.floor(wy1 / step); i++) {
+      v = i * step;
+      ctx.beginPath(); ctx.moveTo(0, Y(v)); ctx.lineTo(W, Y(v)); ctx.stroke();
+    }
+
+    var ax = Y(0), ay = X(0);
+    ctx.strokeStyle = C.axis;
+    ctx.lineWidth = 1.6;
+    if (ax > 0 && ax < H) { ctx.beginPath(); ctx.moveTo(0, ax); ctx.lineTo(W, ax); ctx.stroke(); }
+    if (ay > 0 && ay < W) { ctx.beginPath(); ctx.moveTo(ay, 0); ctx.lineTo(ay, H); ctx.stroke(); }
+
+    ctx.fillStyle = C.tick;
+    if (ax > 0 && ax < H) {
+      ctx.beginPath(); ctx.moveTo(W - 2, ax); ctx.lineTo(W - 12, ax - 5); ctx.lineTo(W - 12, ax + 5); ctx.closePath(); ctx.fill();
+    }
+    if (ay > 0 && ay < W) {
+      ctx.beginPath(); ctx.moveTo(ay, 2); ctx.lineTo(ay - 5, 12); ctx.lineTo(ay + 5, 12); ctx.closePath(); ctx.fill();
+    }
+
+    ctx.font = '10.5px "Segoe UI","Microsoft YaHei",sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    if (ax > 0 && ax < H - 18) {
+      for (i = Math.ceil(wx0 / step); i <= Math.floor(wx1 / step); i++) {
+        v = i * step;
+        if (Math.abs(v) < step * 0.01) continue;
+        var px = X(v);
+        if (px < 16 || px > W - 16) continue;
+        ctx.fillText(fmtTick(v, step), px, ax + 5);
+      }
+    }
+    ctx.textAlign = 'right';
+    ctx.textBaseline = 'middle';
+    if (ay > 0 && ay < W - 18) {
+      for (i = Math.ceil(wy0 / step); i <= Math.floor(wy1 / step); i++) {
+        v = i * step;
+        if (Math.abs(v) < step * 0.01) continue;
+        var py = Y(v);
+        if (py < 12 || py > H - 12) continue;
+        ctx.fillText(fmtTick(v, step), ay - 6, py);
+      }
+    }
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'alphabetic';
+    ctx.fillStyle = C.axis;
+    ctx.font = 'italic 13px "Cambria Math",Cambria,Georgia,serif';
+    if (ax > 0 && ax < H) ctx.fillText('x', W - 16, ax - 9);
+    if (ay > 0 && ay < W) ctx.fillText('y', ay + 8, 16);
+  }
+
+  function drawParabola(X, Y, p, wy0, wy1) {
+    var ylim = Math.max(Math.abs(wy0), Math.abs(wy1)) * 1.06;
+    var N = 460;
+    ctx.beginPath();
+    for (var i = 0; i <= N; i++) {
+      var y = -ylim + 2 * ylim * i / N;
+      var x = y * y / (2 * p);
+      if (i === 0) ctx.moveTo(X(x), Y(y)); else ctx.lineTo(X(x), Y(y));
+    }
+    ctx.strokeStyle = C.parabola;
+    ctx.lineWidth = 2.2;
+    ctx.lineJoin = 'round';
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.arc(X(0), Y(0), 3, 0, Math.PI * 2);
+    ctx.fillStyle = C.parabola;
+    ctx.fill();
+  }
+
+  function drawChord(X, Y, g) {
+    var L = (Math.abs(W / S.view.s) + Math.abs(H / S.view.s)) * 1.4;
+
+    ctx.save();
+    ctx.setLineDash([6, 6]);
+    ctx.strokeStyle = 'rgba(234,88,12,0.30)';
+    ctx.lineWidth = 1.6;
+    ctx.beginPath();
+    ctx.moveTo(X(g.F.x - L * g.ct), Y(g.F.y - L * g.st));
+    ctx.lineTo(X(g.F.x + L * g.ct), Y(g.F.y + L * g.st));
+    ctx.stroke();
+    ctx.restore();
+
+    ctx.strokeStyle = C.chord;
+    ctx.lineWidth = 2.6;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(X(g.A.x), Y(g.A.y));
+    ctx.lineTo(X(g.B.x), Y(g.B.y));
+    ctx.stroke();
+    ctx.lineCap = 'butt';
+  }
+
+  function drawRadii(X, Y, g) {
+    ctx.strokeStyle = C.radius;
+    ctx.lineWidth = 1.9;
+    ctx.beginPath();
+    ctx.moveTo(X(0), Y(0)); ctx.lineTo(X(g.A.x), Y(g.A.y));
+    ctx.moveTo(X(0), Y(0)); ctx.lineTo(X(g.B.x), Y(g.B.y));
+    ctx.stroke();
+
+    // O 处的直角符号
+    var la = Math.hypot(g.A.x, g.A.y), lb = Math.hypot(g.B.x, g.B.y);
+    if (la < 1e-9 || lb < 1e-9) return;
+    var ua = { x: g.A.x / la, y: g.A.y / la };
+    var ub = { x: g.B.x / lb, y: g.B.y / lb };
+    var r = 17;
+    var p1 = { x: X(0) + ua.x * r, y: Y(0) - ua.y * r };
+    var p2 = { x: X(0) + ub.x * r, y: Y(0) - ub.y * r };
+    var p3 = { x: X(0) + (ua.x + ub.x) * r, y: Y(0) - (ua.y + ub.y) * r };
+    ctx.beginPath();
+    ctx.moveTo(p1.x, p1.y);
+    ctx.lineTo(p3.x, p3.y);
+    ctx.lineTo(p2.x, p2.y);
+    ctx.strokeStyle = 'rgba(220,38,38,0.85)';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+    ctx.fillStyle = 'rgba(220,38,38,0.10)';
+    ctx.beginPath();
+    ctx.moveTo(X(0), Y(0));
+    ctx.lineTo(p1.x, p1.y);
+    ctx.lineTo(p3.x, p3.y);
+    ctx.lineTo(p2.x, p2.y);
+    ctx.closePath();
+    ctx.fill();
+  }
+
+  function dot(pt, color, r) {
+    ctx.beginPath();
+    ctx.arc(pt.x, pt.y, r + 2.5, 0, Math.PI * 2);
+    ctx.fillStyle = '#fff';
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(pt.x, pt.y, r, 0, Math.PI * 2);
+    ctx.fillStyle = color;
+    ctx.fill();
+  }
+
+  function label(text, px, py, color, size, align) {
+    ctx.font = '600 ' + (size || 12.5) + 'px "Segoe UI","Microsoft YaHei",sans-serif';
+    ctx.textAlign = align || 'left';
+    ctx.textBaseline = 'middle';
+    var w = ctx.measureText(text).width, pad = 8;
+    var x = px;
+    if (align === 'right') x = Math.max(px, w + pad);
+    else x = Math.min(px, W - w - pad);
+    var y = Math.min(Math.max(py, 13), H - 13);
+    var bx = align === 'right' ? x - w : x;
+    ctx.fillStyle = 'rgba(255,255,255,0.88)';
+    ctx.fillRect(bx - 3, y - 8.5, w + 6, 17);
+    ctx.fillStyle = color;
+    ctx.fillText(text, x, y);
+    ctx.textAlign = 'left';
+  }
+
+  function drawPoints(X, Y, g) {
+    // 定点 F：脉冲圈
+    var t = (performance.now() % 2000) / 2000;
+    ctx.beginPath();
+    ctx.arc(X(g.F.x), Y(g.F.y), 7 + t * 16, 0, Math.PI * 2);
+    ctx.strokeStyle = 'rgba(220,38,38,' + (0.42 * (1 - t)).toFixed(3) + ')';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    dot({ x: X(g.F.x), y: Y(g.F.y) }, C.fixed, 6);
+    dot({ x: X(g.A.x), y: Y(g.A.y) }, C.point, 5.5);
+    dot({ x: X(g.B.x), y: Y(g.B.y) }, C.point, 5.5);
+    dot({ x: X(0), y: Y(0) }, '#0f172a', 4.5);
+
+    label('O', X(0) - 12, Y(0) + 13, '#334155', 13, 'right');
+    label('定点 (' + fmt(g.F.x, 2) + ', 0)', X(g.F.x) + 10, Y(0) + 18, C.fixed, 12.5, 'left');
+    label('A(' + fmt(g.A.x, 2) + ', ' + fmt(g.A.y, 2) + ')', X(g.A.x) + 11, Y(g.A.y) - 15, C.point, 12.5, 'left');
+    label('B(' + fmt(g.B.x, 2) + ', ' + fmt(g.B.y, 2) + ')', X(g.B.x) + 11, Y(g.B.y) + 17, C.point, 12.5, 'left');
+  }
+
+  /* ---------- 读数 ---------- */
+  var lastTxt = {};
+  function setText(id, txt) {
+    if (lastTxt[id] === txt) return;
+    lastTxt[id] = txt;
+    var el = document.getElementById(id);
+    if (el) el.textContent = txt;
+  }
+
+  function updateReadout(g) {
+    var p = g.p;
+    var dotv = g.A.x * g.B.x + g.A.y * g.B.y;
+    var t1 = g.A.y / (2 * p), t2 = g.B.y / (2 * p);
+    var la = Math.hypot(g.A.x, g.A.y), lb = Math.hypot(g.B.x, g.B.y);
+    var ang = Math.acos(Math.min(1, Math.max(-1, dotv / (la * lb)))) * 180 / Math.PI;
+    var ab = Math.hypot(g.A.x - g.B.x, g.A.y - g.B.y);
+
+    setText('thVal', S.theta.toFixed(1) + '°');
+    setText('pVal', p.toFixed(2));
+    setText('vTh', S.theta.toFixed(1) + '°');
+    setText('vF', '(' + fmt(2 * p, 2) + ', 0)');
+    setText('vA', '(' + fmt(g.A.x, 2) + ', ' + fmt(g.A.y, 2) + ')');
+    setText('vB', '(' + fmt(g.B.x, 2) + ', ' + fmt(g.B.y, 2) + ')');
+    setText('vAng', ang.toFixed(2) + '°');
+    setText('vDot', fmt(dotv, 3));
+    setText('vT', fmt(t1 * t2, 3));
+    setText('vAB', fmt(ab, 2));
+
+    qbtns.forEach(function (b) {
+      b.classList.toggle('on', Math.abs(S.theta - (+b.getAttribute('data-th'))) < 0.6);
+    });
+  }
+
+  /* ---------- 交互 ---------- */
+  function setPlaying(v) {
+    S.playing = v;
+    playBtn.textContent = v ? '暂停旋转' : '自动旋转';
+  }
+
+  thSlider.addEventListener('input', function () {
+    S.theta = parseFloat(thSlider.value);
+    setPlaying(false);
+  });
+  pSlider.addEventListener('input', function () {
+    S.p = parseFloat(pSlider.value);
+  });
+  playBtn.addEventListener('click', function () {
+    if (!S.playing && (S.theta >= 150 || S.theta <= 30)) S.dir = S.theta >= 150 ? -1 : 1;
+    setPlaying(!S.playing);
+  });
+  resetBtn.addEventListener('click', function () {
+    S.theta = 65; S.p = 1; S.dir = 1; S.view = null;
+    thSlider.value = '65'; pSlider.value = '1';
+    setPlaying(false);
+  });
+  qbtns.forEach(function (b) {
+    b.addEventListener('click', function () {
+      S.theta = +b.getAttribute('data-th');
+      thSlider.value = S.theta;
+      setPlaying(false);
+    });
+  });
+
+  var lastT = performance.now();
+  function loop(now) {
+    var dt = Math.min(60, now - lastT) / 1000;
+    lastT = now;
+    if (S.playing) {
+      S.theta += S.dir * 16 * dt;
+      if (S.theta >= 150) { S.theta = 150; S.dir = -1; }
+      if (S.theta <= 30) { S.theta = 30; S.dir = 1; }
+      thSlider.value = S.theta.toFixed(1);
+    }
+    draw();
+    updateReadout(geo());
+    requestAnimationFrame(loop);
+  }
+
+  if (window.ResizeObserver) new ResizeObserver(function () { resize(); }).observe(cv);
+  else window.addEventListener('resize', resize);
+
+  resize();
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>
